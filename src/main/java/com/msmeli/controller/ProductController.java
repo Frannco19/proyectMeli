@@ -1,5 +1,7 @@
 package com.msmeli.controller;
 
+import com.msmeli.model.Product;
+import com.msmeli.service.databaseService.ProductService;
 import com.msmeli.service.feignService.MeliService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,15 +14,14 @@ import java.util.List;
 @RequestMapping("/meli")
 public class ProductController {
 
-    private final MeliService meliService;
+    private final ProductService productService;
 
-
-    public ProductController(MeliService meliService) {
-        this.meliService = meliService;
+    public ProductController(ProductService productService) {
+        this.productService = productService;
     }
 
-    @GetMapping("/site/{site}/search/{query}")
-    public List<Object> getProductSearch(@PathVariable String site,@PathVariable String query){
-        return meliService.getProductSearch(query,site);
+    @GetMapping("/product/getall")
+    public List<Product> getAll(){
+        return productService.getAllProducts();
     }
 }

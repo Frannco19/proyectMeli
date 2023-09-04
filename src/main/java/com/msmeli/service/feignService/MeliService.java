@@ -2,9 +2,11 @@ package com.msmeli.service.feignService;
 
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
-import com.msmeli.feignClient.MeliClient;
-import net.minidev.json.JSONArray;
-import net.minidev.json.JSONObject;
+import com.msmeli.feignClient.ProductFeignClient;
+import com.msmeli.model.Product;
+import com.msmeli.repository.ProductRepository;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,23 +15,39 @@ import java.util.stream.Collectors;
 @Service
 public class MeliService {
 
-    private final MeliClient meliClient;
+    private final ProductFeignClient productFeignClient;
 
-    public MeliService(MeliClient meliClient) {
-        this.meliClient = meliClient;
+    private final ProductRepository productRepository;
+
+    public MeliService(ProductFeignClient productFeignClient, ProductRepository productRepository) {
+        this.productFeignClient = productFeignClient;
+        this.productRepository = productRepository;
     }
 
-    public List<Object> getProductSearch(String query, String site) {
-        DocumentContext json = JsonPath.parse(meliClient.getProductSearch(query, site));
-        JSONArray results = json.read("$.results[*]");
+    @EventListener(ApplicationReadyEvent.class)
+    public void saveProducts(){
+        DocumentContext json = JsonPath.parse(productFeignClient.getProductSearch("MLA16224063"));
 
-        return results.stream()
+        List<Object> results = json.read("$.results[*]");
+
+        productRepository.saveAll(results
+                .stream()
                 .map(JsonPath::parse)
-                .map(productContext -> new JSONObject() {{
-                    put("title", productContext.read("$.title"));
-                    put("price", productContext.read("$.price"));
-                    put("seller_nickname", productContext.read("$.seller.nickname"));
-                }})
-                .collect(Collectors.toList());
+                .map(productContext -> {
+                            Number price = productContext.read("$.price");
+                            return Product
+                            .builder()
+                            .item_id(productContext.read("$.item_id"))
+                            .seller_id(productContext.read("$.seller_id"))
+                            .price(price.doubleValue())
+                            .available_quantity(productContext.read("$.available_quantity"))
+                            .sold_quantity(productContext.read("$.sold_quantity"))
+                            .category_id(productContext.read("$.category_id"))
+                            .build();
+                        })
+                .collect(Collectors.toList())
+        );
     }
+
+
 }
