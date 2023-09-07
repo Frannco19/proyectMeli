@@ -14,28 +14,21 @@ public class Item {
     @Id
     private String item_id;
 
-    @OneToOne
-    @JoinColumn(name="product_id")
-    private Product product;
+    private String product;
 
     private String title;
 
-    private String condition;
+    private String status_condition;
 
-    @OneToOne()
-    @JoinColumn(name = "category_id")
-    private Category category;
+    private String category;
 
     private Double price;
-
-    private Double original_price;
 
     private Integer sold_quantity;
 
     private Integer available_quantity;
 
-    @ManyToOne
-    private Seller seller;
+    private Integer seller;
 
 
 
