@@ -1,29 +1,35 @@
 package com.msmeli.model;
 
+import java.io.Serializable;
+import java.util.List;
+
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.math.BigDecimal;
-
 @Entity
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
-public class Product {
-
+@Table(name = "product", catalog = "msmeli")
+public class Product{
     @Id
-    private String product_id;
+    @Basic(optional = false)
+    @Column(name = "product_id")
+    private String productId;
+    @Column(name = "sold_quantity")
+    private Integer soldQuantity;
+    @Column(name = "domain_id")
+    private String domainId;
+    @Column(name = "product_name")
+    private String productName;
+    @Column(name = "family_name")
+    private String familyName;
+    @Column(name = "product_type")
+    private String productType;
+    @OneToMany(mappedBy = "productId")
+    private List<Item> itemList;
 
-    private Integer sold_quantity;
-
-    private String domain_id;
-
-    private String name;
-
-    private String family_name;
-
-    private String type;
 
 }
