@@ -14,11 +14,16 @@ import java.math.BigDecimal;
 public class Product {
 
     @Id
-    private String item_id;
-    private Integer seller_id;
-    private Double price;
-    private Integer available_quantity;
+    private String product_id;
+
     private Integer sold_quantity;
-    private String category_id;
+
+    private String domain_id;
+
+    private String name;
+
+    private String family_name;
+
+    private String type;
 
 }
