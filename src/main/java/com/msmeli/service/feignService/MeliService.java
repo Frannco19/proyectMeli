@@ -11,9 +11,7 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
-import javax.print.Doc;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -48,7 +46,7 @@ public class MeliService {
         sellerRepository.save(
                     Seller
                         .builder()
-                        .seller_id(sellerJson.read("$.id"))
+                        .sellerId(sellerJson.read("$.id"))
                         .nickname(sellerJson.read("$.nickname"))
                         .build());
     }
@@ -70,15 +68,15 @@ public class MeliService {
                     Number price = itemContext.read("$.price");
                     return Item
                             .builder()
-                            .item_id(itemContext.read("$.id"))
-                            .product(itemContext.read("$.catalog_product_id"))
+                            .itemId(itemContext.read("$.id"))
+//                            .productId(itemContext.read("$.catalog_product_id"))
                             .title(itemContext.read("$.title"))
-                            .status_condition(itemContext.read("$.condition"))
-                            .category(itemContext.read("$.category_id"))
+                            .statusCondition(itemContext.read("$.condition"))
+//                            .categoryId(itemContext.read("$.category_id"))
                             .price(price.doubleValue())
-                            .sold_quantity(itemContext.read("$.sold_quantity"))
-                            .available_quantity(itemContext.read("$.available_quantity"))
-                            .seller(itemContext.read("$.seller.id"))
+                            .soldQuantity(itemContext.read("$.sold_quantity"))
+                            .availableQuantity(itemContext.read("$.available_quantity"))
+//                            .sellerId(itemContext.read("$.seller.id"))
                             .build();
                 })
                 .collect(Collectors.toList()));

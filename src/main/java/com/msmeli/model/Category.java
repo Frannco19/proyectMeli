@@ -1,21 +1,29 @@
 package com.msmeli.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
+import java.io.Serializable;
+import java.util.List;
+
+import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
-public class Category {
+@Table(name = "category", catalog = "msmeli")
+public class Category{
 
     @Id
-    private String category_id;
+    @Basic(optional = false)
+    @Column(name = "category_id")
+    private String categoryId;
+    @Column(name = "category_name")
+    private String categoryName;
+    @OneToMany(mappedBy = "categoryId")
+    private List<Item> itemList;
 
-    private String name;
+
 
 }
