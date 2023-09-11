@@ -3,6 +3,7 @@ package com.msmeli.service.feignService;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.msmeli.feignClient.MeliFeignClient;
+import com.msmeli.model.Category;
 import com.msmeli.model.Item;
 import com.msmeli.model.Product;
 import com.msmeli.model.Seller;
@@ -11,7 +12,11 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.Document;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -55,6 +60,59 @@ public class MeliService {
         return productRepository.findById(productId).orElseThrow(() -> new Exception("Product not found"));
     }
 
+    public Category getCategory(String categoryId) throws Exception {
+        return categoryRepository.findById(categoryId).orElseThrow(() -> new Exception("Category not found"));
+    }
+
+    public Seller getSeller(Integer sellerId) throws Exception {
+        return sellerRepository.findById(sellerId).orElseThrow(() -> new Exception("Seller not found"));
+    }
+
+
+    public Category saveCategory(String categoryId){
+        DocumentContext json = JsonPath.parse(meliFeignClient.getCategory(categoryId));
+        return categoryRepository.save(
+                Category
+                    .builder()
+                    .categoryId(json.read("$.id"))
+                    .categoryName(json.read("$.name"))
+                    .build());
+    }
+
+//    @EventListener(ApplicationReadyEvent.class)
+//    public Product saveProduct(String productId){
+//        DocumentContext jsonItem = JsonPath.parse(meliFeignClient.getSellerByNickname("MORO TECH"));
+//
+//
+//        DocumentContext jsonProduct = JsonPath.parse(meliFeignClient.getProductSearch(productId));
+//        DocumentContext jsonSeller = JsonPath.parse(meliFeignClient.getSellerNickname(jsonProduct.read("$.seller_id")));
+//
+//        List<Object> products = jsonProduct.read("$.results[0:5]");
+//
+//        productRepository.saveAll(
+//            products
+//                    .stream()
+//                    .map(JsonPath::parse)
+//                    .map(productContext -> {
+//                        Number price = productContext.read("$.price");
+//                        return Product
+//                                .builder()
+//                                .productId(productId)
+//                                .soldQuantity(productContext.read("$.sold_quantity"))
+//                                .available_quantity(productContext.read("$.available_quantity"))
+//                                .productName(jsonItem.read("$.title"))
+//                                .statusCondition(productContext.read("$.condition"))
+//                                .listing_type_id(productContext.read("$.listing_type_id"))
+//                                .price(price.doubleValue())
+//                                .seller_name(jsonSeller.read("$.nickname"))
+//                                .build();
+//                    })
+//                    .collect(Collectors.toList())
+//        );
+//        return null;
+//    }
+
+
     @EventListener(ApplicationReadyEvent.class)
     public void saveSellerItems(){
         DocumentContext json = JsonPath.parse(meliFeignClient.getSellerByNickname("MORO TECH"));
@@ -65,19 +123,28 @@ public class MeliService {
                 .stream()
                 .map(JsonPath::parse)
                 .map(itemContext -> {
+
                     Number price = itemContext.read("$.price");
-                    return Item
-                            .builder()
-                            .itemId(itemContext.read("$.id"))
-//                            .productId(itemContext.read("$.catalog_product_id"))
-                            .title(itemContext.read("$.title"))
-                            .statusCondition(itemContext.read("$.condition"))
-//                            .categoryId(itemContext.read("$.category_id"))
-                            .price(price.doubleValue())
-                            .soldQuantity(itemContext.read("$.sold_quantity"))
-                            .availableQuantity(itemContext.read("$.available_quantity"))
-//                            .sellerId(itemContext.read("$.seller.id"))
-                            .build();
+
+
+                    try {
+                        return Item
+                                .builder()
+                                .itemId(itemContext.read("$.id"))
+    //                            .productId(saveProduct(itemContext.read("$.catalog_product_id")))
+                                .title(itemContext.read("$.title"))
+                                .statusCondition(itemContext.read("$.condition"))
+                                .categoryId(saveCategory(itemContext.read("$.category_id")))
+                                .price(price.doubleValue())
+                                .soldQuantity(itemContext.read("$.sold_quantity"))
+                                .availableQuantity(itemContext.read("$.available_quantity"))
+                                .sellerId(getSeller(itemContext.read("$.seller_id")))
+                                .build();
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+
+
                 })
                 .collect(Collectors.toList()));
     }

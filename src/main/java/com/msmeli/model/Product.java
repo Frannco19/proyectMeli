@@ -20,16 +20,16 @@ public class Product{
     private String productId;
     @Column(name = "sold_quantity")
     private Integer soldQuantity;
-    @Column(name = "domain_id")
-    private String domainId;
+
+    private Integer available_quantity;
     @Column(name = "product_name")
     private String productName;
-    @Column(name = "family_name")
-    private String familyName;
-    @Column(name = "product_type")
-    private String productType;
-    @OneToMany(mappedBy = "productId")
-    private List<Item> itemList;
+
+    private String statusCondition;
+
+    private String listing_type_id;
+    private Double price;
+    private String seller_name;
 
 
 }

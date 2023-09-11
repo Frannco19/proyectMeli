@@ -20,7 +20,6 @@ public class Item{
     private String title;
     @Column(name = "status_condition")
     private String statusCondition;
-    // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Column(name = "price")
     private Double price;
     @Column(name = "sold_quantity")
