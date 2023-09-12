@@ -34,7 +34,7 @@ public interface MeliFeignClient {
     @Headers(
             "Authorization: " + ACCESS_TOKEN
     )
-    public String getSellerNickname(@PathVariable Integer seller_id);
+    public String getSellerBySellerId(@PathVariable Integer seller_id);
 
 
 }

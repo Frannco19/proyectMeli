@@ -1,7 +1,10 @@
 package com.msmeli.model;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -15,27 +18,30 @@ import lombok.*;
 @Table(name = "item", catalog = "msmeli")
 public class Item{
     @Id
-    @Column(name = "item_id")
-    private String itemId;
-    @Column(name = "title")
-    private String title;
-    @Column(name = "status_condition")
-    private String statusCondition;
-    @Column(name = "price")
-    private Double price;
-    @Column(name = "sold_quantity")
-    private Integer soldQuantity;
-    @Column(name = "available_quantity")
-    private Integer availableQuantity;
+    private String item_id;
 
-    @JoinColumn(name = "product_id", referencedColumnName = "productId")
-    @ManyToOne
-    private Product productId;
+    private String title;
+
+    private String catalog_product_id;
+
+    private Double price;
+
+    private int sold_quantity;
+
+    private int available_quantity;
+
+    private String listing_type_id;
+
+    private int catalog_position;
+
     @JoinColumn(name = "seller_id", referencedColumnName = "seller_id")
     @ManyToOne
-    private Seller sellerId;
+    private Seller seller_id;
+
     @JoinColumn(name = "category_id", referencedColumnName = "category_id")
     @ManyToOne
-    private Category categoryId;
+    private Category category_id;
 
+    @Temporal(TemporalType.TIMESTAMP)
+    private LocalDateTime update_date;
 }
