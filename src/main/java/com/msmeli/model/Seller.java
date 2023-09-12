@@ -15,7 +15,6 @@ import lombok.*;
 public class Seller{
 
     @Id
-    @Basic(optional = false)
     @Column(name = "seller_id")
     private Integer sellerId;
     @Column(name = "nickname")

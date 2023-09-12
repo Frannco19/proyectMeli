@@ -1,6 +1,8 @@
 package com.msmeli.model;
 
 import java.io.Serializable;
+import java.util.List;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -13,7 +15,6 @@ import lombok.*;
 @Table(name = "item", catalog = "msmeli")
 public class Item{
     @Id
-    @Basic(optional = false)
     @Column(name = "item_id")
     private String itemId;
     @Column(name = "title")
@@ -26,7 +27,8 @@ public class Item{
     private Integer soldQuantity;
     @Column(name = "available_quantity")
     private Integer availableQuantity;
-    @JoinColumn(name = "product_id", referencedColumnName = "product_id")
+
+    @JoinColumn(name = "product_id", referencedColumnName = "productId")
     @ManyToOne
     private Product productId;
     @JoinColumn(name = "seller_id", referencedColumnName = "seller_id")
@@ -35,7 +37,5 @@ public class Item{
     @JoinColumn(name = "category_id", referencedColumnName = "category_id")
     @ManyToOne
     private Category categoryId;
-
-
 
 }

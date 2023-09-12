@@ -79,38 +79,42 @@ public class MeliService {
                     .build());
     }
 
+
 //    @EventListener(ApplicationReadyEvent.class)
-//    public Product saveProduct(String productId){
+    public Product saveProduct(String productId, String itemId){
+        DocumentContext jsonProduct = JsonPath.parse(meliFeignClient.getProductSearch(productId));
+
 //        DocumentContext jsonItem = JsonPath.parse(meliFeignClient.getSellerByNickname("MORO TECH"));
-//
-//
-//        DocumentContext jsonProduct = JsonPath.parse(meliFeignClient.getProductSearch(productId));
-//        DocumentContext jsonSeller = JsonPath.parse(meliFeignClient.getSellerNickname(jsonProduct.read("$.seller_id")));
-//
-//        List<Object> products = jsonProduct.read("$.results[0:5]");
-//
-//        productRepository.saveAll(
-//            products
-//                    .stream()
-//                    .map(JsonPath::parse)
-//                    .map(productContext -> {
-//                        Number price = productContext.read("$.price");
-//                        return Product
-//                                .builder()
-//                                .productId(productId)
-//                                .soldQuantity(productContext.read("$.sold_quantity"))
-//                                .available_quantity(productContext.read("$.available_quantity"))
+//        DocumentContext jsonSeller = JsonPath.parse(meliFeignClient.getSellerNickname(productContext.read("$.seller_id")));
+
+        List<Object> products = jsonProduct.read("$.results[0:5]");
+
+        return productRepository.save(
+            products
+                    .stream()
+                    .map(JsonPath::parse)
+                    .map(productContext -> {
+                        Number price = productContext.read("$.price");
+
+//                        DocumentContext jsonItem = JsonPath.parse(meliFeignClient.getSellerByNickname("MORO TECH"));
+
+//                        DocumentContext jsonSeller = JsonPath.parse(meliFeignClient.getSellerNickname(productContext.read("$.seller_id")));
+
+                        return Product
+                                .builder()
+                                .productId(productId)
+                                .soldQuantity(productContext.read("$.sold_quantity"))
+                                .available_quantity(productContext.read("$.available_quantity"))
 //                                .productName(jsonItem.read("$.title"))
-//                                .statusCondition(productContext.read("$.condition"))
-//                                .listing_type_id(productContext.read("$.listing_type_id"))
-//                                .price(price.doubleValue())
+                                .listing_type_id(productContext.read("$.listing_type_id"))
+                                .price(price.doubleValue())
+                                .item_id(itemId)
 //                                .seller_name(jsonSeller.read("$.nickname"))
-//                                .build();
-//                    })
-//                    .collect(Collectors.toList())
-//        );
-//        return null;
-//    }
+                                .build();
+                    })
+                    .collect(Collectors.toList())
+        );
+    }
 
 
     @EventListener(ApplicationReadyEvent.class)
@@ -126,19 +130,20 @@ public class MeliService {
 
                     Number price = itemContext.read("$.price");
 
+//                    saveProduct(itemContext.read("$.catalog_product_id"));
 
                     try {
                         return Item
                                 .builder()
                                 .itemId(itemContext.read("$.id"))
-    //                            .productId(saveProduct(itemContext.read("$.catalog_product_id")))
+                                .productId(saveProduct(itemContext.read("$.catalog_product_id"), itemContext.read("$.id")))
                                 .title(itemContext.read("$.title"))
                                 .statusCondition(itemContext.read("$.condition"))
                                 .categoryId(saveCategory(itemContext.read("$.category_id")))
                                 .price(price.doubleValue())
                                 .soldQuantity(itemContext.read("$.sold_quantity"))
                                 .availableQuantity(itemContext.read("$.available_quantity"))
-                                .sellerId(getSeller(itemContext.read("$.seller_id")))
+                                .sellerId(getSeller(itemContext.read("$.seller.id")))
                                 .build();
                     } catch (Exception e) {
                         throw new RuntimeException(e);
