@@ -9,13 +9,11 @@ import com.msmeli.model.Seller;
 import com.msmeli.repository.*;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,7 +38,6 @@ public class MeliService {
     }
 
 
-
     public Item getItemById(String itemId) throws Exception {
         return itemRepository.findById(itemId).orElseThrow(() -> new Exception("Item not found"));
     }
@@ -63,8 +60,6 @@ public class MeliService {
                     .categoryName(json.read("$.name"))
                     .build());
     }
-
-
 
     public Seller saveSeller(Integer seller_id){
         DocumentContext json = JsonPath.parse(meliFeignClient.getSellerBySellerId(seller_id));
