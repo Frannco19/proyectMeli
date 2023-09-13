@@ -2,6 +2,7 @@ package com.msmeli.service.feignService;
 
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
+import com.msmeli.dto.response.CreateItemDTO;
 import com.msmeli.feignClient.MeliFeignClient;
 import com.msmeli.model.Category;
 import com.msmeli.model.Item;
@@ -13,9 +14,9 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 @Service
@@ -79,59 +80,25 @@ public class MeliService {
                         .build());
     }
 
-    private void saveItem(String catalog_product_id, String product_title){
-        DocumentContext jsonProduct = JsonPath.parse(meliFeignClient.getProductSearch(catalog_product_id));
-
-        List<Object> products = jsonProduct.read("$.results[0:5]");
-        AtomicInteger i = new AtomicInteger(0);
-        itemRepository.saveAll(
-                products
-                        .stream()
-                        .map(JsonPath::parse)
-                        .map(productContext -> {
-                            Number price = productContext.read("$.price");
-                            try {
-                                return Item
-                                        .builder()
-                                        .item_id(productContext.read("$.item_id"))
-                                        .catalog_product_id(catalog_product_id)
-                                        .title(product_title)
-                                        .category_id(saveCategory(productContext.read("$.category_id")))
-                                        .price(price.doubleValue())
-                                        .sold_quantity(productContext.read("$.sold_quantity"))
-                                        .available_quantity(productContext.read("$.available_quantity"))
-                                        .seller_id(saveSeller(productContext.read("$.seller_id")))
-                                        .update_date(LocalDateTime.now())
-                                        .listing_type_id(productContext.read("$.listing_type_id"))
-                                        .catalog_position(i.incrementAndGet())
-                                        .build();
-                            } catch (Exception e) {
-                                throw new RuntimeException(e);
-                            }
-                        })
-                        .collect(Collectors.toList())
-        );
-    }
-
     @EventListener(ApplicationReadyEvent.class)
+    @Order(1)
     public void saveSellerItems() throws Exception{
-        DocumentContext json = JsonPath.parse(meliFeignClient.getSellerByNickname("MORO TECH"));
+        try {
+            DocumentContext json = JsonPath.parse(meliFeignClient.getSellerByNickname("MORO TECH"));
+            List<Object> items = json.read("$.results[*]");
 
-        List<Object> items = json.read("$.results[*]");
+            int batchSize = 25;
+            List<Item> batch = new ArrayList<>(batchSize);
 
-        itemRepository.saveAll(items
-                .stream()
-                .map(JsonPath::parse)
-                .map(itemContext -> {
-                    Number price = itemContext.read("$.price");
-                    String catalog_product_id = itemContext.read("$.catalog_product_id");
-                    String title = itemContext.read("$.title");
-                    try {
-                        return Item
+            items.forEach((e) -> {
+                DocumentContext itemContext = JsonPath.parse(e);
+                Number price = itemContext.read("$.price");
+
+                Item item = Item
                                 .builder()
                                 .item_id(itemContext.read("$.id"))
-                                .catalog_product_id(catalog_product_id)
-                                .title(title)
+                                .catalog_product_id(itemContext.read("$.catalog_product_id"))
+                                .title(itemContext.read("$.title"))
                                 .category_id(saveCategory(itemContext.read("$.category_id")))
                                 .price(price.doubleValue())
                                 .sold_quantity(itemContext.read("$.sold_quantity"))
@@ -141,16 +108,72 @@ public class MeliService {
                                 .listing_type_id(itemContext.read("$.listing_type_id"))
                                 .catalog_position(0)
                                 .build();
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }finally {
-                        saveItem(catalog_product_id,title);
-                    }
 
+                batch.add(item);
 
-                })
-                .collect(Collectors.toList()));
+                if (batch.size() >= batchSize) {
+                    itemRepository.saveAll(batch);
+                    batch.clear();
+                }
+            });
+            if (!batch.isEmpty()) {
+                itemRepository.saveAll(batch);
+            }
+        }catch (Exception e){
+            throw new RuntimeException(e);
+        }
     }
 
+    @EventListener(ApplicationReadyEvent.class)
+    @Order(2)
+    private void saveItem(){
+        try {
+            List<CreateItemDTO> itemAtribbutes = itemRepository.getItemAtribbutes();
+
+            AtomicInteger i = new AtomicInteger(0);
+
+            int batchSize = 10;
+            List<Item> batch = new ArrayList<>(batchSize);
+
+            itemAtribbutes.forEach((e) ->{
+                DocumentContext jsonProduct = JsonPath.parse(meliFeignClient.getProductSearch(e.getCatalog_product_id()));
+                List<Object> products = jsonProduct.read("$.results[0:5]");
+
+                products.forEach((product) -> {
+                    DocumentContext productContext = JsonPath.parse(product);
+                    Number price = productContext.read("$.price");
+
+                    Item item = Item
+                            .builder()
+                            .item_id(productContext.read("$.item_id"))
+                            .catalog_product_id(e.getCatalog_product_id())
+                            .title(e.getTitle())
+                            .category_id(saveCategory(productContext.read("$.category_id")))
+                            .price(price.doubleValue())
+                            .sold_quantity(productContext.read("$.sold_quantity"))
+                            .available_quantity(productContext.read("$.available_quantity"))
+                            .seller_id(saveSeller(productContext.read("$.seller_id")))
+                            .update_date(LocalDateTime.now())
+                            .listing_type_id(productContext.read("$.listing_type_id"))
+                            .catalog_position(i.incrementAndGet())
+                            .build();
+
+                    batch.add(item);
+
+                    if(i.get() == 5) i.set(0);
+
+                    if (batch.size() >= batchSize) {
+                        itemRepository.saveAll(batch);
+                        batch.clear();
+                    }
+                });
+                if (!batch.isEmpty()) {
+                    itemRepository.saveAll(batch);
+                }
+            });
+        }catch (Exception e){
+            throw new RuntimeException(e);
+        }
+    }
 
 }
