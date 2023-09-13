@@ -77,8 +77,8 @@ public class MeliService {
                         .build());
     }
 
-    @EventListener(ApplicationReadyEvent.class)
-    @Order(1)
+//    @EventListener(ApplicationReadyEvent.class)
+//    @Order(1)
     public void saveSellerItems() throws Exception{
         try {
             DocumentContext json = JsonPath.parse(meliFeignClient.getSellerByNickname("MORO TECH"));
@@ -100,7 +100,7 @@ public class MeliService {
                                 .price(price.doubleValue())
                                 .sold_quantity(itemContext.read("$.sold_quantity"))
                                 .available_quantity(itemContext.read("$.available_quantity"))
-                                .seller_id(saveSeller(itemContext.read("$.seller.id")))
+                                .sellerId(saveSeller(itemContext.read("$.seller.id")))
                                 .update_date(LocalDateTime.now())
                                 .listing_type_id(itemContext.read("$.listing_type_id"))
                                 .catalog_position(0)
@@ -121,8 +121,8 @@ public class MeliService {
         }
     }
 
-    @EventListener(ApplicationReadyEvent.class)
-    @Order(2)
+//    @EventListener(ApplicationReadyEvent.class)
+//    @Order(2)
     private void saveItem(){
         try {
             List<CreateItemDTO> itemAtribbutes = itemRepository.getItemAtribbutes();
@@ -149,7 +149,7 @@ public class MeliService {
                             .price(price.doubleValue())
                             .sold_quantity(productContext.read("$.sold_quantity"))
                             .available_quantity(productContext.read("$.available_quantity"))
-                            .seller_id(saveSeller(productContext.read("$.seller_id")))
+                            .sellerId(saveSeller(productContext.read("$.seller_id")))
                             .update_date(LocalDateTime.now())
                             .listing_type_id(productContext.read("$.listing_type_id"))
                             .catalog_position(i.incrementAndGet())

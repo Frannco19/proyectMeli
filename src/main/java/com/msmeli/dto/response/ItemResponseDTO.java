@@ -19,6 +19,6 @@ public class ItemResponseDTO {
     private int available_quantity;
     private String listing_type_id;
     private int catalog_position;
-    private Seller seller_id;
-    private Category category_id;
+    private Integer seller_id;
+    private String category_id;
 }

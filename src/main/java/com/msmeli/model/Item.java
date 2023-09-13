@@ -15,6 +15,7 @@ import lombok.*;
 @AllArgsConstructor
 @Getter
 @Setter
+@ToString
 @Table(name = "item", catalog = "msmeli")
 public class Item{
     @Id
@@ -36,7 +37,7 @@ public class Item{
 
     @JoinColumn(name = "seller_id", referencedColumnName = "seller_id")
     @ManyToOne
-    private Seller seller_id;
+    private Seller sellerId;
 
     @JoinColumn(name = "category_id", referencedColumnName = "category_id")
     @ManyToOne
