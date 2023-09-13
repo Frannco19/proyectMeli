@@ -1,4 +1,4 @@
 package com.msmeli.service.services;
 
-public interface exampleService {
+public interface ItemService {
 }
