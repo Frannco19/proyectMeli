@@ -38,7 +38,7 @@ public class UserEntityService implements IUserEntityService {
         if (!userRegisterRequestDTO.getPassword().equals(userRegisterRequestDTO.getRePassword()))
             throw new ResourceNotFoundException("Passwords don't match");
         UserEntity userEntity = mapper.map(userRegisterRequestDTO, UserEntity.class);
-        userEntity.setPassword(passwordEncoder.encode(userEntity.getPassword()));
+        userEntity.setPassword(passwordEncoder.encode(userRegisterRequestDTO.getPassword()));
         List<RoleEntity> roles = new ArrayList<>();
         roles.add(roleEntityService.findByName(Role.USER));
         userEntity.setRoles(roles);

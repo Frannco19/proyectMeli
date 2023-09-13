@@ -34,7 +34,7 @@ public class UserController {
     }
 
     @PostMapping("/create")
-    private ResponseEntity<UserResponseDTO> createUser(@Valid @RequestBody UserRegisterRequestDTO userEntity) throws ResourceNotFoundException {
+    public ResponseEntity<UserResponseDTO> createUser(@Valid @RequestBody UserRegisterRequestDTO userEntity) throws ResourceNotFoundException {
         return ResponseEntity.status(HttpStatus.CREATED).body(userEntityService.create(userEntity));
     }
 
