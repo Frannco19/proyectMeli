@@ -39,6 +39,7 @@ public class UserController {
     }
 
     @GetMapping("/list")
+    @PreAuthorize("hasAuthority('USER')")
     public ResponseEntity<List<UserResponseDTO>> listarUsers() throws ResourceNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(userEntityService.readAll());
     }
