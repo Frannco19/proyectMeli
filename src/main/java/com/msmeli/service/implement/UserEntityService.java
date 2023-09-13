@@ -1,7 +1,9 @@
 package com.msmeli.service.implement;
 
 import com.msmeli.dto.request.UserRegisterRequestDTO;
+import com.msmeli.dto.response.UserAuthResponseDTO;
 import com.msmeli.dto.response.UserResponseDTO;
+import com.msmeli.exception.AlreadyExistsException;
 import com.msmeli.exception.ResourceNotFoundException;
 import com.msmeli.model.RoleEntity;
 import com.msmeli.model.UserEntity;
@@ -34,11 +36,13 @@ public class UserEntityService implements IUserEntityService {
     }
 
     @Override
-    public UserResponseDTO create(UserRegisterRequestDTO userRegisterRequestDTO) throws ResourceNotFoundException {
+    public UserResponseDTO create(UserRegisterRequestDTO userRegisterRequestDTO) throws ResourceNotFoundException, AlreadyExistsException {
+        if (userEntityRepository.findByUsername(userRegisterRequestDTO.getUsername()).isPresent())
+            throw new AlreadyExistsException("Username already taken");
         if (!userRegisterRequestDTO.getPassword().equals(userRegisterRequestDTO.getRePassword()))
             throw new ResourceNotFoundException("Passwords don't match");
         UserEntity userEntity = mapper.map(userRegisterRequestDTO, UserEntity.class);
-        userEntity.setPassword(passwordEncoder.encode(userEntity.getPassword()));
+        userEntity.setPassword(passwordEncoder.encode(userRegisterRequestDTO.getPassword()));
         List<RoleEntity> roles = new ArrayList<>();
         roles.add(roleEntityService.findByName(Role.USER));
         userEntity.setRoles(roles);
@@ -82,5 +86,12 @@ public class UserEntityService implements IUserEntityService {
         if (userEntity.getRoles().size() == 1) userEntity.getRoles().add(admin);
         else userEntity.getRoles().remove(admin);
         return mapper.map(userEntityRepository.save(userEntity), UserResponseDTO.class);
+    }
+
+    @Override
+    public UserAuthResponseDTO findByUsername(String username) throws ResourceNotFoundException {
+        Optional<UserEntity> userSearch = userEntityRepository.findByUsername(username);
+        if (userSearch.isEmpty()) throw new ResourceNotFoundException("User not found");
+        return mapper.map(userSearch,UserAuthResponseDTO.class);
     }
 }

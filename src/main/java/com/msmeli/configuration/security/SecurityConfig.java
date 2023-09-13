@@ -39,7 +39,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.csrf().disable()
                 .authorizeHttpRequests()
-                .requestMatchers("/meli/user/authenticate", "/meli/user/create").permitAll()
+                .requestMatchers("/meli/user/**").permitAll()
                 .and()
                 .authorizeHttpRequests().anyRequest().authenticated()
                 .and()
