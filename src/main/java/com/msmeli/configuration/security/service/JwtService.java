@@ -23,15 +23,13 @@ public class JwtService {
     @Value("${jwt.time.expiration}")
     private long expirationTime;
 
-    public HashMap<String, String> generateToken(String username) {
+    public String generateToken(String username) {
         Map<String, Object> claims = new HashMap<>();
         return createToken(claims, username);
     }
 
-    private HashMap<String, String> createToken(Map<String, Object> claims, String username) {
-        HashMap<String, String> token = new HashMap<>();
-        token.put("token", Jwts.builder().setClaims(claims).setSubject(username).setIssuedAt(new Date(System.currentTimeMillis())).setExpiration(new Date(System.currentTimeMillis() + expirationTime)).signWith(getSignKey(), SignatureAlgorithm.HS256).compact());
-        return token;
+    private String createToken(Map<String, Object> claims, String username) {
+        return Jwts.builder().setClaims(claims).setSubject(username).setIssuedAt(new Date(System.currentTimeMillis())).setExpiration(new Date(System.currentTimeMillis() + expirationTime)).signWith(getSignKey(), SignatureAlgorithm.HS256).compact();
     }
 
     private Key getSignKey() {
