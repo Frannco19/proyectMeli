@@ -19,10 +19,14 @@ public class ItemController {
         this.itemService = itemService;
     }
 
-    @GetMapping("/seller/items/{seller_id}")
-    public List<ItemResponseDTO> sellerItems(@PathVariable Integer seller_id){
-        return itemService.getSellerItems(seller_id);
+    @GetMapping("/seller/items/{sellerId}")
+    public List<ItemResponseDTO> sellerItems(@PathVariable Integer sellerId){
+        return itemService.getSellerItems(sellerId);
     }
 
+    @GetMapping("/catalog/{productId}")
+    public List<ItemResponseDTO> catalogItems(@PathVariable String productId){
+        return itemService.getCatalogItems(productId);
+    }
 
 }
