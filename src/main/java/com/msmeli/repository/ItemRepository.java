@@ -16,6 +16,9 @@ public interface ItemRepository extends JpaRepository<Item, String> {
     List<CreateItemDTO> getItemAtribbutes();
 
     @Query("SELECT i FROM Item i WHERE i.sellerId.sellerId = ?1")
-    List<Item> getItemsBySellerId(Integer seller_id);
+    List<Item> getItemsBySellerId(Integer sellerId);
+
+    @Query("SELECT i FROM Item i WHERE i.catalog_product_id = ?1 ORDER BY i.catalog_position ASC")
+    List<Item> getCatalogItems(String productId);
 
 }

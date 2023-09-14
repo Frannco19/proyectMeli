@@ -7,6 +7,8 @@ import java.util.List;
 
 public interface ItemService {
 
-    public List<ItemResponseDTO> getSellerItems(Integer seller_id);
+    public List<ItemResponseDTO> getSellerItems(Integer sellerId);
+
+    public List<ItemResponseDTO> getCatalogItems(String productId);
 
 }
