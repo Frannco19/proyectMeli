@@ -21,4 +21,7 @@ public class ItemResponseDTO {
     private int catalog_position;
     private Integer seller_id;
     private String category_id;
+    private String statusCondition;
+    private String urlImage;
+    private String sku;
 }

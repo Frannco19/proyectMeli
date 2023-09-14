@@ -57,6 +57,9 @@ public class ItemServiceImpl implements ItemService {
                         .catalog_position(e.getCatalog_position())
                         .seller_id(e.getSellerId().getSellerId())
                         .category_id(e.getCategory_id().getCategoryId())
+                        .statusCondition(e.getStatusCondition())
+                        .urlImage(e.getUrlImage())
+                        .sku(e.getSku())
                         .build()
                 )
                 .collect(Collectors.toList());

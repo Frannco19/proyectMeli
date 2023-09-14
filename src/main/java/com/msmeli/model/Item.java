@@ -45,4 +45,10 @@ public class Item{
 
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime update_date;
+
+    private String statusCondition;
+
+    private String urlImage;
+
+    private String sku;
 }
