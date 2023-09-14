@@ -31,9 +31,19 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemResponseDTO> getSellerItems(Integer seller_id){
-        List<Item> itemList = itemRepository.getItemsBySellerId(seller_id);
-        return itemList
+    public List<ItemResponseDTO> getSellerItems(Integer sellerId){
+        List<Item> itemList = itemRepository.getItemsBySellerId(sellerId);
+        return getItemResponseDTOS(itemList);
+    }
+
+    @Override
+    public List<ItemResponseDTO> getCatalogItems(String productId) {
+        List<Item> catalogItems = itemRepository.getCatalogItems(productId);
+        return getItemResponseDTOS(catalogItems);
+    }
+
+    private List<ItemResponseDTO> getItemResponseDTOS(List<Item> items) {
+        return items
                 .stream()
                 .map((e) -> ItemResponseDTO
                         .builder()
@@ -51,5 +61,4 @@ public class ItemServiceImpl implements ItemService {
                 )
                 .collect(Collectors.toList());
     }
-
 }
