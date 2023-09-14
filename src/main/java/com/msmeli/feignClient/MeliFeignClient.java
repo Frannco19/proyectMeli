@@ -36,5 +36,12 @@ public interface MeliFeignClient {
     )
     public String getSellerBySellerId(@PathVariable Integer seller_id);
 
+    @GetMapping("/items/{item_id}")
+    @Headers(
+            "Authorization: " + ACCESS_TOKEN
+    )
+    public String getImageAndSku(@PathVariable String item_id);
+
+
 
 }
