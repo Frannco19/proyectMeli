@@ -1,6 +1,11 @@
 package com.msmeli.model;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -10,33 +15,34 @@ import lombok.*;
 @AllArgsConstructor
 @Getter
 @Setter
+@ToString
 @Table(name = "item", catalog = "msmeli")
 public class Item{
     @Id
-    @Basic(optional = false)
-    @Column(name = "item_id")
-    private String itemId;
-    @Column(name = "title")
+    private String item_id;
+
     private String title;
-    @Column(name = "status_condition")
-    private String statusCondition;
-    // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
-    @Column(name = "price")
+
+    private String catalog_product_id;
+
     private Double price;
-    @Column(name = "sold_quantity")
-    private Integer soldQuantity;
-    @Column(name = "available_quantity")
-    private Integer availableQuantity;
-    @JoinColumn(name = "product_id", referencedColumnName = "product_id")
-    @ManyToOne
-    private Product productId;
+
+    private int sold_quantity;
+
+    private int available_quantity;
+
+    private String listing_type_id;
+
+    private int catalog_position;
+
     @JoinColumn(name = "seller_id", referencedColumnName = "seller_id")
     @ManyToOne
     private Seller sellerId;
+
     @JoinColumn(name = "category_id", referencedColumnName = "category_id")
     @ManyToOne
-    private Category categoryId;
+    private Category category_id;
 
-
-
+    @Temporal(TemporalType.TIMESTAMP)
+    private LocalDateTime update_date;
 }
