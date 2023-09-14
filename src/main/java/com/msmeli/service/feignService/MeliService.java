@@ -77,11 +77,12 @@ public class MeliService {
                         .build());
     }
 
-//    @EventListener(ApplicationReadyEvent.class)
-//    @Order(1)
+    @EventListener(ApplicationReadyEvent.class)
+    @Order(1)
     public void saveSellerItems() throws Exception{
         try {
             DocumentContext json = JsonPath.parse(meliFeignClient.getSellerByNickname("MORO TECH"));
+
             List<Object> items = json.read("$.results[*]");
 
             int batchSize = 25;
@@ -90,6 +91,11 @@ public class MeliService {
             items.forEach((e) -> {
                 DocumentContext itemContext = JsonPath.parse(e);
                 Number price = itemContext.read("$.price");
+
+
+                //Refactorizar
+                DocumentContext itemImageAndSku = JsonPath.parse(meliFeignClient.getImageAndSku(itemContext.read("$.id")));
+                List<Object> sku = itemImageAndSku.read("$.attributes[?(@.id == 'SELLER_SKU')].values[0].name");
 
                 Item item = Item
                                 .builder()
@@ -104,6 +110,9 @@ public class MeliService {
                                 .update_date(LocalDateTime.now())
                                 .listing_type_id(itemContext.read("$.listing_type_id"))
                                 .catalog_position(0)
+                                .statusCondition(itemImageAndSku.read("$.status"))
+                                .urlImage(itemImageAndSku.read("$.pictures[0].url"))
+                                .sku(sku.get(0).toString())
                                 .build();
 
                 batch.add(item);
@@ -140,6 +149,15 @@ public class MeliService {
                     DocumentContext productContext = JsonPath.parse(product);
                     Number price = productContext.read("$.price");
 
+                    DocumentContext itemImageAndSku = JsonPath.parse(meliFeignClient.getImageAndSku(productContext.read("$.item_id")));
+                    List<Object> sku = itemImageAndSku.read("$.attributes[?(@.id == 'SELLER_SKU')].values[0].name");
+
+                    String getSku = null;
+
+                    if (!sku.isEmpty()){
+                        getSku = sku.get(0).toString();
+                    }
+
                     Item item = Item
                             .builder()
                             .item_id(productContext.read("$.item_id"))
@@ -153,6 +171,8 @@ public class MeliService {
                             .update_date(LocalDateTime.now())
                             .listing_type_id(productContext.read("$.listing_type_id"))
                             .catalog_position(i.incrementAndGet())
+                            .urlImage(itemImageAndSku.read("$.pictures[0].url"))
+                            .sku(getSku)
                             .build();
 
                     batch.add(item);
