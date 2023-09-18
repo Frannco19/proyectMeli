@@ -15,7 +15,6 @@ import lombok.*;
 public class Seller{
 
     @Id
-    @Basic(optional = false)
     @Column(name = "seller_id")
     private Integer sellerId;
     @Column(name = "nickname")
@@ -23,8 +22,9 @@ public class Seller{
     @JoinColumn(name = "seller_reputation_id", referencedColumnName = "seller_reputation_id")
     @ManyToOne
     private SellerReputation sellerReputationId;
-    @OneToMany(mappedBy = "sellerId")
-    private List<Item> itemList;
+
+//    @OneToMany(mappedBy = "seller_id")
+//    private List<Item> itemList;
 
 
 

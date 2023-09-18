@@ -21,7 +21,7 @@ public class Category{
     private String categoryId;
     @Column(name = "category_name")
     private String categoryName;
-    @OneToMany(mappedBy = "categoryId")
+    @OneToMany(mappedBy = "category_id")
     private List<Item> itemList;
 
 

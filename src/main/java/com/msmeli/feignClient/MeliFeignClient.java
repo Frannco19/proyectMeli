@@ -18,10 +18,30 @@ public interface MeliFeignClient {
     )
     public String getProductSearch(@PathVariable String productId);
 
-    @GetMapping("sites/MLA/search?nickname={nickname}")
+    @GetMapping("/sites/MLA/search?nickname={nickname}")
     @Headers(
             "Authorization: " + ACCESS_TOKEN
     )
     public String getSellerByNickname(@PathVariable String nickname);
+
+    @GetMapping("/categories/{categoryId}")
+    @Headers(
+            "Authorization: " + ACCESS_TOKEN
+    )
+    public String getCategory(@PathVariable String categoryId);
+
+    @GetMapping("/sites/MLA/search?seller_id={seller_id}")
+    @Headers(
+            "Authorization: " + ACCESS_TOKEN
+    )
+    public String getSellerBySellerId(@PathVariable Integer seller_id);
+
+    @GetMapping("/items/{item_id}")
+    @Headers(
+            "Authorization: " + ACCESS_TOKEN
+    )
+    public String getImageAndSku(@PathVariable String item_id);
+
+
 
 }
