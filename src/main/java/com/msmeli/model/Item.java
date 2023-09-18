@@ -35,13 +35,9 @@ public class Item{
 
     private int catalog_position;
 
-    @JoinColumn(name = "seller_id", referencedColumnName = "seller_id")
-    @ManyToOne
-    private Seller sellerId;
+    private Integer sellerId;
 
-    @JoinColumn(name = "category_id", referencedColumnName = "category_id")
-    @ManyToOne
-    private Category category_id;
+    private String category_id;
 
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime update_date;

@@ -12,10 +12,10 @@ import java.util.List;
 
 @Repository
 public interface ItemRepository extends JpaRepository<Item, String> {
-    @Query("SELECT new com.msmeli.dto.response.CreateItemDTO(i.catalog_product_id, i.title) FROM Item i")
-    List<CreateItemDTO> getItemAtribbutes();
+    @Query("SELECT new com.msmeli.dto.response.CreateItemDTO(i.catalog_product_id, i.title) FROM Item i WHERE i.sellerId = ?1")
+    List<CreateItemDTO> getItemAtribbutes(Integer selleId);
 
-    @Query("SELECT i FROM Item i WHERE i.sellerId.sellerId = ?1")
+    @Query("SELECT i FROM Item i WHERE i.sellerId = ?1")
     List<Item> getItemsBySellerId(Integer sellerId);
 
     @Query("SELECT i FROM Item i WHERE i.catalog_product_id = ?1 ORDER BY i.catalog_position ASC")
