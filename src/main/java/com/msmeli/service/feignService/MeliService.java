@@ -85,13 +85,12 @@ public class MeliService {
 
             List<Object> items = json.read("$.results[*]");
 
-            int batchSize = 25;
+            int batchSize = 50;
             List<Item> batch = new ArrayList<>(batchSize);
 
             items.forEach((e) -> {
                 DocumentContext itemContext = JsonPath.parse(e);
                 Number price = itemContext.read("$.price");
-
 
                 //Refactorizar
                 DocumentContext itemImageAndSku = JsonPath.parse(meliFeignClient.getImageAndSku(itemContext.read("$.id")));
@@ -102,11 +101,11 @@ public class MeliService {
                                 .item_id(itemContext.read("$.id"))
                                 .catalog_product_id(itemContext.read("$.catalog_product_id"))
                                 .title(itemContext.read("$.title"))
-                                .category_id(saveCategory(itemContext.read("$.category_id")))
+                                .category_id(itemContext.read("$.category_id"))
                                 .price(price.doubleValue())
                                 .sold_quantity(itemContext.read("$.sold_quantity"))
                                 .available_quantity(itemContext.read("$.available_quantity"))
-                                .sellerId(saveSeller(itemContext.read("$.seller.id")))
+                                .sellerId(itemContext.read("$.seller.id"))
                                 .update_date(LocalDateTime.now())
                                 .listing_type_id(itemContext.read("$.listing_type_id"))
                                 .catalog_position(0)
@@ -130,18 +129,19 @@ public class MeliService {
         }
     }
 
-//    @EventListener(ApplicationReadyEvent.class)
-//    @Order(2)
+    @EventListener(ApplicationReadyEvent.class)
+    @Order(2)
     private void saveItem(){
         try {
-            List<CreateItemDTO> itemAtribbutes = itemRepository.getItemAtribbutes();
+            List<CreateItemDTO> itemAtribbutes = itemRepository.getItemAtribbutes(1152777827);
 
             AtomicInteger i = new AtomicInteger(0);
 
-            int batchSize = 10;
+            int batchSize = 100;
             List<Item> batch = new ArrayList<>(batchSize);
 
             itemAtribbutes.forEach((e) ->{
+
                 DocumentContext jsonProduct = JsonPath.parse(meliFeignClient.getProductSearch(e.getCatalog_product_id()));
                 List<Object> products = jsonProduct.read("$.results[0:5]");
 
@@ -163,15 +163,16 @@ public class MeliService {
                             .item_id(productContext.read("$.item_id"))
                             .catalog_product_id(e.getCatalog_product_id())
                             .title(e.getTitle())
-                            .category_id(saveCategory(productContext.read("$.category_id")))
+                            .category_id(productContext.read("$.category_id"))
                             .price(price.doubleValue())
                             .sold_quantity(productContext.read("$.sold_quantity"))
                             .available_quantity(productContext.read("$.available_quantity"))
-                            .sellerId(saveSeller(productContext.read("$.seller_id")))
+                            .sellerId(productContext.read("$.seller_id"))
                             .update_date(LocalDateTime.now())
                             .listing_type_id(productContext.read("$.listing_type_id"))
                             .catalog_position(i.incrementAndGet())
                             .urlImage(itemImageAndSku.read("$.pictures[0].url"))
+                            .statusCondition(itemImageAndSku.read("$.status"))
                             .sku(getSku)
                             .build();
 
