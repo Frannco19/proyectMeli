@@ -1,5 +1,6 @@
 package com.msmeli.service.implement;
 
+import com.msmeli.dto.request.UpdatePassRequestDTO;
 import com.msmeli.dto.request.UserRegisterRequestDTO;
 import com.msmeli.dto.response.UserAuthResponseDTO;
 import com.msmeli.dto.response.UserResponseDTO;
@@ -8,6 +9,7 @@ import com.msmeli.exception.ResourceNotFoundException;
 import com.msmeli.model.RoleEntity;
 import com.msmeli.model.UserEntity;
 import com.msmeli.repository.UserEntityRepository;
+import com.msmeli.service.services.IEmailService;
 import com.msmeli.service.services.IRoleEntityService;
 import com.msmeli.service.services.IUserEntityService;
 import com.msmeli.util.Role;
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UserEntityService implements IUserEntityService {
@@ -26,13 +29,15 @@ public class UserEntityService implements IUserEntityService {
     private final PasswordEncoder passwordEncoder;
     private final ModelMapper mapper;
     private final IRoleEntityService roleEntityService;
+    private final IEmailService emailService;
 
 
-    public UserEntityService(UserEntityRepository userEntityRepository, PasswordEncoder passwordEncoder, ModelMapper mapper, IRoleEntityService roleEntityService) {
+    public UserEntityService(UserEntityRepository userEntityRepository, PasswordEncoder passwordEncoder, ModelMapper mapper, IRoleEntityService roleEntityService, IEmailService emailService) {
         this.userEntityRepository = userEntityRepository;
         this.passwordEncoder = passwordEncoder;
         this.mapper = mapper;
         this.roleEntityService = roleEntityService;
+        this.emailService = emailService;
     }
 
     @Override
@@ -46,6 +51,7 @@ public class UserEntityService implements IUserEntityService {
         List<RoleEntity> roles = new ArrayList<>();
         roles.add(roleEntityService.findByName(Role.USER));
         userEntity.setRoles(roles);
+        emailService.sendMail(userEntity.getEmail(), "Welcome to MoroTech App", emailWelcomeBody(userEntity.getUsername()));
         return mapper.map(userEntityRepository.save(userEntity), UserResponseDTO.class);
     }
 
@@ -92,6 +98,47 @@ public class UserEntityService implements IUserEntityService {
     public UserAuthResponseDTO findByUsername(String username) throws ResourceNotFoundException {
         Optional<UserEntity> userSearch = userEntityRepository.findByUsername(username);
         if (userSearch.isEmpty()) throw new ResourceNotFoundException("User not found");
-        return mapper.map(userSearch,UserAuthResponseDTO.class);
+        return mapper.map(userSearch, UserAuthResponseDTO.class);
+    }
+
+    public String recoverPassword(String username) throws ResourceNotFoundException {
+        Optional<UserEntity> userSearch = userEntityRepository.findByUsername(username);
+        if (userSearch.isEmpty()) throw new ResourceNotFoundException("User not found");
+        emailService.sendMail(userSearch.get().getEmail(), "Recover Password", emailRecoverPassword(username));
+        return "Recovery password email sent successfully to " + username;
+    }
+
+    public String resetPassword(String username) throws ResourceNotFoundException {
+        Optional<UserEntity> userSearch = userEntityRepository.findByUsername(username);
+        if (userSearch.isEmpty()) throw new ResourceNotFoundException("User not found");
+        String newPassword = String.valueOf(UUID.randomUUID()).substring(0, 7);
+        userSearch.get().setPassword(passwordEncoder.encode(newPassword));
+        emailService.sendMail(userSearch.get().getEmail(), "Reset Password",emailResetPassword(username,newPassword));
+        userEntityRepository.save(userSearch.get());
+        return "Reset password email sent successfully to " + username;
+    }
+
+    @Override
+    public String updatePassword(UpdatePassRequestDTO updatePassRequestDTO, String username) throws ResourceNotFoundException {
+        Optional<UserEntity> userSearch = userEntityRepository.findByUsername(username);
+        if (userSearch.isEmpty()) throw new ResourceNotFoundException("User not found");
+        if (!updatePassRequestDTO.getPassword().equals(updatePassRequestDTO.getRePassword()))
+            throw new ResourceNotFoundException("Passwords don't match");
+        UserEntity userEntity = userSearch.get();
+        userEntity.setPassword(passwordEncoder.encode(updatePassRequestDTO.getPassword()));
+        userEntityRepository.save(userEntity);
+        return "Password updated Successfully";
+    }
+
+    private String emailWelcomeBody(String username) {
+        return "Dear " + username + ",\n \n" + "For log in continue to : http://localhost:4200/auth/login/" + "\n \n" + "Greetings, 3ra Aceleracion staff.";
+    }
+
+    private String emailRecoverPassword(String username) {
+        return "Dear " + username + ",\n \n" + "To continue with your password reset click here : http://localhost:8080/meli/user/reset_password/" + username + "\n \n" + "If you haven't requested it discard this mail. " + "\n \n" + "Greetings, 3ra Aceleracion staff.";
+    }
+
+    private String emailResetPassword(String username, String newPassword) {
+        return "Dear " + username + ",\n \n" + "Password reset successfully." + "\n \n" + "Your new password is :  " + newPassword + "\n \n" + "Greetings, 3ra Aceleracion staff.";
     }
 }
