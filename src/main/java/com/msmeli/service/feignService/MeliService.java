@@ -3,6 +3,7 @@ package com.msmeli.service.feignService;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.msmeli.dto.response.CreateItemDTO;
+import com.msmeli.dto.response.ImageAndSkuDTO;
 import com.msmeli.feignClient.MeliFeignClient;
 import com.msmeli.model.Category;
 import com.msmeli.model.Item;
@@ -77,6 +78,47 @@ public class MeliService {
                         .build());
     }
 
+    private ImageAndSkuDTO getItemImageAndSku(String itemId){
+        DocumentContext item = JsonPath.parse(meliFeignClient.getImageAndSku(itemId));
+        List<Object> skuObj = item.read("$.attributes[?(@.id == 'SELLER_SKU')].values[0].name");
+
+        String sku = null;
+        String image = item.read("$.pictures[0].url");
+        String status = item.read("$.status");
+
+        if (!skuObj.isEmpty()) sku = skuObj.get(0).toString();
+
+        return ImageAndSkuDTO.builder()
+                .sku(sku)
+                .image_url(image)
+                .status_condition(status)
+                .build();
+    }
+
+    private Item filterJsonData(DocumentContext itemContext){
+        Number price = itemContext.read("$.price");
+
+        ImageAndSkuDTO imageAndSku = getItemImageAndSku(itemContext.read("$.id"));
+
+        return Item
+                .builder()
+                .item_id(itemContext.read("$.id"))
+                .catalog_product_id(itemContext.read("$.catalog_product_id"))
+                .title(itemContext.read("$.title"))
+                .category_id(itemContext.read("$.category_id"))
+                .price(price.doubleValue())
+                .sold_quantity(itemContext.read("$.sold_quantity"))
+                .available_quantity(itemContext.read("$.available_quantity"))
+                .sellerId(itemContext.read("$.seller.id"))
+                .update_date(LocalDateTime.now())
+                .listing_type_id(itemContext.read("$.listing_type_id"))
+                .catalog_position(0)
+                .statusCondition(imageAndSku.getStatus_condition())
+                .urlImage(imageAndSku.getImage_url())
+                .sku(imageAndSku.getSku())
+                .build();
+    }
+
     @EventListener(ApplicationReadyEvent.class)
     @Order(1)
     public void saveSellerItems() throws Exception{
@@ -85,52 +127,18 @@ public class MeliService {
 
             List<Object> items = json.read("$.results[*]");
 
-            int batchSize = 50;
-            List<Item> batch = new ArrayList<>(batchSize);
-
-            items.forEach((e) -> {
-                DocumentContext itemContext = JsonPath.parse(e);
-                Number price = itemContext.read("$.price");
-
-                //Refactorizar
-                DocumentContext itemImageAndSku = JsonPath.parse(meliFeignClient.getImageAndSku(itemContext.read("$.id")));
-                List<Object> sku = itemImageAndSku.read("$.attributes[?(@.id == 'SELLER_SKU')].values[0].name");
-
-                Item item = Item
-                                .builder()
-                                .item_id(itemContext.read("$.id"))
-                                .catalog_product_id(itemContext.read("$.catalog_product_id"))
-                                .title(itemContext.read("$.title"))
-                                .category_id(itemContext.read("$.category_id"))
-                                .price(price.doubleValue())
-                                .sold_quantity(itemContext.read("$.sold_quantity"))
-                                .available_quantity(itemContext.read("$.available_quantity"))
-                                .sellerId(itemContext.read("$.seller.id"))
-                                .update_date(LocalDateTime.now())
-                                .listing_type_id(itemContext.read("$.listing_type_id"))
-                                .catalog_position(0)
-                                .statusCondition(itemImageAndSku.read("$.status"))
-                                .urlImage(itemImageAndSku.read("$.pictures[0].url"))
-                                .sku(sku.get(0).toString())
-                                .build();
-
-                batch.add(item);
-
-                if (batch.size() >= batchSize) {
-                    itemRepository.saveAll(batch);
-                    batch.clear();
-                }
-            });
-            if (!batch.isEmpty()) {
-                itemRepository.saveAll(batch);
-            }
+            itemRepository.saveAll(items
+                    .stream()
+                    .map((e) -> filterJsonData(JsonPath.parse(e)))
+                    .collect(Collectors.toList())
+            );
         }catch (Exception e){
             throw new RuntimeException(e);
         }
     }
 
-    @EventListener(ApplicationReadyEvent.class)
-    @Order(2)
+//    @EventListener(ApplicationReadyEvent.class)
+//    @Order(2)
     private void saveItem(){
         try {
             List<CreateItemDTO> itemAtribbutes = itemRepository.getItemAtribbutes(1152777827);
