@@ -11,6 +11,7 @@ import com.msmeli.repository.*;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -18,6 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+
+import static com.msmeli.global.Global.ACCESS_TOKEN;
 
 @Service
 public class MeliService {
@@ -64,6 +67,7 @@ public class MeliService {
                     .build());
     }
 
+
     public Seller saveSeller(Integer seller_id){
         DocumentContext json = JsonPath.parse(meliFeignClient.getSellerBySellerId(seller_id));
 
@@ -75,6 +79,15 @@ public class MeliService {
                         .sellerId(sellerJson.read("$.id"))
                         .nickname(sellerJson.read("$.nickname"))
                         .build());
+    }
+
+    public int getPosition(String categoryId){
+        DocumentContext itemPosition = JsonPath.parse(meliFeignClient.getItemPositionByCategory(categoryId));
+
+        List<Object> items = itemPosition.read("$.results[*]");
+
+//        itemPosition.read("$.content[?(@.id == 'MLA668715299')]")
+        return 0;
     }
 
     @EventListener(ApplicationReadyEvent.class)
@@ -92,7 +105,6 @@ public class MeliService {
                 DocumentContext itemContext = JsonPath.parse(e);
                 Number price = itemContext.read("$.price");
 
-                //Refactorizar
                 DocumentContext itemImageAndSku = JsonPath.parse(meliFeignClient.getImageAndSku(itemContext.read("$.id")));
                 List<Object> sku = itemImageAndSku.read("$.attributes[?(@.id == 'SELLER_SKU')].values[0].name");
 

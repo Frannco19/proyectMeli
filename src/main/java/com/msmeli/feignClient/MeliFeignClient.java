@@ -1,6 +1,8 @@
 package com.msmeli.feignClient;
 
+import com.msmeli.configuration.feign.FeignClientConfiguration;
 import feign.Headers;
+import feign.Param;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -9,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import static com.msmeli.MsMeliApplication.MELI_URL;
 import static com.msmeli.global.Global.ACCESS_TOKEN;
 
-@FeignClient(name = "Meli", url = MELI_URL)
+@FeignClient(name = "Meli", url = MELI_URL, configuration = FeignClientConfiguration.class)
 public interface MeliFeignClient {
 
     @GetMapping("/products/{productId}/items")
@@ -42,6 +44,16 @@ public interface MeliFeignClient {
     )
     public String getImageAndSku(@PathVariable String item_id);
 
+
+//    //Puede funcionar mas a futuro
+//    @GetMapping("/highlights/MLA/item/{product_id}")
+//    public String getItemPosition(@PathVariable String product_id);
+
+    @GetMapping("/highlights/MLA/category/{category_id}")
+    public String getItemPositionByCategory(@PathVariable String category_id);
+
+    @GetMapping("/sites/MLA/listing_types")
+    public String getTypesNames();
 
 
 }
