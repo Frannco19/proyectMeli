@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
+import com.msmeli.dto.response.CatalogItemResponseDTO;
 import com.msmeli.dto.response.ImageAndSkuDTO;
 import com.msmeli.dto.response.ListingTypeResponseDTO;
 import com.msmeli.feignClient.MeliFeignClient;
@@ -214,69 +215,39 @@ public class MeliService {
             );
     }
 
-////    @EventListener(ApplicationReadyEvent.class)
-////    @Order(2)
-//    private void saveItem(){
-//        try {
-//            List<CreateItemDTO> itemAtribbutes = itemRepository.getItemAtribbutes(1152777827);
-//
-//            AtomicInteger i = new AtomicInteger(0);
-//
-//            int batchSize = 100;
-//            List<Item> batch = new ArrayList<>(batchSize);
-//
-//            itemAtribbutes.forEach((e) ->{
-//
-//                DocumentContext jsonProduct = JsonPath.parse(meliFeignClient.getProductSearch(e.getCatalog_product_id()));
-//                List<Object> products = jsonProduct.read("$.results[0:5]");
-//
-//                products.forEach((product) -> {
-//                    DocumentContext productContext = JsonPath.parse(product);
-//                    Number price = productContext.read("$.price");
-//
-//                    DocumentContext itemImageAndSku = JsonPath.parse(meliFeignClient.getImageAndSku(productContext.read("$.item_id")));
-//                    List<Object> sku = itemImageAndSku.read("$.attributes[?(@.id == 'SELLER_SKU')].values[0].name");
-//
-//                    String getSku = null;
-//
-//                    if (!sku.isEmpty()){
-//                        getSku = sku.get(0).toString();
-//                    }
-//
-//                    Item item = Item
-//                            .builder()
-//                            .item_id(productContext.read("$.item_id"))
-//                            .catalog_product_id(e.getCatalog_product_id())
-//                            .title(e.getTitle())
-//                            .category_id(productContext.read("$.category_id"))
-//                            .price(price.doubleValue())
-//                            .sold_quantity(productContext.read("$.sold_quantity"))
-//                            .available_quantity(productContext.read("$.available_quantity"))
-//                            .sellerId(productContext.read("$.seller_id"))
-//                            .update_date_db(LocalDateTime.now())
-//                            .listing_type_id(productContext.read("$.listing_type_id"))
-//                            .catalog_position(i.incrementAndGet())
-//                            .urlImage(itemImageAndSku.read("$.pictures[0].url"))
-//                            .statusCondition(itemImageAndSku.read("$.status"))
-//                            .sku(getSku)
-//                            .build();
-//
-//                    batch.add(item);
-//
-//                    if(i.get() == 5) i.set(0);
-//
-//                    if (batch.size() >= batchSize) {
-//                        itemRepository.saveAll(batch);
-//                        batch.clear();
-//                    }
-//                });
-//                if (!batch.isEmpty()) {
-//                    itemRepository.saveAll(batch);
-//                }
-//            });
-//        }catch (Exception e){
-//            throw new RuntimeException(e);
-//        }
-//    }
+    public List<CatalogItemResponseDTO> getSellerItemCatalog(String product_catalog_id){
+
+        DocumentContext jsonProduct = JsonPath.parse(meliFeignClient.getProductSearch(product_catalog_id));
+
+        List<Object> catalogProducts = jsonProduct.read("$.results[*]");
+
+        return catalogProducts
+                .stream()
+                .map( (product) -> {
+                    DocumentContext productContext = JsonPath.parse(product);
+
+                    Number price = productContext.read("$.price");
+
+                    try {
+                        String itemId = productContext.read("$.item_id");
+                        ImageAndSkuDTO imageAndSkuDTO = getItemImageAndSku(itemId);
+
+                        return CatalogItemResponseDTO
+                                .builder()
+                                .price(price.doubleValue())
+                                .seller_nickname(getSellerNickname(productContext.read("$.seller_id")))
+                                .sold_quantity(productContext.read("$.sold_quantity"))
+                                .available_quantity(productContext.read("$.available_quantity"))
+                                .category_id(productContext.read("$.category_id"))
+//                                .position(getPosition(itemId, product_catalog_id))
+                                .created_date_item(imageAndSkuDTO.getCreated_date_item())
+                                .updated_date_item(imageAndSkuDTO.getUpdated_date_item())
+                                .build();
+                    } catch (ParseException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .toList();
+    }
 
 }
