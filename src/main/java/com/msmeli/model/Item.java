@@ -1,6 +1,7 @@
 package com.msmeli.model;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
@@ -31,20 +32,20 @@ public class Item{
 
     private int available_quantity;
 
-    private String listing_type_id;
+    private String listing_type_name;
 
-    private int catalog_position;
-
-    @JoinColumn(name = "seller_id", referencedColumnName = "seller_id")
-    @ManyToOne
-    private Seller sellerId;
-
-    @JoinColumn(name = "category_id", referencedColumnName = "category_id")
-    @ManyToOne
-    private Category category_id;
+    private Integer catalog_position;
+    private Integer sellerId;
+    private String category_id;
 
     @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime update_date;
+    private LocalDateTime update_date_db;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date created_date_item;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date updated_date_item;
 
     private String statusCondition;
 
