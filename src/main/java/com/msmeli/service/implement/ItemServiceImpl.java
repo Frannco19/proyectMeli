@@ -55,7 +55,6 @@ public class ItemServiceImpl implements ItemService {
                         .available_quantity(e.getAvailable_quantity())
                         .listing_type_id(e.getListing_type_id())
                         .catalog_position(e.getCatalog_position())
-                        .seller_nickname(e.getSeller_nickname())
                         .category_id(e.getCategory_id())
                         .statusCondition(e.getStatusCondition())
                         .urlImage(e.getUrlImage())

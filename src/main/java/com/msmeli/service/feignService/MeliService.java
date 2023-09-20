@@ -197,19 +197,16 @@ public class MeliService {
 
 //    @EventListener(ApplicationReadyEvent.class)
 //    @Order(2)
-    private void saveItem(){
+    private List<> getSellerItemCatalog(String product_catalog_id){
         try {
-            List<CreateItemDTO> itemAtribbutes = itemRepository.getItemAtribbutes(1152777827);
+            DocumentContext jsonProduct = JsonPath.parse(meliFeignClient.getProductSearch(product_catalog_id));
+            List<Object> catalogProducts = jsonProduct.read("$.results[*]");
 
-            AtomicInteger i = new AtomicInteger(0);
+            catalogProducts.forEach( product -> {
 
-            int batchSize = 100;
-            List<Item> batch = new ArrayList<>(batchSize);
+            });
 
-            itemAtribbutes.forEach((e) ->{
 
-                DocumentContext jsonProduct = JsonPath.parse(meliFeignClient.getProductSearch(e.getCatalog_product_id()));
-                List<Object> products = jsonProduct.read("$.results[0:5]");
 
                 products.forEach((product) -> {
                     DocumentContext productContext = JsonPath.parse(product);
@@ -218,11 +215,6 @@ public class MeliService {
                     DocumentContext itemImageAndSku = JsonPath.parse(meliFeignClient.getImageAndSku(productContext.read("$.item_id")));
                     List<Object> sku = itemImageAndSku.read("$.attributes[?(@.id == 'SELLER_SKU')].values[0].name");
 
-                    String getSku = null;
-
-                    if (!sku.isEmpty()){
-                        getSku = sku.get(0).toString();
-                    }
 
                     Item item = Item
                             .builder()
@@ -242,18 +234,9 @@ public class MeliService {
                             .sku(getSku)
                             .build();
 
-                    batch.add(item);
 
-                    if(i.get() == 5) i.set(0);
-
-                    if (batch.size() >= batchSize) {
-                        itemRepository.saveAll(batch);
-                        batch.clear();
-                    }
                 });
-                if (!batch.isEmpty()) {
-                    itemRepository.saveAll(batch);
-                }
+
             });
         }catch (Exception e){
             throw new RuntimeException(e);
