@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
+import com.msmeli.dto.response.CatalogItemResponseDTO;
 import com.msmeli.dto.response.CreateItemDTO;
 import com.msmeli.dto.response.ImageAndSkuDTO;
 import com.msmeli.dto.response.PositionResponseDTO;
@@ -89,17 +90,17 @@ public class MeliService {
 //    }
 
 
-    public Category saveCategory(String categoryId){
+    public Category saveCategory(String categoryId) {
         DocumentContext json = JsonPath.parse(meliFeignClient.getCategory(categoryId));
         return categoryRepository.save(
                 Category
-                    .builder()
-                    .categoryId(json.read("$.id"))
-                    .categoryName(json.read("$.name"))
-                    .build());
+                        .builder()
+                        .categoryId(json.read("$.id"))
+                        .categoryName(json.read("$.name"))
+                        .build());
     }
 
-    public Seller saveSeller(Integer seller_id){
+    public Seller saveSeller(Integer seller_id) {
         DocumentContext json = JsonPath.parse(meliFeignClient.getSellerBySellerId(seller_id));
 
         DocumentContext sellerJson = JsonPath.parse((Object) json.read("$.seller"));
@@ -112,38 +113,37 @@ public class MeliService {
                         .build());
     }
 
-    public String getSellerNickname(Integer sellerId){
+    public String getSellerNickname(Integer sellerId) {
         DocumentContext json = JsonPath.parse(meliFeignClient.getSellerBySellerId(sellerId));
 //        DocumentContext sellerJson = JsonPath.parse((Object) json.read("$.seller.nickname"));
         return json.read("$.seller.nickname");
     }
 
 
-
     private ImageAndSkuDTO getItemImageAndSku(String itemId) throws ParseException {
-        DocumentContext item = JsonPath.parse(meliFeignClient.getImageAndSku(itemId));
-        List<Object> skuObj = item.read("$.attributes[?(@.id == 'SELLER_SKU')].values[0].name");
+            DocumentContext item = JsonPath.parse(meliFeignClient.getImageAndSku(itemId));
+            List<Object> skuObj = item.read("$.attributes[?(@.id == 'SELLER_SKU')].values[0].name");
 
-        String sku = null;
-        String image = item.read("$.pictures[0].url");
-        String status = item.read("$.status");
-        String created_date_item = item.read("$.date_created");
-        String updated_date_item = item.read("$.last_updated");
+            String sku = null;
+            String image = item.read("$.pictures[0].url");
+            String status = item.read("$.status");
+            String created_date_item = item.read("$.date_created");
+            String updated_date_item = item.read("$.last_updated");
 
-        SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+            SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
-        Date createdDate = dateFormatter.parse(created_date_item);
-        Date updatedDate = dateFormatter.parse(updated_date_item);
+            Date createdDate = dateFormatter.parse(created_date_item);
+            Date updatedDate = dateFormatter.parse(updated_date_item);
 
-        if (!skuObj.isEmpty()) sku = skuObj.get(0).toString();
+            if (!skuObj.isEmpty()) sku = skuObj.get(0).toString();
 
-        return ImageAndSkuDTO.builder()
-                .sku(sku)
-                .image_url(image)
-                .status_condition(status)
-                .created_date_item(createdDate)
-                .updated_date_item(updatedDate)
-                .build();
+            return ImageAndSkuDTO.builder()
+                    .sku(sku)
+                    .image_url(image)
+                    .status_condition(status)
+                    .created_date_item(createdDate)
+                    .updated_date_item(updatedDate)
+                    .build();
     }
 
     private Item filterJsonData(DocumentContext itemContext) throws JsonProcessingException, ParseException {
@@ -177,70 +177,58 @@ public class MeliService {
 
     @EventListener(ApplicationReadyEvent.class)
     @Order(1)
-    public void saveSellerItems(){
-            DocumentContext json = JsonPath.parse(meliFeignClient.getSellerByNickname("MORO TECH"));
+    public void saveSellerItems() {
+        DocumentContext json = JsonPath.parse(meliFeignClient.getSellerByNickname("MORO TECH"));
 
-            List<Object> items = json.read("$.results[*]");
+        List<Object> items = json.read("$.results[*]");
 
-            itemRepository.saveAll(items
-                    .stream()
-                    .map((e) -> {
-                        try {
-                            return filterJsonData(JsonPath.parse(e));
-                        } catch (JsonProcessingException | ParseException ex) {
-                            throw new RuntimeException(ex);
-                        }
-                    })
-                    .collect(Collectors.toList())
-            );
+        itemRepository.saveAll(items
+                .stream()
+                .map((e) -> {
+                    try {
+                        return filterJsonData(JsonPath.parse(e));
+                    } catch (JsonProcessingException | ParseException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                })
+                .collect(Collectors.toList())
+        );
     }
 
-//    @EventListener(ApplicationReadyEvent.class)
-//    @Order(2)
-    private List<> getSellerItemCatalog(String product_catalog_id){
-        try {
-            DocumentContext jsonProduct = JsonPath.parse(meliFeignClient.getProductSearch(product_catalog_id));
-            List<Object> catalogProducts = jsonProduct.read("$.results[*]");
 
-            catalogProducts.forEach( product -> {
+    public List<CatalogItemResponseDTO> getSellerItemCatalog(String product_catalog_id){
 
-            });
+        DocumentContext jsonProduct = JsonPath.parse(meliFeignClient.getProductSearch(product_catalog_id));
 
+        List<Object> catalogProducts = jsonProduct.read("$.results[*]");
 
+        System.out.println(catalogProducts);
 
-                products.forEach((product) -> {
+        return catalogProducts
+                .stream()
+                .map( (product) -> {
                     DocumentContext productContext = JsonPath.parse(product);
+
                     Number price = productContext.read("$.price");
 
-                    DocumentContext itemImageAndSku = JsonPath.parse(meliFeignClient.getImageAndSku(productContext.read("$.item_id")));
-                    List<Object> sku = itemImageAndSku.read("$.attributes[?(@.id == 'SELLER_SKU')].values[0].name");
+                    try {
+                        ImageAndSkuDTO imageAndSkuDTO = getItemImageAndSku(productContext.read("$.item_id"));
 
-
-                    Item item = Item
-                            .builder()
-                            .item_id(productContext.read("$.item_id"))
-                            .catalog_product_id(e.getCatalog_product_id())
-                            .title(e.getTitle())
-                            .category_id(productContext.read("$.category_id"))
-                            .price(price.doubleValue())
-                            .sold_quantity(productContext.read("$.sold_quantity"))
-                            .available_quantity(productContext.read("$.available_quantity"))
-                            .sellerId(productContext.read("$.seller_id"))
-                            .update_date_db(LocalDateTime.now())
-                            .listing_type_id(productContext.read("$.listing_type_id"))
-                            .catalog_position(i.incrementAndGet())
-                            .urlImage(itemImageAndSku.read("$.pictures[0].url"))
-                            .statusCondition(itemImageAndSku.read("$.status"))
-                            .sku(getSku)
-                            .build();
-
-
-                });
-
-            });
-        }catch (Exception e){
-            throw new RuntimeException(e);
-        }
+                        return CatalogItemResponseDTO
+                                .builder()
+                                .price(price.doubleValue())
+                                .seller_nickname(getSellerNickname(productContext.read("$.seller_id")))
+                                .sold_quantity(productContext.read("$.sold_quantity"))
+                                .available_quantity(productContext.read("$.available_quantity"))
+                                .category_id(productContext.read("$.category_id"))
+                                .created_date_item(imageAndSkuDTO.getCreated_date_item())
+                                .updated_date_item(imageAndSkuDTO.getUpdated_date_item())
+                                .build();
+                    } catch (ParseException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .toList();
     }
 
 }

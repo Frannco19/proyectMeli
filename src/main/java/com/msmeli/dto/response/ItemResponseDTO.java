@@ -23,6 +23,8 @@ public class ItemResponseDTO {
     private int available_quantity;
     private String listing_type_id;
     private int catalog_position;
+
+//    private Integer seller_id;
     private String seller_nickname;
     private String category_id;
     private String statusCondition;
