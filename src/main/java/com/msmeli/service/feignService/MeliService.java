@@ -121,8 +121,7 @@ public class MeliService {
 
     @EventListener(ApplicationReadyEvent.class)
     @Order(1)
-    public void saveSellerItems() throws Exception{
-        try {
+    public void saveSellerItems(){
             DocumentContext json = JsonPath.parse(meliFeignClient.getSellerByNickname("MORO TECH"));
 
             List<Object> items = json.read("$.results[*]");
@@ -132,9 +131,6 @@ public class MeliService {
                     .map((e) -> filterJsonData(JsonPath.parse(e)))
                     .collect(Collectors.toList())
             );
-        }catch (Exception e){
-            throw new RuntimeException(e);
-        }
     }
 
 //    @EventListener(ApplicationReadyEvent.class)
