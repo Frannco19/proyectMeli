@@ -5,28 +5,25 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
-import com.msmeli.dto.response.CreateItemDTO;
 import com.msmeli.dto.response.ImageAndSkuDTO;
-import com.msmeli.dto.response.PositionResponseDTO;
-import com.msmeli.exception.ResourceNotFoundException;
+import com.msmeli.dto.response.ListingTypeResponseDTO;
 import com.msmeli.feignClient.MeliFeignClient;
 import com.msmeli.model.Category;
 import com.msmeli.model.Item;
 import com.msmeli.model.Seller;
 import com.msmeli.repository.*;
+import feign.FeignException;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 @Service
@@ -66,28 +63,6 @@ public class MeliService {
         return sellerRepository.findById(sellerId).orElseThrow(() -> new Exception("Seller not found"));
     }
 
-//    public Integer getPosition(String categoryId, String itemId) throws JsonProcessingException, ResourceNotFoundException {
-//
-//        try {
-//            DocumentContext json = JsonPath.parse(meliFeignClient.getItemPositionByCategory(categoryId));
-//
-//            String content = json.read("$.content[*]").toString();
-//            List<PositionResponseDTO> positionList = objectMapper.readValue(content, new TypeReference<>(){});
-//
-//            AtomicReference<Integer> position = new AtomicReference<>(0);
-//
-//            positionList.forEach( e -> {
-//                if(e.getId().equals(itemId)){
-//                    position.set(e.getPosition());
-//                };
-//            });
-//            return position.get();
-//        } catch (ResourceNotFoundException e) {
-//            return null;
-//        }
-//
-//    }
-
 
     public Category saveCategory(String categoryId){
         DocumentContext json = JsonPath.parse(meliFeignClient.getCategory(categoryId));
@@ -118,6 +93,49 @@ public class MeliService {
         return json.read("$.seller.nickname");
     }
 
+    public String getListingTypeName(String listingTypeId) throws JsonProcessingException {
+        DocumentContext jsonType = JsonPath.parse(meliFeignClient.getTypeName());
+        String content = jsonType.read("$.[*]").toString();
+
+        List<ListingTypeResponseDTO> typesList = objectMapper.readValue(content, new TypeReference<>(){});
+
+        String typeName;
+
+        for (ListingTypeResponseDTO e : typesList) {
+            if (e.getId().equals(listingTypeId)) {
+                typeName = e.getName();
+                return typeName;
+            }
+        }
+
+        return null;
+
+    }
+
+    public Integer getPositionMethod(DocumentContext positionByItemId){
+        return positionByItemId.read("$.position");
+    }
+
+    public Integer getPosition(String itemId, String productId) {
+
+        try {
+            DocumentContext positionByItemId = JsonPath.parse(meliFeignClient.getItemPositionByItemId(itemId));
+            return getPositionMethod(positionByItemId);
+
+        } catch (FeignException.NotFound ignored) {
+
+        }
+
+        try {
+            DocumentContext positionByProductId = JsonPath.parse(meliFeignClient.getItemPositionByProductId(productId));
+            return getPositionMethod(positionByProductId);
+        } catch (FeignException.NotFound ignored) {
+
+        }
+
+        return 0;
+
+    }
 
 
     private ImageAndSkuDTO getItemImageAndSku(String itemId) throws ParseException {
@@ -153,11 +171,12 @@ public class MeliService {
 
         String categoryId = itemContext.read("$.category_id");
         String itemId = itemContext.read("$.id");
+        String productId = itemContext.read("$.catalog_product_id");
 
         return Item
                 .builder()
                 .item_id(itemId)
-                .catalog_product_id(itemContext.read("$.catalog_product_id"))
+                .catalog_product_id(productId)
                 .title(itemContext.read("$.title"))
                 .category_id(categoryId)
                 .price(price.doubleValue())
@@ -165,8 +184,8 @@ public class MeliService {
                 .available_quantity(itemContext.read("$.available_quantity"))
                 .sellerId(itemContext.read("$.seller.id"))
                 .update_date_db(LocalDateTime.now())
-                .listing_type_id(itemContext.read("$.listing_type_id"))
-                .catalog_position(0)
+                .listing_type_name(getListingTypeName(itemContext.read("$.listing_type_id")))
+                .catalog_position(getPosition(itemId, productId))
                 .statusCondition(imageAndSku.getStatus_condition())
                 .urlImage(imageAndSku.getImage_url())
                 .sku(imageAndSku.getSku())
@@ -195,69 +214,69 @@ public class MeliService {
             );
     }
 
-//    @EventListener(ApplicationReadyEvent.class)
-//    @Order(2)
-    private void saveItem(){
-        try {
-            List<CreateItemDTO> itemAtribbutes = itemRepository.getItemAtribbutes(1152777827);
-
-            AtomicInteger i = new AtomicInteger(0);
-
-            int batchSize = 100;
-            List<Item> batch = new ArrayList<>(batchSize);
-
-            itemAtribbutes.forEach((e) ->{
-
-                DocumentContext jsonProduct = JsonPath.parse(meliFeignClient.getProductSearch(e.getCatalog_product_id()));
-                List<Object> products = jsonProduct.read("$.results[0:5]");
-
-                products.forEach((product) -> {
-                    DocumentContext productContext = JsonPath.parse(product);
-                    Number price = productContext.read("$.price");
-
-                    DocumentContext itemImageAndSku = JsonPath.parse(meliFeignClient.getImageAndSku(productContext.read("$.item_id")));
-                    List<Object> sku = itemImageAndSku.read("$.attributes[?(@.id == 'SELLER_SKU')].values[0].name");
-
-                    String getSku = null;
-
-                    if (!sku.isEmpty()){
-                        getSku = sku.get(0).toString();
-                    }
-
-                    Item item = Item
-                            .builder()
-                            .item_id(productContext.read("$.item_id"))
-                            .catalog_product_id(e.getCatalog_product_id())
-                            .title(e.getTitle())
-                            .category_id(productContext.read("$.category_id"))
-                            .price(price.doubleValue())
-                            .sold_quantity(productContext.read("$.sold_quantity"))
-                            .available_quantity(productContext.read("$.available_quantity"))
-                            .sellerId(productContext.read("$.seller_id"))
-                            .update_date_db(LocalDateTime.now())
-                            .listing_type_id(productContext.read("$.listing_type_id"))
-                            .catalog_position(i.incrementAndGet())
-                            .urlImage(itemImageAndSku.read("$.pictures[0].url"))
-                            .statusCondition(itemImageAndSku.read("$.status"))
-                            .sku(getSku)
-                            .build();
-
-                    batch.add(item);
-
-                    if(i.get() == 5) i.set(0);
-
-                    if (batch.size() >= batchSize) {
-                        itemRepository.saveAll(batch);
-                        batch.clear();
-                    }
-                });
-                if (!batch.isEmpty()) {
-                    itemRepository.saveAll(batch);
-                }
-            });
-        }catch (Exception e){
-            throw new RuntimeException(e);
-        }
-    }
+////    @EventListener(ApplicationReadyEvent.class)
+////    @Order(2)
+//    private void saveItem(){
+//        try {
+//            List<CreateItemDTO> itemAtribbutes = itemRepository.getItemAtribbutes(1152777827);
+//
+//            AtomicInteger i = new AtomicInteger(0);
+//
+//            int batchSize = 100;
+//            List<Item> batch = new ArrayList<>(batchSize);
+//
+//            itemAtribbutes.forEach((e) ->{
+//
+//                DocumentContext jsonProduct = JsonPath.parse(meliFeignClient.getProductSearch(e.getCatalog_product_id()));
+//                List<Object> products = jsonProduct.read("$.results[0:5]");
+//
+//                products.forEach((product) -> {
+//                    DocumentContext productContext = JsonPath.parse(product);
+//                    Number price = productContext.read("$.price");
+//
+//                    DocumentContext itemImageAndSku = JsonPath.parse(meliFeignClient.getImageAndSku(productContext.read("$.item_id")));
+//                    List<Object> sku = itemImageAndSku.read("$.attributes[?(@.id == 'SELLER_SKU')].values[0].name");
+//
+//                    String getSku = null;
+//
+//                    if (!sku.isEmpty()){
+//                        getSku = sku.get(0).toString();
+//                    }
+//
+//                    Item item = Item
+//                            .builder()
+//                            .item_id(productContext.read("$.item_id"))
+//                            .catalog_product_id(e.getCatalog_product_id())
+//                            .title(e.getTitle())
+//                            .category_id(productContext.read("$.category_id"))
+//                            .price(price.doubleValue())
+//                            .sold_quantity(productContext.read("$.sold_quantity"))
+//                            .available_quantity(productContext.read("$.available_quantity"))
+//                            .sellerId(productContext.read("$.seller_id"))
+//                            .update_date_db(LocalDateTime.now())
+//                            .listing_type_id(productContext.read("$.listing_type_id"))
+//                            .catalog_position(i.incrementAndGet())
+//                            .urlImage(itemImageAndSku.read("$.pictures[0].url"))
+//                            .statusCondition(itemImageAndSku.read("$.status"))
+//                            .sku(getSku)
+//                            .build();
+//
+//                    batch.add(item);
+//
+//                    if(i.get() == 5) i.set(0);
+//
+//                    if (batch.size() >= batchSize) {
+//                        itemRepository.saveAll(batch);
+//                        batch.clear();
+//                    }
+//                });
+//                if (!batch.isEmpty()) {
+//                    itemRepository.saveAll(batch);
+//                }
+//            });
+//        }catch (Exception e){
+//            throw new RuntimeException(e);
+//        }
+//    }
 
 }

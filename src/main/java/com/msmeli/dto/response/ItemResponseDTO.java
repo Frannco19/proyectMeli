@@ -21,7 +21,7 @@ public class ItemResponseDTO {
     private Double price;
     private int sold_quantity;
     private int available_quantity;
-    private String listing_type_id;
+    private String listing_type_name;
     private int catalog_position;
     private Integer seller_id;
     private String seller_nickname;

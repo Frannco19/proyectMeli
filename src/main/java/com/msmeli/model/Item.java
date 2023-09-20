@@ -32,9 +32,9 @@ public class Item{
 
     private int available_quantity;
 
-    private String listing_type_id;
+    private String listing_type_name;
 
-    private int catalog_position;
+    private Integer catalog_position;
     private Integer sellerId;
     private String category_id;
 

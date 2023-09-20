@@ -7,10 +7,9 @@ import lombok.*;
 @AllArgsConstructor
 @Getter
 @Setter
-public class PositionResponseDTO {
+public class ListingTypeResponseDTO {
 
     private String id;
-    private Integer position;
-    private String type;
+    private String name;
 
 }
