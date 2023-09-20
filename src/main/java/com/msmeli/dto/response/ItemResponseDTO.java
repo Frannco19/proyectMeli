@@ -2,7 +2,11 @@ package com.msmeli.dto.response;
 
 import com.msmeli.model.Category;
 import com.msmeli.model.Seller;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import lombok.*;
+
+import java.util.Date;
 
 @Getter
 @Setter
@@ -19,9 +23,13 @@ public class ItemResponseDTO {
     private int available_quantity;
     private String listing_type_id;
     private int catalog_position;
-    private Integer seller_id;
+
+//    private Integer seller_id;
+    private String seller_nickname;
     private String category_id;
     private String statusCondition;
     private String urlImage;
     private String sku;
+    private Date created_date_item;
+    private Date updated_date_item;
 }

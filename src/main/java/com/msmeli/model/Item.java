@@ -1,6 +1,7 @@
 package com.msmeli.model;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
@@ -34,13 +35,17 @@ public class Item{
     private String listing_type_id;
 
     private int catalog_position;
-
     private Integer sellerId;
-
     private String category_id;
 
     @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime update_date;
+    private LocalDateTime update_date_db;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date created_date_item;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date updated_date_item;
 
     private String statusCondition;
 

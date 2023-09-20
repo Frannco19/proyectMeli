@@ -1,6 +1,7 @@
 package com.msmeli.feignClient;
 
 import com.msmeli.configuration.feign.FeignClientConfiguration;
+import com.msmeli.exception.ResourceNotFoundException;
 import feign.Headers;
 import feign.Param;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -32,6 +33,9 @@ public interface MeliFeignClient {
     )
     public String getCategory(@PathVariable String categoryId);
 
+    @GetMapping("/sites/MLA/search?nickname={nickname}&catalog_listing=true")
+    public String getSellerCatalogItems(@PathVariable String nickname);
+
     @GetMapping("/sites/MLA/search?seller_id={seller_id}")
     @Headers(
             "Authorization: " + ACCESS_TOKEN
@@ -45,12 +49,13 @@ public interface MeliFeignClient {
     public String getImageAndSku(@PathVariable String item_id);
 
 
+
 //    //Puede funcionar mas a futuro
 //    @GetMapping("/highlights/MLA/item/{product_id}")
 //    public String getItemPosition(@PathVariable String product_id);
 
     @GetMapping("/highlights/MLA/category/{category_id}")
-    public String getItemPositionByCategory(@PathVariable String category_id);
+    public String getItemPositionByCategory(@PathVariable String category_id) throws ResourceNotFoundException;;
 
     @GetMapping("/sites/MLA/listing_types")
     public String getTypesNames();
