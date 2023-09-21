@@ -239,11 +239,12 @@ public class MeliService {
                                 .sold_quantity(productContext.read("$.sold_quantity"))
                                 .available_quantity(productContext.read("$.available_quantity"))
                                 .category_id(productContext.read("$.category_id"))
+                                .listing_type_name(getListingTypeName(productContext.read("$.listing_type_id")))
 //                                .position(getPosition(itemId, product_catalog_id))
                                 .created_date_item(imageAndSkuDTO.getCreated_date_item())
                                 .updated_date_item(imageAndSkuDTO.getUpdated_date_item())
                                 .build();
-                    } catch (ParseException e) {
+                    } catch (ParseException | JsonProcessingException e) {
                         throw new RuntimeException(e);
                     }
                 })

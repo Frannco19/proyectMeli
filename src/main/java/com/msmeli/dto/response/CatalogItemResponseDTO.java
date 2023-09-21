@@ -18,6 +18,8 @@ public class CatalogItemResponseDTO {
     private int available_quantity;
     private String category_id;
 
+    private String listing_type_name;
+
     private Integer position;
     private Date created_date_item;
     private Date updated_date_item;
