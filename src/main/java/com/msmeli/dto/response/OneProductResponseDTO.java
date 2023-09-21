@@ -4,23 +4,24 @@ import lombok.*;
 
 import java.util.Date;
 
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
-@ToString
-public class CatalogItemResponseDTO {
+public class OneProductResponseDTO {
 
+    private String item_id;
+    private String title;
     private Double price;
-    private String seller_nickname;
     private int sold_quantity;
     private int available_quantity;
-    private String category_id;
     private String listing_type_name;
-    private Integer position;
+    private int catalog_position;
+    private String seller_nickname;
+    private String category_id;
+    private String sku;
     private Date created_date_item;
     private Date updated_date_item;
-
 
 }

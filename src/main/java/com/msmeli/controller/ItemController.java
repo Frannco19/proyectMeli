@@ -2,6 +2,7 @@ package com.msmeli.controller;
 
 import com.msmeli.dto.response.CatalogItemResponseDTO;
 import com.msmeli.dto.response.ItemResponseDTO;
+import com.msmeli.dto.response.OneProductResponseDTO;
 import com.msmeli.service.feignService.MeliService;
 import com.msmeli.service.services.ItemService;
 import org.springframework.web.bind.annotation.*;
@@ -30,6 +31,11 @@ public class ItemController {
     @GetMapping("/catalog/{product_catalog_id}")
     public List<CatalogItemResponseDTO> getSellerItemCatalog (@PathVariable String product_catalog_id) {
         return meliService.getSellerItemCatalog(product_catalog_id);
+    }
+
+    @GetMapping("/seller/catalog/{product_catalog_id}")
+    public OneProductResponseDTO getOneCatalogProduct(@PathVariable String product_catalog_id){
+        return itemService.getOneProduct(product_catalog_id);
     }
 
 }

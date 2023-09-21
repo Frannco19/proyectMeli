@@ -90,7 +90,6 @@ public class MeliService {
 
     public String getSellerNickname(Integer sellerId){
         DocumentContext json = JsonPath.parse(meliFeignClient.getSellerBySellerId(sellerId));
-//        DocumentContext sellerJson = JsonPath.parse((Object) json.read("$.seller.nickname"));
         return json.read("$.seller.nickname");
     }
 

@@ -44,5 +44,7 @@ public interface MeliFeignClient {
     @GetMapping("/sites/MLA/listing_types")
     public String getTypeName();
 
+    @GetMapping("/products/{productId}")
+    public String getBuyBoxWinner(@PathVariable String productId);
 
 }
