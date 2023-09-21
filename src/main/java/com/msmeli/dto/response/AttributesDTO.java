@@ -3,16 +3,13 @@ package com.msmeli.dto.response;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 
-import java.util.List;
-
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 @JsonIgnoreProperties(ignoreUnknown = true)
-@ToString
-public class SellerResponseDTO {
-    private SellerDTO seller;
-    private List<ItemDTO> results;
+public class AttributesDTO {
+    private String name;
+    private String value_name;
 }

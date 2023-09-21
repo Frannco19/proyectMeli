@@ -2,8 +2,8 @@ package com.msmeli.service.implement;
 
 import com.msmeli.dto.response.ItemResponseDTO;
 import com.msmeli.dto.response.OneProductResponseDTO;
+import com.msmeli.dto.response.ItemDTO;
 import com.msmeli.model.Item;
-import com.msmeli.model.Seller;
 import com.msmeli.repository.ItemRepository;
 import com.msmeli.service.feignService.MeliService;
 import com.msmeli.service.services.ItemService;
@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,7 +27,7 @@ public class ItemServiceImpl implements ItemService {
     private ModelMapper mapper;
 
     @Autowired
-    public ItemServiceImpl(ItemRepository itemRepository, SellerService sellerService, MeliService meliService, ModelMapper mapper) {
+    public ItemServiceImpl(ItemRepository itemRepository, SellerService sellerService, ModelMapper mapper) {
         this.itemRepository = itemRepository;
         this.sellerService = sellerService;
         this.meliService = meliService;
@@ -36,17 +35,18 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemResponseDTO> getSellerItems(Integer sellerId){
+    public List<ItemDTO> getSellerItems(Integer sellerId){
         List<Item> itemList = itemRepository.getItemsBySellerId(sellerId);
         return getItemResponseDTOS(itemList);
     }
 
     @Override
-    public List<ItemResponseDTO> getCatalogItems(String productId) {
+    public List<ItemDTO> getCatalogItems(String productId) {
         List<Item> catalogItems = itemRepository.getCatalogItems(productId);
         return getItemResponseDTOS(catalogItems);
     }
 
+    private List<ItemDTO> getItemResponseDTOS(List<Item> items) {
     @Override
     public OneProductResponseDTO getOneProduct(String productId) {
         Item item = itemRepository.findByProductId(productId);
@@ -72,23 +72,22 @@ public class ItemServiceImpl implements ItemService {
                 .build();
     }
 
-    private List<ItemResponseDTO> getItemResponseDTOS(List<Item> items) {
+    private List<ItemDTO> getItemResponseDTOS(List<Item> items) {
         return items
                 .stream()
-                .map((e) -> ItemResponseDTO
+                .map((e) -> ItemDTO
                         .builder()
-                        .item_id(e.getItem_id())
+                        .item_id(e.getId())
                         .title(e.getTitle())
                         .catalog_product_id(e.getCatalog_product_id())
                         .price(e.getPrice())
                         .sold_quantity(e.getSold_quantity())
                         .available_quantity(e.getAvailable_quantity())
-                        .listing_type_name(e.getListing_type_name())
+                        .listing_type_id(e.getListing_type_id())
                         .catalog_position(e.getCatalog_position())
-//                        .seller_nickname(e.getSeller_nickname())
                         .category_id(e.getCategory_id())
-                        .statusCondition(e.getStatusCondition())
-                        .urlImage(e.getUrlImage())
+                        .status_condition(e.getStatus_condition())
+                        .image_url(e.getImage_url())
                         .sku(e.getSku())
                         .build()
                 )

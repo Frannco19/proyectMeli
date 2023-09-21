@@ -16,11 +16,10 @@ import lombok.*;
 @AllArgsConstructor
 @Getter
 @Setter
-@ToString
 @Table(name = "item", catalog = "msmeli")
 public class Item{
     @Id
-    private String item_id;
+    private String id;
 
     private String title;
 
@@ -32,10 +31,12 @@ public class Item{
 
     private int available_quantity;
 
-    private String listing_type_name;
+    private String listing_type_id;
 
-    private Integer catalog_position;
+    private int catalog_position;
+
     private Integer sellerId;
+
     private String category_id;
 
     @Temporal(TemporalType.TIMESTAMP)
@@ -47,9 +48,9 @@ public class Item{
     @Temporal(TemporalType.TIMESTAMP)
     private Date updated_date_item;
 
-    private String statusCondition;
+    private String status_condition;
 
-    private String urlImage;
+    private String image_url;
 
     private String sku;
 }
