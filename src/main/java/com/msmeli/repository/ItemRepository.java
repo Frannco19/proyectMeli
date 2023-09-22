@@ -20,7 +20,7 @@ public interface ItemRepository extends JpaRepository<Item, String> {
     @Query("SELECT i FROM Item i WHERE i.catalog_product_id = ?1 ORDER BY i.catalog_position ASC")
     List<Item> getCatalogItems(String productId);
 
-    @Query("SELECT i FROM Item i WHERE i.catalog_product_id = ?1")
+    @Query("SELECT i FROM Item i WHERE i.catalog_product_id = ?1 ")
     Item findByProductId(String productId);
 
 }

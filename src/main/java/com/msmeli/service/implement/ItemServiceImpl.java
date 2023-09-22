@@ -1,15 +1,16 @@
 package com.msmeli.service.implement;
 
-import com.msmeli.dto.response.ItemResponseDTO;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.msmeli.dto.response.OneProductResponseDTO;
 import com.msmeli.dto.response.ItemDTO;
+import com.msmeli.dto.response.SellerResponseDTO;
+import com.msmeli.feignClient.MeliFeignClient;
 import com.msmeli.model.Item;
 import com.msmeli.repository.ItemRepository;
 import com.msmeli.service.feignService.MeliService;
 import com.msmeli.service.services.ItemService;
 import com.msmeli.service.services.SellerService;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,21 +19,24 @@ import java.util.stream.Collectors;
 @Service
 public class ItemServiceImpl implements ItemService {
 
-    private ItemRepository itemRepository;
+    private final ItemRepository itemRepository;
 
-    private SellerService sellerService;
+    private final MeliFeignClient meliFeignClient;
 
-    private MeliService meliService;
+    private final SellerService sellerService;
 
-    private ModelMapper mapper;
+    private final MeliService meliService;
 
-    @Autowired
-    public ItemServiceImpl(ItemRepository itemRepository, SellerService sellerService, ModelMapper mapper) {
+    private final ModelMapper mapper;
+
+    public ItemServiceImpl(ItemRepository itemRepository, MeliFeignClient meliFeignClient, SellerService sellerService, MeliService meliService, ModelMapper mapper) {
         this.itemRepository = itemRepository;
+        this.meliFeignClient = meliFeignClient;
         this.sellerService = sellerService;
         this.meliService = meliService;
         this.mapper = mapper;
     }
+
 
     @Override
     public List<ItemDTO> getSellerItems(Integer sellerId){
@@ -46,30 +50,31 @@ public class ItemServiceImpl implements ItemService {
         return getItemResponseDTOS(catalogItems);
     }
 
-    private List<ItemDTO> getItemResponseDTOS(List<Item> items) {
+
+    //TODO revision getOneProduct
     @Override
-    public OneProductResponseDTO getOneProduct(String productId) {
+    public OneProductResponseDTO getOneProduct(String productId) throws JsonProcessingException {
         Item item = itemRepository.findByProductId(productId);
-        Optional<Seller> sellerOptional = sellerService.getSeller(item.getSellerId());
 
-        Seller newSeller;
-        newSeller = sellerOptional.orElseGet(() -> meliService.saveSeller(item.getSellerId()));
+        SellerResponseDTO seller = meliFeignClient.getSellerBySellerId(item.getSellerId());
+        String typeName = meliService.getListingTypeName(item.getListing_type_id());
 
-        return OneProductResponseDTO
-                .builder()
-                .item_id(item.getItem_id())
+        return OneProductResponseDTO.builder()
                 .title(item.getTitle())
+                .catalog_product_id(item.getCatalog_product_id())
                 .price(item.getPrice())
                 .sold_quantity(item.getSold_quantity())
                 .available_quantity(item.getAvailable_quantity())
-                .listing_type_name(item.getListing_type_name())
+                .listing_type_name(typeName)
                 .catalog_position(item.getCatalog_position())
-                .seller_nickname(newSeller.getNickname())
+                .seller_nickname(seller.getSeller().getNickname())
                 .category_id(item.getCategory_id())
-                .sku(item.getSku())
                 .created_date_item(item.getCreated_date_item())
                 .updated_date_item(item.getUpdated_date_item())
+                .image_url(item.getImage_url())
+                .sku(item.getSku())
                 .build();
+
     }
 
     private List<ItemDTO> getItemResponseDTOS(List<Item> items) {

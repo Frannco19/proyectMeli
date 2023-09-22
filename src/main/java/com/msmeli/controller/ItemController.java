@@ -1,5 +1,6 @@
 package com.msmeli.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.msmeli.dto.response.CatalogItemResponseDTO;
 import com.msmeli.dto.response.ItemDTO;
 import com.msmeli.dto.response.OneProductResponseDTO;
@@ -38,7 +39,7 @@ public class ItemController {
     }
 
     @GetMapping("/seller/catalog/{product_catalog_id}")
-    public OneProductResponseDTO getOneCatalogProduct(@PathVariable String product_catalog_id){
+    public OneProductResponseDTO getOneCatalogProduct(@PathVariable String product_catalog_id) throws JsonProcessingException {
         return itemService.getOneProduct(product_catalog_id);
     }
 

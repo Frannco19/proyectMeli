@@ -33,8 +33,6 @@ public interface MeliFeignClient {
     @GetMapping("/items/{item_id}")
     public ItemAttributesDTO getItemAtributtes(@PathVariable String item_id);
 
-
-
 //    //Puede funcionar mas a futuro
 //    @GetMapping("/highlights/MLA/item/{product_id}")
 //    public String getItemPosition(@PathVariable String product_id);

@@ -22,7 +22,7 @@ public class ItemDTO {
     private Double price;
     private int sold_quantity;
     private int available_quantity;
-    private String listing_type_name;
+    private String listing_type_id;
     private int catalog_position;
     private String seller_nickname;
     private String category_id;
