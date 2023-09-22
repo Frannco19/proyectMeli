@@ -1,5 +1,6 @@
 package com.msmeli.service.services;
 
+import com.msmeli.dto.request.UpdatePassRequestDTO;
 import com.msmeli.dto.request.UserRegisterRequestDTO;
 import com.msmeli.dto.response.UserAuthResponseDTO;
 import com.msmeli.dto.response.UserResponseDTO;
@@ -21,5 +22,12 @@ public interface IUserEntityService {
     void delete(Long id) throws ResourceNotFoundException;
 
     UserResponseDTO modifyUserRoles(Long userId) throws ResourceNotFoundException;
+
     UserAuthResponseDTO findByUsername(String username) throws ResourceNotFoundException;
+
+    String recoverPassword(String username) throws ResourceNotFoundException;
+
+    String resetPassword(String username) throws ResourceNotFoundException;
+
+    String updatePassword(UpdatePassRequestDTO updatePassRequestDTO, String username) throws ResourceNotFoundException;
 }
