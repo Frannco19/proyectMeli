@@ -11,8 +11,7 @@ import java.util.List;
 @Getter
 @Setter
 @JsonIgnoreProperties(ignoreUnknown = true)
-@ToString
-public class SellerResponseDTO {
-    private SellerDTO seller;
-    private List<ItemDTO> results;
+public class ItemCatalogResponseDTO {
+    private PagingDTO paging;
+    private List<CatalogItemResponseDTO> results;
 }
