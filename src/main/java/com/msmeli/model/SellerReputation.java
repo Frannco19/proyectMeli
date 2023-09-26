@@ -1,9 +1,9 @@
 package com.msmeli.model;
 
-import java.util.List;
-
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.List;
 
 @Entity
 @Builder
@@ -31,8 +31,6 @@ public class SellerReputation {
     @JoinColumn(name = "seller_rating_id", referencedColumnName = "seller_rating_id")
     @ManyToOne
     private SellerRating sellerRatingId;
-
-
 
 
 }

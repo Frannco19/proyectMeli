@@ -1,8 +1,8 @@
 package com.msmeli.service.implement;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.msmeli.dto.response.OneProductResponseDTO;
 import com.msmeli.dto.response.ItemDTO;
+import com.msmeli.dto.response.OneProductResponseDTO;
 import com.msmeli.dto.response.SellerResponseDTO;
 import com.msmeli.feignClient.MeliFeignClient;
 import com.msmeli.model.Item;
@@ -39,7 +39,7 @@ public class ItemServiceImpl implements ItemService {
 
 
     @Override
-    public List<ItemDTO> getSellerItems(Integer sellerId){
+    public List<ItemDTO> getSellerItems(Integer sellerId) {
         List<Item> itemList = itemRepository.getItemsBySellerId(sellerId);
         return getItemResponseDTOS(itemList);
     }

@@ -31,7 +31,7 @@ public class RoleEntityService implements IRoleEntityService {
 
     public RoleEntity findByName(Role rol) throws ResourceNotFoundException {
         Optional<RoleEntity> role = roleRepository.findByName(rol);
-        if(role.isEmpty()) throw new ResourceNotFoundException("Role not found");
+        if (role.isEmpty()) throw new ResourceNotFoundException("Role not found");
         return role.get();
     }
 }

@@ -1,15 +1,14 @@
 package com.msmeli.configuration.feign;
 
 import feign.RequestInterceptor;
-import feign.RequestTemplate;
 import org.springframework.context.annotation.Bean;
 
 public class FeignClientConfiguration {
 
-    private String bearerToken = "APP_USR-1541593069766345-092122-d482dabeb21a6614f3dbdc09c09854f8-179995772";
+    private String bearerToken = "APP_USR-3292649208279826-092609-5ef7a8326c7208cb3bca5fa420ddf6d0-146409424";
 
     @Bean
-    public RequestInterceptor bearerTokenInterceptor(){
+    public RequestInterceptor bearerTokenInterceptor() {
         return template -> template.header("Authorization", String.format("Bearer %s", bearerToken));
     }
 

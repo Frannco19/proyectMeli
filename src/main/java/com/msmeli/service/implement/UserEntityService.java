@@ -113,7 +113,7 @@ public class UserEntityService implements IUserEntityService {
         if (userSearch.isEmpty()) throw new ResourceNotFoundException("User not found");
         String newPassword = String.valueOf(UUID.randomUUID()).substring(0, 7);
         userSearch.get().setPassword(passwordEncoder.encode(newPassword));
-        emailService.sendMail(userSearch.get().getEmail(), "Reset Password",emailResetPassword(username,newPassword));
+        emailService.sendMail(userSearch.get().getEmail(), "Reset Password", emailResetPassword(username, newPassword));
         userEntityRepository.save(userSearch.get());
         return "Reset password email sent successfully to " + username;
     }

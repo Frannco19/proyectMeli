@@ -68,9 +68,15 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(userEntityService.resetPassword(username));
     }
 
+    @PatchMapping("/add_role/{userId}")
+    public ResponseEntity<UserResponseDTO> modifyUserRoles(@PathVariable Long userId) throws ResourceNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(userEntityService.modifyUserRoles(userId));
+    }
+
+
     @PatchMapping("/modify_password")
     @PreAuthorize("hasAnyAuthority('USER','ADMIN')")
     public ResponseEntity<String> modifyPassword(@RequestBody UpdatePassRequestDTO updatePassRequestDTO, Authentication authentication) throws ResourceNotFoundException {
-        return ResponseEntity.status(HttpStatus.OK).body(userEntityService.updatePassword(updatePassRequestDTO,authentication.getName()));
+        return ResponseEntity.status(HttpStatus.OK).body(userEntityService.updatePassword(updatePassRequestDTO, authentication.getName()));
     }
 }
