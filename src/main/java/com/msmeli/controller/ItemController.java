@@ -26,12 +26,12 @@ public class ItemController {
     }
 
     @GetMapping("/seller/items/{sellerId}")
-    public List<ItemDTO> sellerItems(@PathVariable Integer sellerId){
+    public List<ItemDTO> sellerItems(@PathVariable Integer sellerId) {
         return itemService.getSellerItems(sellerId);
     }
 
     @GetMapping("/catalog/{product_catalog_id}")
-    public List<CatalogItemResponseDTO> getSellerItemCatalog (@PathVariable String product_catalog_id) throws ParseException {
+    public List<CatalogItemResponseDTO> getSellerItemCatalog(@PathVariable String product_catalog_id) throws ParseException {
 
         System.out.println(product_catalog_id);
 

@@ -1,7 +1,5 @@
 package com.msmeli.model;
 
-import java.util.List;
-
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,7 +10,7 @@ import lombok.*;
 @Getter
 @Setter
 @Table(name = "seller", catalog = "msmeli")
-public class Seller{
+public class Seller {
 
     @Id
     @Column(name = "seller_id")
@@ -25,7 +23,6 @@ public class Seller{
 
 //    @OneToMany(mappedBy = "seller_id")
 //    private List<Item> itemList;
-
 
 
 }

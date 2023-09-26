@@ -1,14 +1,10 @@
 package com.msmeli.model;
 
-import java.io.Serializable;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.time.LocalDateTime;
+import java.util.Date;
 
 @Entity
 @Builder
@@ -18,7 +14,7 @@ import lombok.*;
 @Setter
 @ToString
 @Table(name = "item", catalog = "msmeli")
-public class Item{
+public class Item {
     @Id
     private String id;
 

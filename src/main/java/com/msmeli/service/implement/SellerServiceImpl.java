@@ -21,7 +21,7 @@ public class SellerServiceImpl implements SellerService {
         this.mapper = mapper;
     }
 
-    public Optional<Seller> getSeller(Integer seller_id){
+    public Optional<Seller> getSeller(Integer seller_id) {
         return sellerRepository.findById(seller_id);
     }
 

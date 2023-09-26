@@ -13,7 +13,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class UpdatePassRequestDTO {
     @NotBlank(message = "password should not be empty")
-    @Size(min=3, message = "password should have at least 3 characters")
+    @Size(min = 3, message = "password should have at least 3 characters")
     private String password;
     @NotBlank
     private String rePassword;

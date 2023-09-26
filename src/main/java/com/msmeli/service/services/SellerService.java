@@ -6,5 +6,5 @@ import java.util.Optional;
 
 public interface SellerService {
 
-    public Optional<Seller> getSeller(Integer seller_id);
+     Optional<Seller> getSeller(Integer seller_id);
 }

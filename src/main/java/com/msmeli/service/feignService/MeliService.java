@@ -6,8 +6,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.msmeli.dto.response.*;
-import com.msmeli.dto.response.CatalogItemResponseDTO;
-import com.msmeli.dto.response.ListingTypeResponseDTO;
 import com.msmeli.feignClient.MeliFeignClient;
 import com.msmeli.model.Category;
 import com.msmeli.model.Item;
@@ -20,8 +18,6 @@ import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
-
-import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -88,14 +84,14 @@ public class MeliService {
 //    }
 
 
-    public Category saveCategory(String categoryId){
+    public Category saveCategory(String categoryId) {
         DocumentContext json = JsonPath.parse(meliFeignClient.getCategory(categoryId));
         return categoryRepository.save(
                 Category
-                    .builder()
-                    .categoryId(json.read("$.id"))
-                    .categoryName(json.read("$.name"))
-                    .build());
+                        .builder()
+                        .categoryId(json.read("$.id"))
+                        .categoryName(json.read("$.name"))
+                        .build());
     }
 
 //    public String getSellerNickname(Integer sellerId){
@@ -103,7 +99,7 @@ public class MeliService {
 //        return seller.getSeller().getNickname();
 //    }
 
-    public Seller saveSeller(Integer seller_id){
+    public Seller saveSeller(Integer seller_id) {
         DocumentContext json = JsonPath.parse(meliFeignClient.getSellerBySellerId(seller_id));
 
         DocumentContext sellerJson = JsonPath.parse((Object) json.read("$.seller"));
@@ -120,7 +116,8 @@ public class MeliService {
         DocumentContext jsonType = JsonPath.parse(meliFeignClient.getTypeName());
         String content = jsonType.read("$.[*]").toString();
 
-        List<ListingTypeResponseDTO> typesList = objectMapper.readValue(content, new TypeReference<>(){});
+        List<ListingTypeResponseDTO> typesList = objectMapper.readValue(content, new TypeReference<>() {
+        });
 
         String typeName;
 
@@ -136,7 +133,7 @@ public class MeliService {
     }
 
 
-    public Integer getPositionMethod(DocumentContext positionByItemId){
+    public Integer getPositionMethod(DocumentContext positionByItemId) {
         return positionByItemId.read("$.position");
     }
 
@@ -194,20 +191,20 @@ public class MeliService {
     @EventListener(ApplicationReadyEvent.class)
     @Order(1)
     public void saveSellerItems() {
-         SellerResponseDTO responseDTO = meliFeignClient.getSellerByNickname("MORO TECH");
+        SellerResponseDTO responseDTO = meliFeignClient.getSellerByNickname("MORO TECH");
 
-         List<Item> items = responseDTO.getResults().parallelStream().map(e ->{
-             ItemAttributesDTO attributesDTO = meliFeignClient.getItemAtributtes(e.getId());
-             e.setImage_url(attributesDTO.getPictures().get(0).getUrl());
-             e.setCreated_date_item(attributesDTO.getDate_created());
-             e.setUpdated_date_item(attributesDTO.getLast_updated());
-             e.setSku(attributesDTO.getAttributes().parallelStream().filter(att-> att.getName().equals("SKU")).toList().get(0).getValue_name());
-             Item item = modelMapper.map(e,Item.class);
-             item.setUpdate_date_db(LocalDateTime.now());
-             item.setSellerId(responseDTO.getSeller().getId());
-             return item;
-         }).toList();
-         itemRepository.saveAll(items);
+        List<Item> items = responseDTO.getResults().parallelStream().map(e -> {
+            ItemAttributesDTO attributesDTO = meliFeignClient.getItemAtributtes(e.getId());
+            e.setImage_url(attributesDTO.getPictures().get(0).getUrl());
+            e.setCreated_date_item(attributesDTO.getDate_created());
+            e.setUpdated_date_item(attributesDTO.getLast_updated());
+            e.setSku(attributesDTO.getAttributes().parallelStream().filter(att -> att.getName().equals("SKU")).toList().get(0).getValue_name());
+            Item item = modelMapper.map(e, Item.class);
+            item.setUpdate_date_db(LocalDateTime.now());
+            item.setSellerId(responseDTO.getSeller().getId());
+            return item;
+        }).toList();
+        itemRepository.saveAll(items);
     }
 
 
@@ -216,7 +213,7 @@ public class MeliService {
         ItemCatalogResponseDTO responseDTO = meliFeignClient.getProductSearch(product_catalog_id);
 
 
-        return responseDTO.getResults().parallelStream().peek(e ->{
+        return responseDTO.getResults().parallelStream().peek(e -> {
 
             ItemAttributesDTO attributesDTO = meliFeignClient.getItemAtributtes(e.getItem_id());
             SellerResponseDTO sellerResponseDTO = meliFeignClient.getSellerBySellerId(e.getSeller_id());
