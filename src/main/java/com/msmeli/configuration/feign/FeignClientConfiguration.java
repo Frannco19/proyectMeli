@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Bean;
 
 public class FeignClientConfiguration {
 
-    private String bearerToken = "APP_USR-3292649208279826-092609-5ef7a8326c7208cb3bca5fa420ddf6d0-146409424";
+    private String bearerToken = "APP_USR-8717495891911341-092619-c1252e765020619f2e0064f0c1f86489-20438228";
 
     @Bean
     public RequestInterceptor bearerTokenInterceptor() {

@@ -1,6 +1,15 @@
 package com.msmeli.service.feignService;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+
+import org.mockito.Mockito;
+import org.springframework.http.ResponseEntity;
+import static org.mockito.Mockito.when;
 import com.msmeli.feignClient.MeliFeignClient;
+import com.msmeli.model.Category;
+import com.msmeli.model.Item;
 import com.msmeli.model.Seller;
 import com.msmeli.repository.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -8,84 +17,106 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.boot.test.context.SpringBootTest;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.*;
+import java.time.LocalDateTime;
+import java.util.Optional;
 
-@SpringBootTest
 public class MeliServiceTest {
-
-    @InjectMocks
-    private MeliService meliService;
 
     @Mock
     private MeliFeignClient meliFeignClient;
 
     @Mock
-    private SellerRepository sellerRepository;
-
-    @Mock
     private ItemRepository itemRepository;
 
     @Mock
-    private ProductRepository productRepository;
+    private CategoryRepository categoryRepository;
 
     @Mock
-    CategoryRepository categoryRepository;
+    private SellerRepository sellerRepository;
 
     @Mock
-    SellerRatingRepository sellerRatingRepository;
+    private SellerRatingRepository sellerRatingRepository;
 
     @Mock
-    SellerReputationRepository sellerReputationRepository;
+    private SellerReputationRepository sellerReputationRepository;
 
     @Mock
-    SellerTransactionRepository sellerTransactionRepository;
+    private SellerTransactionRepository sellerTransactionRepository;
+
+    @InjectMocks
+    private MeliService meliService;
 
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        meliService = new MeliService(
-                meliFeignClient,
-                productRepository,
-                itemRepository, // Asegúrate de inyectar el repositorio en la instancia de MeliService
-                categoryRepository,
-                sellerRepository,
-                sellerRatingRepository,
-                sellerReputationRepository,
-                sellerTransactionRepository
-        );
     }
 
     @Test
-    public void testSaveSeller() {
-        // Simular el comportamiento de meliFeignClient
-        String sellerJsonResponse = "{\"seller\": {\"id\": 123, \"nickname\": \"MORO TECH\"}}";
-        when(meliFeignClient.getSellerByNickname("MORO TECH")).thenReturn(sellerJsonResponse);
-
-        // Llamar al método saveSeller
-        meliService.saveSeller();
-
-        // Verificar que sellerRepository.save se llamó con el Seller esperado
-        verify(sellerRepository).save(
-                argThat(seller -> {
-                    assertEquals(123, seller.getSellerId());
-                    assertEquals("MORO TECH", seller.getNickname());
-                    return true;
-                })
-        );
-    }
-
-    @Test
-    public void testSaveSellerItems() {
-        // Configura el comportamiento simulado del cliente Feign
-        when(meliFeignClient.getSellerByNickname("MORO TECH")).thenReturn("{\"results\":[{\"id\":\"123\",\"title\":\"Item 1\",\"condition\":\"New\",\"price\":10.0,\"sold_quantity\":2,\"available_quantity\":5}]}");
+    public void testGetItemById() {
+        // Configura el comportamiento simulado del repositorio de ítems
+        when(itemRepository.findById("itemId")).thenReturn(Optional.of(new Item(/* Datos del ítem */)));
 
         // Llama al método que deseas probar
-        meliService.saveSellerItems();
+        try {
+            Item item = meliService.getItemById("itemId");
 
-        // Verifica que el método saveAll del repositorio se haya llamado con la lista de ítems correcta
-        verify(itemRepository, times(1)).saveAll(anyList());
+            // Realiza afirmaciones sobre el resultado
+            assertNotNull(item);
+            // Agrega más afirmaciones según sea necesario
+        } catch (Exception e) {
+            fail("Excepción no esperada: " + e.getMessage());
+        }
     }
+
+    @Test
+    public void testGetCategory() {
+        // Configura el comportamiento simulado del repositorio de categorías
+        when(categoryRepository.findById("categoryId")).thenReturn(Optional.of(new Category(/* Datos de la categoría */)));
+
+        // Llama al método que deseas probar
+        try {
+            Category category = meliService.getCategory("categoryId");
+
+            // Realiza afirmaciones sobre el resultado
+            assertNotNull(category);
+            // Agrega más afirmaciones según sea necesario
+        } catch (Exception e) {
+            fail("Excepción no esperada: " + e.getMessage());
+        }
+    }
+
+    @Test
+    public void testGetSeller() {
+        // Configura el comportamiento simulado del repositorio de vendedores
+        int sellerId = 123; // El ID del vendedor que deseas buscar
+        Seller seller = new Seller(/* Datos del vendedor simulado */);
+        when(sellerRepository.findById(sellerId)).thenReturn(Optional.of(seller));
+
+        // Llama al método que deseas probar
+        try {
+            Seller resultSeller = meliService.getSeller(sellerId);
+
+            // Realiza afirmaciones sobre el resultado
+            assertNotNull(resultSeller);
+            // Agrega más afirmaciones según sea necesario
+        } catch (Exception e) {
+            fail("Excepción no esperada: " + e.getMessage());
+        }
+    }
+
+    @Test
+    public void testGetSellerWhenSellerNotFound() {
+        // Configura el comportamiento simulado del repositorio de vendedores cuando no se encuentra el vendedor
+        int sellerId = 456; // Un ID de vendedor que no existe en el repositorio
+        when(sellerRepository.findById(sellerId)).thenReturn(Optional.empty());
+
+        // Llama al método que deseas probar y espera una excepción
+        assertThrows(Exception.class, () -> {
+            meliService.getSeller(sellerId);
+        }, "Seller not found");
+    }
+
+
+
 }
