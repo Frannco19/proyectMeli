@@ -104,7 +104,7 @@ public class UserEntityService implements IUserEntityService {
     public String recoverPassword(String username) throws ResourceNotFoundException {
         Optional<UserEntity> userSearch = userEntityRepository.findByUsername(username);
         if (userSearch.isEmpty()) throw new ResourceNotFoundException("User not found");
-        emailService.sendMail(userSearch.get().getEmail(), "Recover Password", emailRecoverPassword(username));
+        emailService.sendMail(userSearch.get().getEmail(), "Recuperar contraseña", emailRecoverPassword(username));
         return "Recovery password email sent successfully to " + username;
     }
 
@@ -113,9 +113,10 @@ public class UserEntityService implements IUserEntityService {
         if (userSearch.isEmpty()) throw new ResourceNotFoundException("User not found");
         String newPassword = String.valueOf(UUID.randomUUID()).substring(0, 7);
         userSearch.get().setPassword(passwordEncoder.encode(newPassword));
-        emailService.sendMail(userSearch.get().getEmail(), "Reset Password", emailResetPassword(username, newPassword));
+        emailService.sendMail(userSearch.get().getEmail(), "Restablecer la contraseña", emailResetPassword(username, newPassword));
         userEntityRepository.save(userSearch.get());
-        return "Reset password email sent successfully to " + username;
+        return "\n" +
+                "Correo electrónico para restablecer la contraseña enviado correctamente a" + username;
     }
 
     @Override
@@ -131,14 +132,16 @@ public class UserEntityService implements IUserEntityService {
     }
 
     private String emailWelcomeBody(String username) {
-        return "Dear " + username + ",\n \n" + "For log in continue to : http://localhost:4200/auth/login/" + "\n \n" + "Greetings, 3ra Aceleracion staff.";
+        return "Dear " + username + ",\n \n" + "Para iniciar sesión click aqui : http://localhost:4200/auth/login/" + "\n \n" + "Saludos, equipo de la 3ra Aceleracion.";
     }
 
     private String emailRecoverPassword(String username) {
-        return "Dear " + username + ",\n \n" + "To continue with your password reset click here : http://localhost:8080/meli/user/reset_password/" + username + "\n \n" + "If you haven't requested it discard this mail. " + "\n \n" + "Greetings, 3ra Aceleracion staff.";
+        return "Dear " + username + ",\n \n" + "Para continuar con el restablecimiento de su contraseña haga click aquí: http://localhost:4200/recover-password/" + username + "\n \n" + "Si no has solicitado el restablecimiento descarta este correo. " + "\n \n" + "Saludos, equipo de la 3ra Aceleracion.";
     }
 
     private String emailResetPassword(String username, String newPassword) {
-        return "Dear " + username + ",\n \n" + "Password reset successfully." + "\n \n" + "Your new password is :  " + newPassword + "\n \n" + "Greetings, 3ra Aceleracion staff.";
+        return "Dear " + username + ",\n \n" +
+                "Restablecimiento de contraseña exitoso." + "\n \n"+
+                "Tu nueva contraseña es :  " + newPassword + "\n \n" + "Saludos, equipo de la 3ra Aceleracion.";
     }
 }
