@@ -13,9 +13,9 @@ import java.util.Date;
 @Setter
 @JsonIgnoreProperties(ignoreUnknown = true)
 @ToString
-public class ItemDTO {
+public class ItemResponseDTO {
 
-    private String item_id;
+//    private String item_id;
     private String id;
     private String title;
     private String catalog_product_id;

@@ -1,4 +1,4 @@
-package com.msmeli.dto.response;
+package com.msmeli.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
@@ -9,7 +9,6 @@ import lombok.*;
 @Getter
 @Setter
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class SellerDTO {
-    private Integer id;
-    private String nickname;
+public class PicturesDTO {
+    String url;
 }

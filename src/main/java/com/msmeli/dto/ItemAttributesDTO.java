@@ -1,7 +1,8 @@
-package com.msmeli.dto.response;
+package com.msmeli.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.msmeli.dto.AttributesDTO;
+import com.msmeli.dto.PicturesDTO;
 import lombok.*;
 
 import java.util.Date;
@@ -19,4 +20,5 @@ public class ItemAttributesDTO {
     private String condition;
     private Date date_created;
     private Date last_updated;
+
 }

@@ -2,8 +2,8 @@ package com.msmeli.service.implement;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.msmeli.dto.response.OneProductResponseDTO;
-import com.msmeli.dto.response.ItemDTO;
-import com.msmeli.dto.response.SellerResponseDTO;
+import com.msmeli.dto.response.ItemResponseDTO;
+import com.msmeli.dto.SellerDTO;
 import com.msmeli.feignClient.MeliFeignClient;
 import com.msmeli.model.Item;
 import com.msmeli.repository.ItemRepository;
@@ -37,65 +37,27 @@ public class ItemServiceImpl implements ItemService {
         this.mapper = mapper;
     }
 
-
     @Override
-    public List<ItemDTO> getSellerItems(Integer sellerId){
+    public List<ItemResponseDTO> getSellerItems(Integer sellerId){
         List<Item> itemList = itemRepository.getItemsBySellerId(sellerId);
-        return getItemResponseDTOS(itemList);
+        return itemList.stream().map(item -> mapper.map(item, ItemResponseDTO.class))
+                .collect(Collectors.toList());
     }
 
-    @Override
-    public List<ItemDTO> getCatalogItems(String productId) {
-        List<Item> catalogItems = itemRepository.getCatalogItems(productId);
-        return getItemResponseDTOS(catalogItems);
-    }
+//    @Override
+//    public List<ItemResponseDTO> getCatalogItems(String productId) {
+//        List<Item> catalogItems = itemRepository.getCatalogItems(productId);
+//        return null;
+////        return getItemResponseDTOS(catalogItems);
+//    }
 
-
-    //TODO revision getOneProduct
     @Override
     public OneProductResponseDTO getOneProduct(String productId) throws JsonProcessingException {
         Item item = itemRepository.findByProductId(productId);
-
-        SellerResponseDTO seller = meliFeignClient.getSellerBySellerId(item.getSellerId());
-        String typeName = meliService.getListingTypeName(item.getListing_type_id());
-
-        return OneProductResponseDTO.builder()
-                .title(item.getTitle())
-                .catalog_product_id(item.getCatalog_product_id())
-                .price(item.getPrice())
-                .sold_quantity(item.getSold_quantity())
-                .available_quantity(item.getAvailable_quantity())
-                .listing_type_name(typeName)
-                .catalog_position(item.getCatalog_position())
-                .seller_nickname(seller.getSeller().getNickname())
-                .category_id(item.getCategory_id())
-                .created_date_item(item.getCreated_date_item())
-                .updated_date_item(item.getUpdated_date_item())
-                .image_url(item.getImage_url())
-                .sku(item.getSku())
-                .build();
-
+        SellerDTO seller = meliFeignClient.getSellerBySellerId(item.getSellerId());
+        OneProductResponseDTO responseDTO = mapper.map(item, OneProductResponseDTO.class);
+        responseDTO.setSeller_nickname(seller.getSeller().getNickname());
+        return responseDTO;
     }
 
-    private List<ItemDTO> getItemResponseDTOS(List<Item> items) {
-        return items
-                .stream()
-                .map((e) -> ItemDTO
-                        .builder()
-                        .item_id(e.getId())
-                        .title(e.getTitle())
-                        .catalog_product_id(e.getCatalog_product_id())
-                        .price(e.getPrice())
-                        .sold_quantity(e.getSold_quantity())
-                        .available_quantity(e.getAvailable_quantity())
-                        .listing_type_id(e.getListing_type_id())
-                        .catalog_position(e.getCatalog_position())
-                        .category_id(e.getCategory_id())
-                        .status_condition(e.getStatus_condition())
-                        .image_url(e.getImage_url())
-                        .sku(e.getSku())
-                        .build()
-                )
-                .collect(Collectors.toList());
-    }
 }

@@ -1,4 +1,4 @@
-package com.msmeli.dto.response;
+package com.msmeli.dto;
 
 import lombok.*;
 

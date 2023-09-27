@@ -1,17 +1,19 @@
-package com.msmeli.dto.response;
+package com.msmeli.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.msmeli.dto.response.CatalogItemResponseDTO;
 import lombok.*;
 
 import java.util.List;
 
-@Builder
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ItemCatalogResponseDTO {
+public class ItemCatalogDTO {
     private PagingDTO paging;
     private List<CatalogItemResponseDTO> results;
+
 }
