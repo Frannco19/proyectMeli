@@ -51,7 +51,7 @@ public class UserEntityService implements IUserEntityService {
         List<RoleEntity> roles = new ArrayList<>();
         roles.add(roleEntityService.findByName(Role.USER));
         userEntity.setRoles(roles);
-        emailService.sendMail(userEntity.getEmail(), "Welcome to MoroTech App", emailWelcomeBody(userEntity.getUsername()));
+        emailService.sendMail(userEntity.getEmail(), "Bienvenido a G&L App", emailWelcomeBody(userEntity.getUsername()));
         return mapper.map(userEntityRepository.save(userEntity), UserResponseDTO.class);
     }
 
@@ -115,8 +115,7 @@ public class UserEntityService implements IUserEntityService {
         userSearch.get().setPassword(passwordEncoder.encode(newPassword));
         emailService.sendMail(userSearch.get().getEmail(), "Restablecer la contraseña", emailResetPassword(username, newPassword));
         userEntityRepository.save(userSearch.get());
-        return "\n" +
-                "Correo electrónico para restablecer la contraseña enviado correctamente a" + username;
+        return "Correo electrónico para restablecer la contraseña enviado correctamente a" + username;
     }
 
     @Override
@@ -124,24 +123,26 @@ public class UserEntityService implements IUserEntityService {
         Optional<UserEntity> userSearch = userEntityRepository.findByUsername(username);
         if (userSearch.isEmpty()) throw new ResourceNotFoundException("User not found");
         if (!updatePassRequestDTO.getPassword().equals(updatePassRequestDTO.getRePassword()))
-            throw new ResourceNotFoundException("Passwords don't match");
+            throw new ResourceNotFoundException("new passwords don't match");
         UserEntity userEntity = userSearch.get();
+        if (!passwordEncoder.matches(updatePassRequestDTO.getCurrentPassword(), userEntity.getPassword()))
+            throw new ResourceNotFoundException("Current passwords don't match");
         userEntity.setPassword(passwordEncoder.encode(updatePassRequestDTO.getPassword()));
         userEntityRepository.save(userEntity);
         return "Password updated Successfully";
     }
 
     private String emailWelcomeBody(String username) {
-        return "Dear " + username + ",\n \n" + "Para iniciar sesión click aqui : http://localhost:4200/auth/login/" + "\n \n" + "Saludos, equipo de la 3ra Aceleracion.";
+        return "Hola " + username + ",\n \n" + "Para iniciar sesión click aqui : http://localhost:4200/auth/login/" + "\n \n" + "Saludos, equipo de la 3ra Aceleracion.";
     }
 
     private String emailRecoverPassword(String username) {
-        return "Dear " + username + ",\n \n" + "Para continuar con el restablecimiento de su contraseña haga click aquí: http://localhost:4200/recover-password/" + username + "\n \n" + "Si no has solicitado el restablecimiento descarta este correo. " + "\n \n" + "Saludos, equipo de la 3ra Aceleracion.";
+        return "Hola " + username + ",\n \n" + "Para continuar con el restablecimiento de su contraseña haga click aquí: http://localhost:4200/recover-password/" + username + "\n \n" + "Si no has solicitado el restablecimiento descarta este correo. " + "\n \n" + "Saludos, equipo de la 3ra Aceleracion.";
     }
 
     private String emailResetPassword(String username, String newPassword) {
-        return "Dear " + username + ",\n \n" +
-                "Restablecimiento de contraseña exitoso." + "\n \n"+
+        return "Hola " + username + ",\n \n" +
+                "Restablecimiento de contraseña exitoso." + "\n \n" +
                 "Tu nueva contraseña es :  " + newPassword + "\n \n" + "Saludos, equipo de la 3ra Aceleracion.";
     }
 }
