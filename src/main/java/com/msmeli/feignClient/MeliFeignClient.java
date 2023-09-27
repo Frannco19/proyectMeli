@@ -1,14 +1,14 @@
 package com.msmeli.feignClient;
 
 import com.msmeli.configuration.feign.FeignClientConfiguration;
-import com.msmeli.dto.BoxWinnerDTO;
-import com.msmeli.dto.ItemAttributesDTO;
-import com.msmeli.dto.ItemCatalogDTO;
-import com.msmeli.dto.SellerDTO;
+import com.msmeli.dto.*;
+import com.msmeli.dto.request.RefreshTokenRequestDTO;
 import com.msmeli.exception.ResourceNotFoundException;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import static com.msmeli.MsMeliApplication.MELI_URL;
 
@@ -54,8 +54,8 @@ public interface MeliFeignClient {
     @GetMapping("/products/{productId}")
     public String getBuyBoxWinner(@PathVariable String productId);
 
-
-
+    @PostMapping("/oauth/token")
+    public void refreshToken(@RequestBody RefreshTokenRequestDTO refreshTokenDTO);
 
 
 }
