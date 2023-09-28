@@ -159,7 +159,7 @@ public class MeliService {
     }
 
     @EventListener(ApplicationReadyEvent.class)
-    @Order(1)
+    @Order(3)
     public void saveSellerItems() {
          SellerDTO responseDTO = meliFeignClient.getSellerByNickname("MORO TECH");
 

@@ -1,17 +1,21 @@
 package com.msmeli.configuration.feign;
 
+import com.msmeli.service.implement.TokenServiceImpl;
 import feign.RequestInterceptor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 
 public class FeignClientConfiguration {
 
-    @Value("${meli.bearer.token}")
-    private String bearerToken;
+    private final TokenServiceImpl tokenService;
+
+    public FeignClientConfiguration(TokenServiceImpl tokenService) {
+        this.tokenService = tokenService;
+    }
+
 
     @Bean
     public RequestInterceptor bearerTokenInterceptor() {
-        return template -> template.header("Authorization", String.format("Bearer %s", bearerToken));
+        return template -> template.header("Authorization", String.format("Bearer %s", tokenService.getAccessToken("ADMIN")));
     }
 
 }
