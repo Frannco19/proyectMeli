@@ -11,7 +11,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
 
 @Component
 public class ScheduledTasks {
@@ -21,7 +20,7 @@ public class ScheduledTasks {
 //    private RefreshTokenRequestDTO refreshTokenRequestDTO;
     private final MeliFeignClient meliFeignClient;
     private final ModelMapper mapper;
-    
+
     @Value("${meli.grantType}")
     private String grant_type;
 
@@ -34,14 +33,12 @@ public class ScheduledTasks {
     @Value("${meli.refreshToken}")
     private String refresh_token;
 
+    @Value("${meli.bearer.token}")
+    private String token;
+
     public ScheduledTasks(MeliFeignClient meliFeignClient, ModelMapper mapper) {
         this.meliFeignClient = meliFeignClient;
         this.mapper = mapper;
-    }
-
-    @Scheduled(fixedRate = 5000)
-    public void reportCurrentTime() {
-        log.info("The time is now {}", dateFormat.format(new Date()));
     }
 
     @Scheduled(fixedRate = 20000)
@@ -53,11 +50,15 @@ public class ScheduledTasks {
         refreshTokenRequestDTO.setClient_secret(client_secret);
         refreshTokenRequestDTO.setRefresh_token(refresh_token);
 
-        meliFeignClient.refreshToken(refreshTokenRequestDTO);
+        RefreshTokenDTO refreshToken = meliFeignClient.refreshToken(refreshTokenRequestDTO);
 
-        RefreshTokenDTO refreshToken = mapper.map(refreshTokenRequestDTO, RefreshTokenDTO.class);
+        log.info("TOKEN ESTATICO : {}", token);
 
-        log.info("TOKEN: {}", refreshToken.getAccess_token());
+        token = refreshToken.getAccess_token();
+
+        log.info("TOKEN refreshToken: {}", refreshToken.getAccess_token());
+        log.info("TOKEN : {}", token);
+
 
     }
 }

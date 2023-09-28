@@ -55,7 +55,7 @@ public interface MeliFeignClient {
     public String getBuyBoxWinner(@PathVariable String productId);
 
     @PostMapping("/oauth/token")
-    public void refreshToken(@RequestBody RefreshTokenRequestDTO refreshTokenDTO);
+    public RefreshTokenDTO refreshToken(@RequestBody RefreshTokenRequestDTO refreshTokenDTO);
 
 
 }
