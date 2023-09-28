@@ -10,7 +10,7 @@ public class FeignClientConfiguration {
     private String bearerToken;
 
     @Bean
-    public RequestInterceptor bearerTokenInterceptor(){
+    public RequestInterceptor bearerTokenInterceptor() {
         return template -> template.header("Authorization", String.format("Bearer %s", bearerToken));
     }
 

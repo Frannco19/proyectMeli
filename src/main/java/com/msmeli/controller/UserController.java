@@ -2,6 +2,7 @@ package com.msmeli.controller;
 
 import com.msmeli.configuration.security.service.JwtService;
 import com.msmeli.dto.request.AuthRequestDTO;
+import com.msmeli.dto.request.UpdatePassRequestDTO;
 import com.msmeli.dto.request.UserRegisterRequestDTO;
 import com.msmeli.dto.response.UserAuthResponseDTO;
 import com.msmeli.dto.response.UserResponseDTO;
@@ -55,5 +56,27 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.OK).body(userAuthResponseDTO);
         }
         throw new UsernameNotFoundException("Invalid user request");
+    }
+
+    @GetMapping("/recover_password/{username}")
+    public ResponseEntity<String> recoverPassword(@PathVariable String username) throws ResourceNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(userEntityService.recoverPassword(username));
+    }
+
+    @GetMapping("/reset_password/{username}")
+    public ResponseEntity<String> resetPassword(@PathVariable String username) throws ResourceNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(userEntityService.resetPassword(username));
+    }
+
+    @PatchMapping("/add_role/{userId}")
+    public ResponseEntity<UserResponseDTO> modifyUserRoles(@PathVariable Long userId) throws ResourceNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(userEntityService.modifyUserRoles(userId));
+    }
+
+
+    @PatchMapping("/modify_password")
+    @PreAuthorize("hasAnyAuthority('USER','ADMIN')")
+    public ResponseEntity<String> modifyPassword(@RequestBody UpdatePassRequestDTO updatePassRequestDTO, Authentication authentication) throws ResourceNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(userEntityService.updatePassword(updatePassRequestDTO, authentication.getName()));
     }
 }

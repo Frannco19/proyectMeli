@@ -20,5 +20,4 @@ public class ItemAttributesDTO {
     private String condition;
     private Date date_created;
     private Date last_updated;
-
 }
