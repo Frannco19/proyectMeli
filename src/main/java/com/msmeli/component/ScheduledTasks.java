@@ -66,4 +66,5 @@ public class ScheduledTasks {
         log.info("TOKEN : {}", token);
 
     }
+
 }

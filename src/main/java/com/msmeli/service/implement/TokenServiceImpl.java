@@ -25,7 +25,10 @@ public class TokenServiceImpl implements TokenService {
         Token token = new Token();
 
         token.setRefresh_token("TG-64e65ca856016a000123852a-179995772");
-        token.setAccess_token(getAccessToken("ADMIN"));
+
+        //CAMBIAR EN CASO DE EMERGENCIA
+        token.setAccess_token("APP_USR-1541593069766345-092811-14f8872cae6768b86c91f84afb3419c7-179995772");
+
         token.setUsername("ADMIN");
 
         tokenRepository.save(token);
