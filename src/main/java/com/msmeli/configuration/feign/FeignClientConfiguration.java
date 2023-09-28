@@ -1,11 +1,13 @@
 package com.msmeli.configuration.feign;
 
 import feign.RequestInterceptor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 
 public class FeignClientConfiguration {
 
-    private String bearerToken = "APP_USR-3292649208279826-092715-393f7d07acb0b1e2736e2dd9877b7bed-146409424";
+    @Value("${meli.bearer.token}")
+    private String bearerToken;
 
     @Bean
     public RequestInterceptor bearerTokenInterceptor() {

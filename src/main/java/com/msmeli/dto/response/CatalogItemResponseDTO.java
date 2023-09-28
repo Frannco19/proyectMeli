@@ -6,7 +6,6 @@ import lombok.*;
 
 import java.util.Date;
 
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -21,10 +20,8 @@ public class CatalogItemResponseDTO {
     private String seller_nickname;
     private int sold_quantity;
     private int available_quantity;
-
     @JsonFormat(pattern = "dd-MM-yyyy")
     private Date created_date_item;
-
     @JsonFormat(pattern = "dd-MM-yyyy")
     private Date updated_date_item;
 

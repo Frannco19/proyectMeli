@@ -1,6 +1,8 @@
-package com.msmeli.dto.response;
+package com.msmeli.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.msmeli.dto.AttributesDTO;
+import com.msmeli.dto.PicturesDTO;
 import lombok.*;
 
 import java.util.Date;

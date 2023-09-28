@@ -1,4 +1,4 @@
-package com.msmeli.dto.response;
+package com.msmeli.dto;
 
 import lombok.*;
 
@@ -7,7 +7,7 @@ import lombok.*;
 @AllArgsConstructor
 @Getter
 @Setter
-public class ListingTypeResponseDTO {
+public class ListingTypeDTO {
 
     private String id;
     private String name;

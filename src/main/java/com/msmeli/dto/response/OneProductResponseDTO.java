@@ -7,7 +7,6 @@ import java.util.Date;
 
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -23,7 +22,7 @@ public class OneProductResponseDTO {
 
     private int available_quantity;
 
-    private String listing_type_name;
+    private String listing_type_id;
 
     private int catalog_position;
 
