@@ -3,15 +3,19 @@ package com.msmeli.component;
 import com.msmeli.dto.RefreshTokenDTO;
 import com.msmeli.dto.request.RefreshTokenRequestDTO;
 import com.msmeli.feignClient.MeliFeignClient;
+import com.msmeli.service.implement.TokenServiceImpl;
+import lombok.Getter;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.annotation.Order;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
 
+@Getter
 @Component
 public class ScheduledTasks {
 
@@ -20,6 +24,8 @@ public class ScheduledTasks {
 //    private RefreshTokenRequestDTO refreshTokenRequestDTO;
     private final MeliFeignClient meliFeignClient;
     private final ModelMapper mapper;
+
+    private final TokenServiceImpl tokenService;
 
     @Value("${meli.grantType}")
     private String grant_type;
@@ -30,35 +36,34 @@ public class ScheduledTasks {
     @Value("${meli.clientSecret}")
     private String client_secret;
 
-    @Value("${meli.refreshToken}")
-    private String refresh_token;
-
-    @Value("${meli.bearer.token}")
     private String token;
 
-    public ScheduledTasks(MeliFeignClient meliFeignClient, ModelMapper mapper) {
+    public ScheduledTasks(MeliFeignClient meliFeignClient, ModelMapper mapper, TokenServiceImpl tokenService) {
         this.meliFeignClient = meliFeignClient;
         this.mapper = mapper;
+        this.tokenService = tokenService;
     }
 
-    @Scheduled(fixedRate = 20000)
+    @Scheduled(fixedRate = 3600000)
+    @Order(2)
     public void refreshToken(){
         RefreshTokenRequestDTO refreshTokenRequestDTO = new RefreshTokenRequestDTO();
 
         refreshTokenRequestDTO.setGrant_type(grant_type);
         refreshTokenRequestDTO.setClient_id(client_id);
         refreshTokenRequestDTO.setClient_secret(client_secret);
-        refreshTokenRequestDTO.setRefresh_token(refresh_token);
+        refreshTokenRequestDTO.setRefresh_token(tokenService.getRefreshToken("ADMIN"));
 
         RefreshTokenDTO refreshToken = meliFeignClient.refreshToken(refreshTokenRequestDTO);
 
-        log.info("TOKEN ESTATICO : {}", token);
+        log.info("TOKEN ESTATICO : {}", tokenService.getAccessToken("ADMIN"));
 
         token = refreshToken.getAccess_token();
 
+        tokenService.updateToken(token);
+
         log.info("TOKEN refreshToken: {}", refreshToken.getAccess_token());
         log.info("TOKEN : {}", token);
-
 
     }
 }
