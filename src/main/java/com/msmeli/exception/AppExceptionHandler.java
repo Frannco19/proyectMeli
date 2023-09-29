@@ -1,5 +1,7 @@
 package com.msmeli.exception;
 
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.security.SignatureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ProblemDetail;
@@ -34,7 +36,7 @@ public class AppExceptionHandler {
         return error;
     }
 
-    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(AlreadyExistsException.class)
     public Map<String, String> alreadyExists(AlreadyExistsException ex) {
         Map<String, String> error = new HashMap<>();
@@ -54,7 +56,16 @@ public class AppExceptionHandler {
             errorDetail = ProblemDetail
                     .forStatusAndDetail(HttpStatusCode.valueOf(403), ex.getMessage());
             errorDetail.setProperty("access_denied_reason", "not_authorized!");
-
+        }
+        if (ex instanceof SignatureException) {
+            errorDetail = ProblemDetail
+                    .forStatusAndDetail(HttpStatusCode.valueOf(403), ex.getMessage());
+            errorDetail.setProperty("access_denied_reason", "JWT signature not valid!");
+        }
+        if (ex instanceof ExpiredJwtException) {
+            errorDetail = ProblemDetail
+                    .forStatusAndDetail(HttpStatusCode.valueOf(403), ex.getMessage());
+            errorDetail.setProperty("access_denied_reason", "JWT token alredy expired!");
         }
         return errorDetail;
     }
