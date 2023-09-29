@@ -1,5 +1,6 @@
 package com.msmeli.service.implement;
 
+import com.msmeli.configuration.security.service.UserEntityRefreshTokenService;
 import com.msmeli.dto.request.UpdatePassRequestDTO;
 import com.msmeli.dto.request.UserRegisterRequestDTO;
 import com.msmeli.dto.response.UserAuthResponseDTO;
@@ -30,14 +31,16 @@ public class UserEntityService implements IUserEntityService {
     private final ModelMapper mapper;
     private final IRoleEntityService roleEntityService;
     private final IEmailService emailService;
+    private final UserEntityRefreshTokenService refreshTokenService;
 
 
-    public UserEntityService(UserEntityRepository userEntityRepository, PasswordEncoder passwordEncoder, ModelMapper mapper, IRoleEntityService roleEntityService, IEmailService emailService) {
+    public UserEntityService(UserEntityRepository userEntityRepository, PasswordEncoder passwordEncoder, ModelMapper mapper, IRoleEntityService roleEntityService, IEmailService emailService, UserEntityRefreshTokenService refreshTokenService) {
         this.userEntityRepository = userEntityRepository;
         this.passwordEncoder = passwordEncoder;
         this.mapper = mapper;
         this.roleEntityService = roleEntityService;
         this.emailService = emailService;
+        this.refreshTokenService = refreshTokenService;
     }
 
     @Override
@@ -51,8 +54,10 @@ public class UserEntityService implements IUserEntityService {
         List<RoleEntity> roles = new ArrayList<>();
         roles.add(roleEntityService.findByName(Role.USER));
         userEntity.setRoles(roles);
+        UserEntity savedUser = userEntityRepository.save(userEntity);
+        refreshTokenService.createRefreshToken(savedUser);
         emailService.sendMail(userEntity.getEmail(), "Bienvenido a G&L App", emailWelcomeBody(userEntity.getUsername()));
-        return mapper.map(userEntityRepository.save(userEntity), UserResponseDTO.class);
+        return mapper.map(savedUser, UserResponseDTO.class);
     }
 
     @Override
@@ -141,8 +146,6 @@ public class UserEntityService implements IUserEntityService {
     }
 
     private String emailResetPassword(String username, String newPassword) {
-        return "Hola " + username + ",\n \n" +
-                "Restablecimiento de contraseña exitoso." + "\n \n" +
-                "Tu nueva contraseña es :  " + newPassword + "\n \n" + "Saludos, equipo de la 3ra Aceleracion.";
+        return "Hola " + username + ",\n \n" + "Restablecimiento de contraseña exitoso." + "\n \n" + "Tu nueva contraseña es :  " + newPassword + "\n \n" + "Saludos, equipo de la 3ra Aceleracion.";
     }
 }
