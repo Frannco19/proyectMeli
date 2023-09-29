@@ -146,8 +146,6 @@ public class UserEntityService implements IUserEntityService {
     }
 
     private String emailResetPassword(String username, String newPassword) {
-        return "Hola " + username + ",\n \n" +
-                "Restablecimiento de contraseña exitoso." + "\n \n" +
-                "Tu nueva contraseña es :  " + newPassword + "\n \n" + "Saludos, equipo de la 3ra Aceleracion.";
+        return "Hola " + username + ",\n \n" + "Restablecimiento de contraseña exitoso." + "\n \n" + "Tu nueva contraseña es :  " + newPassword + "\n \n" + "Saludos, equipo de la 3ra Aceleracion.";
     }
 }
