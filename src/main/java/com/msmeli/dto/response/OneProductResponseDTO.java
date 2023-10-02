@@ -1,6 +1,7 @@
 package com.msmeli.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.persistence.Column;
 import lombok.*;
 
 import java.util.Date;
@@ -25,6 +26,9 @@ public class OneProductResponseDTO {
     private String listing_type_id;
 
     private int catalog_position;
+
+    @Column(name = "best_seller_position")
+    private int bestSellerPosition;
 
     private String seller_nickname;
 

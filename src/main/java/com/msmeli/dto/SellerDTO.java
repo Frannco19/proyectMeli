@@ -17,4 +17,5 @@ import java.util.List;
 public class SellerDTO {
     private SellerResponseDTO seller;
     private List<ItemResponseDTO> results;
+    private PagingDTO paging;
 }

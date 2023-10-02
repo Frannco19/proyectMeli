@@ -32,9 +32,13 @@ public class Item {
 
     private int catalog_position;
 
+    private int best_seller_position;
+
     private Integer sellerId;
 
     private String category_id;
+
+    private String status;
 
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime update_date_db;
