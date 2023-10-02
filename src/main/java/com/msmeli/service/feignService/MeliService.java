@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -113,11 +114,16 @@ public class MeliService {
                         .build());
     }
 
-    public String getListingTypeName(String listingTypeId) throws JsonProcessingException {
+    public String getListingTypeName(String listingTypeId){
         DocumentContext jsonType = JsonPath.parse(meliFeignClient.getTypeName());
         String content = jsonType.read("$.[*]").toString();
 
-        List<ListingTypeDTO> typesList = objectMapper.readValue(content, new TypeReference<>(){});
+        List<ListingTypeDTO> typesList = null;
+        try {
+            typesList = objectMapper.readValue(content, new TypeReference<>(){});
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
 
         String typeName;
 
@@ -158,29 +164,52 @@ public class MeliService {
 
     }
 
+    private String getItemSku(ItemAttributesDTO attributes){
+        List<AttributesDTO> sku = attributes.getAttributes()
+                .parallelStream()
+                .filter(att -> att.getName().equals("SKU"))
+                .toList();
+        if (!sku.isEmpty()) return sku.get(0).getValue_name();
+        return null;
+    }
+
     @EventListener(ApplicationReadyEvent.class)
     @Order(3)
     public void saveSellerItems() {
-         SellerDTO responseDTO = meliFeignClient.getSellerByNickname("MORO TECH");
+        int offset = 0;
+        SellerDTO responseDTO;
+        List<Item> items = new ArrayList<>();
 
-         List<Item> items = responseDTO.getResults().parallelStream().map(e ->{
-             ItemAttributesDTO attributesDTO = meliFeignClient.getItemAtributtes(e.getId());
-             e.setImage_url(attributesDTO.getPictures().get(0).getUrl());
-             e.setCreated_date_item(attributesDTO.getDate_created());
-             e.setUpdated_date_item(attributesDTO.getLast_updated());
-             e.setSku(attributesDTO.getAttributes().parallelStream().filter(att-> att.getName().equals("SKU"))
-                     .toList().get(0).getValue_name());
-             try {
-                 e.setListing_type_id(getListingTypeName(e.getListing_type_id()));
-             } catch (JsonProcessingException ex) {
-                 throw new RuntimeException(ex);
-             }
-             Item item = modelMapper.map(e,Item.class);
-             item.setUpdate_date_db(LocalDateTime.now());
-             item.setSellerId(responseDTO.getSeller().getId());
-             return item;
-         }).toList();
-         itemRepository.saveAll(items);
+        do {
+            items.clear();
+
+            responseDTO = meliFeignClient.getSellerByNickname("MORO TECH", offset);
+
+            SellerDTO finalResponseDTO = responseDTO;
+
+            responseDTO.getResults().parallelStream().forEach(e -> {
+
+                ItemAttributesDTO attributesDTO = meliFeignClient.getItemAtributtes(e.getId());
+
+                e.setImage_url(attributesDTO.getPictures().get(0).getUrl());
+                e.setCreated_date_item(attributesDTO.getDate_created());
+                e.setUpdated_date_item(attributesDTO.getLast_updated());
+
+                e.setSku(getItemSku(attributesDTO));
+
+                e.setListing_type_id(getListingTypeName(e.getListing_type_id()));
+
+                Item item = modelMapper.map(e, Item.class);
+                item.setUpdate_date_db(LocalDateTime.now());
+                item.setSellerId(finalResponseDTO.getSeller().getId());
+
+                items.add(item);
+            });
+
+            itemRepository.saveAll(items);
+
+            offset = offset + 50;
+        } while (!responseDTO.getResults().isEmpty());
     }
 
     public List<CatalogItemResponseDTO> getSellerItemCatalog(String product_catalog_id) {
@@ -196,12 +225,12 @@ public class MeliService {
             e.setUpdated_date_item(attributesDTO.getLast_updated());
             e.setSeller_nickname(sellerDTO.getSeller().getNickname());
 
-            System.out.println(e.getSeller_id());
+            //System.out.println(e.getSeller_id());
 
         }).toList();
     }
 
-    public BuyBoxWinnerResponseDTO getBuyBoxWinner(String productId) throws JsonProcessingException {
+    public BuyBoxWinnerResponseDTO getBuyBoxWinner(String productId){
 
         BoxWinnerDTO result = meliFeignClient.getProductWinnerSearch(productId);
         SellerDTO seller = meliFeignClient.getSellerBySellerId(result.getBuy_box_winner().getSeller_id());
