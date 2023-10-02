@@ -18,6 +18,7 @@ public class ItemAttributesDTO {
     private List<AttributesDTO> attributes;
     private List<PicturesDTO> pictures;
     private String condition;
+    private String status;
     private Date date_created;
     private Date last_updated;
 }

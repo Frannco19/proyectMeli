@@ -26,6 +26,10 @@ public class ItemResponseDTO {
     private int catalog_position;
     private String seller_nickname;
     private String category_id;
+
+    private int best_seller_position;
+
+    private String status;
     @JsonProperty("condition")
     private String status_condition;
     private String image_url;

@@ -20,8 +20,8 @@ public class CatalogItemResponseDTO {
     private String seller_nickname;
     private int sold_quantity;
     private int available_quantity;
-
     private int catalogPosition;
+
     @JsonFormat(pattern = "dd-MM-yyyy")
     private Date created_date_item;
     @JsonFormat(pattern = "dd-MM-yyyy")

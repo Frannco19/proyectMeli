@@ -52,11 +52,13 @@ public class ItemServiceImpl implements ItemService {
 //    }
 
     @Override
-    public OneProductResponseDTO getOneProduct(String productId) throws JsonProcessingException {
+    public OneProductResponseDTO getOneProduct(String productId){
         Item item = itemRepository.findByProductId(productId);
         SellerDTO seller = meliFeignClient.getSellerBySellerId(item.getSellerId());
         OneProductResponseDTO responseDTO = mapper.map(item, OneProductResponseDTO.class);
         responseDTO.setSeller_nickname(seller.getSeller().getNickname());
+        responseDTO.setBestSellerPosition(meliService.getBestSellerPosition(item.getId(), productId));
+        responseDTO.setCatalog_position(meliService.getCatalogPosition(item.getId(), productId));
         return responseDTO;
     }
 
