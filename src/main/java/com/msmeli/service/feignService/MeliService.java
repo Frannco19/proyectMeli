@@ -23,6 +23,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 @Service
 public class MeliService {
@@ -189,12 +191,16 @@ public class MeliService {
 
         return responseDTO.getResults().parallelStream().peek(e ->{
 
+            int position = responseDTO.getResults().indexOf(e);
+
             ItemAttributesDTO attributesDTO = meliFeignClient.getItemAtributtes(e.getItem_id());
             SellerDTO sellerDTO = meliFeignClient.getSellerBySellerId(e.getSeller_id());
 
             e.setCreated_date_item(attributesDTO.getDate_created());
             e.setUpdated_date_item(attributesDTO.getLast_updated());
             e.setSeller_nickname(sellerDTO.getSeller().getNickname());
+
+            e.setCatalogPosition(position + 1);
 
             System.out.println(e.getSeller_id());
 

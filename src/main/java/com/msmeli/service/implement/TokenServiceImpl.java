@@ -3,6 +3,7 @@ package com.msmeli.service.implement;
 import com.msmeli.model.Token;
 import com.msmeli.repository.TokenRepository;
 import com.msmeli.service.services.TokenService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
@@ -12,6 +13,15 @@ import org.springframework.stereotype.Service;
 public class TokenServiceImpl implements TokenService {
 
     private TokenRepository tokenRepository;
+
+    @Value("${meli.refresh.token}")
+    private String meliRefreshToken;
+
+    @Value("${meli.access.token}")
+    private String meliAccessToken;
+
+    @Value("${meli.username.token}")
+    private String meliUsernameToken;
 
     public TokenServiceImpl(TokenRepository tokenRepository) {
         this.tokenRepository = tokenRepository;
@@ -24,12 +34,12 @@ public class TokenServiceImpl implements TokenService {
     public void saveToken(){
         Token token = new Token();
 
-        token.setRefresh_token("TG-64e7a8e091c3b50001c18333-1460630484");
+        token.setRefresh_token(meliRefreshToken);
 
         //TODO CAMBIAR EN CASO DE EMERGENCIA
-        token.setAccess_token("APP_USR-8900314243904844-092909-72e95ec007bdcfc14d41a5975b16df83-1460630484");
+        token.setAccess_token(meliAccessToken);
 
-        token.setUsername("ADMIN");
+        token.setUsername(meliUsernameToken);
 
         tokenRepository.save(token);
     }
