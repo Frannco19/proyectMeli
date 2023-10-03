@@ -11,6 +11,10 @@ import com.msmeli.service.feignService.MeliService;
 import com.msmeli.service.services.ItemService;
 import com.msmeli.service.services.SellerService;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -38,10 +42,15 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemResponseDTO> getSellerItems(Integer sellerId){
-        List<Item> itemList = itemRepository.getItemsBySellerId(sellerId);
-        return itemList.stream().map(item -> mapper.map(item, ItemResponseDTO.class))
-                .collect(Collectors.toList());
+    public Page<ItemResponseDTO> getSellerItems(Integer sellerId, int offset, int pageSize){
+        Pageable pageable = PageRequest.of(offset,pageSize);
+        Page<Item> itemPage = itemRepository.getItemsBySellerId(sellerId, pageable);
+        List<ItemResponseDTO> items = itemPage.getContent()
+                .stream()
+                .parallel()
+                .map(item -> mapper.map(item, ItemResponseDTO.class))
+                .toList();
+        return new PageImpl<>(items,pageable,itemPage.getTotalElements());
     }
 
 //    @Override
