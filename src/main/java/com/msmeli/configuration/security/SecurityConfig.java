@@ -20,6 +20,13 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 
+
+import org.springframework.web.filter.CorsFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+
+
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -31,14 +38,29 @@ public class SecurityConfig {
         this.jwtAuthFilter = jwtAuthFilter;
     }
 
+
+
     @Bean
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-                .allowedOrigins("http://201.216.243.146:10080/","http://201.216.243.146:10080/api")
-                .allowedMethods("GET", "POST", "PATCH", "PUT", "DELETE")
-                .allowedHeaders("Origin", "X-Requested-With", "Content-Type", "Accept")
-                .allowCredentials(true);
+    public CorsFilter corsFilter() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        CorsConfiguration config = new CorsConfiguration();
+
+        // Configura los orígenes permitidos
+        config.addAllowedOrigin("http://201.216.243.146:10080");
+
+        // Configura los métodos HTTP permitidos (GET, POST, etc.)
+        config.addAllowedMethod("*");
+
+        // Configura los encabezados permitidos
+        config.addAllowedHeader("*");
+
+        // Habilita el uso de cookies en las solicitudes CORS
+        config.setAllowCredentials(true);
+
+        source.registerCorsConfiguration("/**", config);
+        return new CorsFilter(source);
     }
+
 
     @Bean
     public UserDetailsService userDetailsService() {
@@ -49,7 +71,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.csrf().disable()
                 .authorizeHttpRequests()
-                .requestMatchers("/api/meli/user/**", "/api/item/**", "/v3/api-docs/**", "/swagger-ui/**", "/v2/api-docs/**", "/swagger-resources/**").permitAll()
+                .requestMatchers("/meli/user/**", "/item/**", "/v3/api-docs/**", "/swagger-ui/**", "/v2/api-docs/**", "/swagger-resources/**").permitAll()
                 .and()
                 .authorizeHttpRequests().anyRequest().authenticated()
                 .and()

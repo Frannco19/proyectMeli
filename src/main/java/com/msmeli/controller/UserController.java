@@ -25,8 +25,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = "http://201.216.243.146:10080/api")
-@RequestMapping("/api/meli/user")
+@CrossOrigin(origins = "http://201.216.243.146:10080")
+@RequestMapping("/meli/user")
 public class UserController {
 
     private final IUserEntityService userEntityService;

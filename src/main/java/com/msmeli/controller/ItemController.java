@@ -13,8 +13,8 @@ import java.text.ParseException;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = "http://201.216.243.146:10080/api")
-@RequestMapping("/api/item")
+@CrossOrigin(origins = "http://201.216.243.146:10080")
+@RequestMapping("/item")
 public class ItemController {
 
     private final ItemService itemService;
