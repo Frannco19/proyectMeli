@@ -1,5 +1,4 @@
-package com.msmeli.configuration.security
-        ;
+package com.msmeli.configuration.security;
 
 import com.msmeli.configuration.security.filter.JwtAuthFilter;
 import com.msmeli.configuration.security.service.UserEntityUserDetailsService;
@@ -18,13 +17,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
 
 
 import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
 
 
 @Configuration
@@ -37,7 +34,6 @@ public class SecurityConfig {
     public SecurityConfig(JwtAuthFilter jwtAuthFilter) {
         this.jwtAuthFilter = jwtAuthFilter;
     }
-
 
 
     @Bean
@@ -60,7 +56,6 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
     }
-
 
     @Bean
     public UserDetailsService userDetailsService() {
