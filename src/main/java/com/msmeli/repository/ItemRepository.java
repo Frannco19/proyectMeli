@@ -2,6 +2,8 @@ package com.msmeli.repository;
 
 import com.msmeli.dto.response.CreateItemDTO;
 import com.msmeli.model.Item;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -14,7 +16,7 @@ public interface ItemRepository extends JpaRepository<Item, String> {
     List<CreateItemDTO> getItemAtribbutes(Integer selleId);
 
     @Query("SELECT i FROM Item i WHERE i.sellerId = ?1")
-    List<Item> getItemsBySellerId(Integer sellerId);
+    Page<Item> getItemsBySellerId(Integer sellerId, Pageable pageable);
 
 //    @Query("SELECT i FROM Item i WHERE i.catalog_product_id = ?1 ORDER BY i.catalog_position ASC")
 //    List<Item> getCatalogItems(String productId);

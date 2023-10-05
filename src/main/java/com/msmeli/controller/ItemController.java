@@ -7,6 +7,7 @@ import com.msmeli.dto.response.ItemResponseDTO;
 import com.msmeli.dto.response.OneProductResponseDTO;
 import com.msmeli.service.feignService.MeliService;
 import com.msmeli.service.services.ItemService;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
@@ -26,9 +27,13 @@ public class ItemController {
         this.meliService = meliService;
     }
 
-    @GetMapping("/seller/items/{sellerId}")
-    public List<ItemResponseDTO> sellerItems(@PathVariable Integer sellerId){
-        return itemService.getSellerItems(sellerId);
+    @GetMapping("/seller/items")
+    public Page<ItemResponseDTO> sellerItems(
+            @RequestParam("sellerId") Integer sellerId,
+            @RequestParam(value = "offset",defaultValue = "0") int offset,
+            @RequestParam(value = "pageSize", defaultValue = "50", required = false) int pageSize
+    ){
+        return itemService.getSellerItems(sellerId,offset,pageSize);
     }
 
     @GetMapping("/catalog/{product_catalog_id}")
