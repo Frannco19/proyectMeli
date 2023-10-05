@@ -1,0 +1,20 @@
+version: "2.2"
+services:
+  melidb:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: gyl_meli
+      MYSQL_PASSWORD: p@ssw0rd
+      MYSQL_DATABASE: msmeli
+    volumes:
+      - ~/mysql-data:/var/lib/mysql
+    restart: always
+  meli_back:
+    image: img_meli_back
+    depends_on:
+      - melidb
+  meli_front:
+    image: img_meli_front
+    ports:
+      - 80:80
