@@ -1,10 +1,9 @@
 package com.msmeli.model;
 
-import java.io.Serializable;
-import java.util.List;
-
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.List;
 
 @Entity
 @Builder
@@ -13,7 +12,7 @@ import lombok.*;
 @Getter
 @Setter
 @Table(name = "category", catalog = "msmeli")
-public class Category{
+public class Category {
 
     @Id
     @Basic(optional = false)
@@ -23,7 +22,6 @@ public class Category{
     private String categoryName;
     @OneToMany(mappedBy = "category_id")
     private List<Item> itemList;
-
 
 
 }

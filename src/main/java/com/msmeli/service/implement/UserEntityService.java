@@ -1,5 +1,7 @@
 package com.msmeli.service.implement;
 
+import com.msmeli.configuration.security.service.UserEntityRefreshTokenService;
+import com.msmeli.dto.request.UpdatePassRequestDTO;
 import com.msmeli.dto.request.UserRegisterRequestDTO;
 import com.msmeli.dto.response.UserAuthResponseDTO;
 import com.msmeli.dto.response.UserResponseDTO;
@@ -8,6 +10,7 @@ import com.msmeli.exception.ResourceNotFoundException;
 import com.msmeli.model.RoleEntity;
 import com.msmeli.model.UserEntity;
 import com.msmeli.repository.UserEntityRepository;
+import com.msmeli.service.services.IEmailService;
 import com.msmeli.service.services.IRoleEntityService;
 import com.msmeli.service.services.IUserEntityService;
 import com.msmeli.util.Role;
@@ -18,6 +21,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UserEntityService implements IUserEntityService {
@@ -26,13 +30,17 @@ public class UserEntityService implements IUserEntityService {
     private final PasswordEncoder passwordEncoder;
     private final ModelMapper mapper;
     private final IRoleEntityService roleEntityService;
+    private final IEmailService emailService;
+    private final UserEntityRefreshTokenService refreshTokenService;
 
 
-    public UserEntityService(UserEntityRepository userEntityRepository, PasswordEncoder passwordEncoder, ModelMapper mapper, IRoleEntityService roleEntityService) {
+    public UserEntityService(UserEntityRepository userEntityRepository, PasswordEncoder passwordEncoder, ModelMapper mapper, IRoleEntityService roleEntityService, IEmailService emailService, UserEntityRefreshTokenService refreshTokenService) {
         this.userEntityRepository = userEntityRepository;
         this.passwordEncoder = passwordEncoder;
         this.mapper = mapper;
         this.roleEntityService = roleEntityService;
+        this.emailService = emailService;
+        this.refreshTokenService = refreshTokenService;
     }
 
     @Override
@@ -46,7 +54,10 @@ public class UserEntityService implements IUserEntityService {
         List<RoleEntity> roles = new ArrayList<>();
         roles.add(roleEntityService.findByName(Role.USER));
         userEntity.setRoles(roles);
-        return mapper.map(userEntityRepository.save(userEntity), UserResponseDTO.class);
+        UserEntity savedUser = userEntityRepository.save(userEntity);
+        refreshTokenService.createRefreshToken(savedUser);
+        emailService.sendMail(userEntity.getEmail(), "Bienvenido a G&L App", emailWelcomeBody(userEntity.getUsername()));
+        return mapper.map(savedUser, UserResponseDTO.class);
     }
 
     @Override
@@ -92,6 +103,49 @@ public class UserEntityService implements IUserEntityService {
     public UserAuthResponseDTO findByUsername(String username) throws ResourceNotFoundException {
         Optional<UserEntity> userSearch = userEntityRepository.findByUsername(username);
         if (userSearch.isEmpty()) throw new ResourceNotFoundException("User not found");
-        return mapper.map(userSearch,UserAuthResponseDTO.class);
+        return mapper.map(userSearch, UserAuthResponseDTO.class);
+    }
+
+    public String recoverPassword(String username) throws ResourceNotFoundException {
+        Optional<UserEntity> userSearch = userEntityRepository.findByUsername(username);
+        if (userSearch.isEmpty()) throw new ResourceNotFoundException("User not found");
+        emailService.sendMail(userSearch.get().getEmail(), "Recuperar contraseña", emailRecoverPassword(username));
+        return "Recovery password email sent successfully to " + username;
+    }
+
+    public String resetPassword(String username) throws ResourceNotFoundException {
+        Optional<UserEntity> userSearch = userEntityRepository.findByUsername(username);
+        if (userSearch.isEmpty()) throw new ResourceNotFoundException("User not found");
+        String newPassword = String.valueOf(UUID.randomUUID()).substring(0, 7);
+        userSearch.get().setPassword(passwordEncoder.encode(newPassword));
+        emailService.sendMail(userSearch.get().getEmail(), "Restablecer la contraseña", emailResetPassword(username, newPassword));
+        userEntityRepository.save(userSearch.get());
+        return "Correo electrónico para restablecer la contraseña enviado correctamente a" + username;
+    }
+
+    @Override
+    public String updatePassword(UpdatePassRequestDTO updatePassRequestDTO, String username) throws ResourceNotFoundException {
+        Optional<UserEntity> userSearch = userEntityRepository.findByUsername(username);
+        if (userSearch.isEmpty()) throw new ResourceNotFoundException("User not found");
+        if (!updatePassRequestDTO.getPassword().equals(updatePassRequestDTO.getRePassword()))
+            throw new ResourceNotFoundException("new passwords don't match");
+        UserEntity userEntity = userSearch.get();
+        if (!passwordEncoder.matches(updatePassRequestDTO.getCurrentPassword(), userEntity.getPassword()))
+            throw new ResourceNotFoundException("Current passwords don't match");
+        userEntity.setPassword(passwordEncoder.encode(updatePassRequestDTO.getPassword()));
+        userEntityRepository.save(userEntity);
+        return "Password updated Successfully";
+    }
+
+    private String emailWelcomeBody(String username) {
+        return "Hola " + username + ",\n \n" + "Para iniciar sesión click aqui : http://201.216.243.146:10080/auth/login/" + "\n \n" + "Saludos, equipo de la 3ra Aceleracion.";
+    }
+
+    private String emailRecoverPassword(String username) {
+        return "Hola " + username + ",\n \n" + "Para continuar con el restablecimiento de su contraseña haga click aquí: http://201.216.243.146:10080/recover-password/" + username + "\n \n" + "Si no has solicitado el restablecimiento descarta este correo. " + "\n \n" + "Saludos, equipo de la 3ra Aceleracion.";
+    }
+
+    private String emailResetPassword(String username, String newPassword) {
+        return "Hola " + username + ",\n \n" + "Restablecimiento de contraseña exitoso." + "\n \n" + "Tu nueva contraseña es :  " + newPassword + "\n \n" + "Saludos, equipo de la 3ra Aceleracion.";
     }
 }
