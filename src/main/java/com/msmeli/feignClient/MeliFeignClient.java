@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.util.List;
+
 import static com.msmeli.MsMeliApplication.MELI_URL;
 
 @FeignClient(name = "Meli", url = MELI_URL, configuration = FeignClientConfiguration.class)
@@ -50,6 +52,9 @@ public interface MeliFeignClient {
 
     @GetMapping("/sites/MLA/listing_types")
     public String getTypeName();
+
+    @GetMapping("/sites/MLA/listing_types")
+    public List<ListingTypeDTO> saveListingTypes();
 
     @GetMapping("/products/{productId}")
     public String getBuyBoxWinner(@PathVariable String productId);
