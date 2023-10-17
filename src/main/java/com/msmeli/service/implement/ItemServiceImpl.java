@@ -1,55 +1,81 @@
 package com.msmeli.service.implement;
 
+import com.msmeli.dto.response.OneProductResponseDTO;
 import com.msmeli.dto.response.ItemResponseDTO;
+import com.msmeli.dto.SellerDTO;
+import com.msmeli.feignClient.MeliFeignClient;
 import com.msmeli.model.Item;
-import com.msmeli.model.Seller;
 import com.msmeli.repository.ItemRepository;
+import com.msmeli.service.feignService.MeliService;
 import com.msmeli.service.services.ItemService;
+import com.msmeli.service.services.ListingTypeService;
 import com.msmeli.service.services.SellerService;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class ItemServiceImpl implements ItemService {
 
-    private ItemRepository itemRepository;
+    private final ItemRepository itemRepository;
 
-    private SellerService sellerService;
+    private final MeliFeignClient meliFeignClient;
 
-    private ModelMapper mapper;
+    private final SellerService sellerService;
 
-    @Autowired
-    public ItemServiceImpl(ItemRepository itemRepository, SellerService sellerService, ModelMapper mapper) {
+    private final ListingTypeService listingTypeService;
+
+    private final MeliService meliService;
+
+    private final ModelMapper mapper;
+
+    public ItemServiceImpl(ItemRepository itemRepository, MeliFeignClient meliFeignClient, SellerService sellerService, ListingTypeService listingTypeService, MeliService meliService, ModelMapper mapper) {
         this.itemRepository = itemRepository;
+        this.meliFeignClient = meliFeignClient;
         this.sellerService = sellerService;
+        this.listingTypeService = listingTypeService;
+        this.meliService = meliService;
         this.mapper = mapper;
     }
 
     @Override
-    public List<ItemResponseDTO> getSellerItems(Integer seller_id){
-        List<Item> itemList = itemRepository.getItemsBySellerId(seller_id);
-        return itemList
+    public Page<ItemResponseDTO> getSellerItems(Integer sellerId, int offset, int pageSize){
+        Pageable pageable = PageRequest.of(offset,pageSize);
+        Page<Item> itemPage = itemRepository.getItemsBySellerId(sellerId, pageable);
+        List<ItemResponseDTO> items = itemPage.getContent()
                 .stream()
-                .map((e) -> ItemResponseDTO
-                        .builder()
-                        .item_id(e.getItem_id())
-                        .title(e.getTitle())
-                        .catalog_product_id(e.getCatalog_product_id())
-                        .price(e.getPrice())
-                        .sold_quantity(e.getSold_quantity())
-                        .available_quantity(e.getAvailable_quantity())
-                        .listing_type_id(e.getListing_type_id())
-                        .catalog_position(e.getCatalog_position())
-                        .seller_id(e.getSellerId().getSellerId())
-                        .category_id(e.getCategory_id().getCategoryId())
-                        .build()
-                )
-                .collect(Collectors.toList());
+                .parallel()
+                .map(item -> {
+                    ItemResponseDTO itemResponseDTO = mapper.map(item, ItemResponseDTO.class);
+                    String listingTypeName = listingTypeService.getListingTypeName(item.getListing_type_id());
+                    itemResponseDTO.setListing_type_id(listingTypeName);
+                    return itemResponseDTO;
+                })
+                .toList();
+        return new PageImpl<>(items,pageable,itemPage.getTotalElements());
+    }
+
+//    @Override
+//    public List<ItemResponseDTO> getCatalogItems(String productId) {
+//        List<Item> catalogItems = itemRepository.getCatalogItems(productId);
+//        return null;
+////        return getItemResponseDTOS(catalogItems);
+//    }
+
+    @Override
+    public OneProductResponseDTO getOneProduct(String productId){
+        Item item = itemRepository.findByProductId(productId);
+        SellerDTO seller = meliFeignClient.getSellerBySellerId(item.getSellerId());
+        OneProductResponseDTO responseDTO = mapper.map(item, OneProductResponseDTO.class);
+        responseDTO.setSeller_nickname(seller.getSeller().getNickname());
+        responseDTO.setBestSellerPosition(meliService.getBestSellerPosition(item.getId(), productId));
+        responseDTO.setCatalog_position(meliService.getCatalogPosition(item.getId(), productId));
+        return responseDTO;
     }
 
 }

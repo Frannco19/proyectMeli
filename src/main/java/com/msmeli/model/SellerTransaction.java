@@ -1,9 +1,9 @@
 package com.msmeli.model;
 
-import java.util.List;
-
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.List;
 
 @Entity
 @Builder
@@ -29,8 +29,6 @@ public class SellerTransaction {
     private Integer total;
     @OneToMany(mappedBy = "sellerTransactionId")
     private List<SellerReputation> sellerreputationList;
-
-
 
 
 }

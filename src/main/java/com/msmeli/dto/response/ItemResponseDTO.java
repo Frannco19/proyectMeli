@@ -1,17 +1,23 @@
 package com.msmeli.dto.response;
 
-import com.msmeli.model.Category;
-import com.msmeli.model.Seller;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
-@Getter
-@Setter
+import java.util.Date;
+
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
+@JsonIgnoreProperties(ignoreUnknown = true)
+@ToString
 public class ItemResponseDTO {
 
-    private String item_id;
+//    private String item_id;
+    private String id;
     private String title;
     private String catalog_product_id;
     private Double price;
@@ -19,6 +25,18 @@ public class ItemResponseDTO {
     private int available_quantity;
     private String listing_type_id;
     private int catalog_position;
-    private Integer seller_id;
+    private String seller_nickname;
     private String category_id;
+
+    private int best_seller_position;
+
+    private String status;
+    @JsonProperty("condition")
+    private String status_condition;
+    private String image_url;
+    private String sku;
+    @JsonFormat(pattern = "dd-MM-yyyy")
+    private Date created_date_item;
+    @JsonFormat(pattern = "dd-MM-yyyy")
+    private Date updated_date_item;
 }

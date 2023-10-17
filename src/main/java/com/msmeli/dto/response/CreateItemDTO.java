@@ -3,7 +3,6 @@ package com.msmeli.dto.response;
 import lombok.*;
 
 
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter

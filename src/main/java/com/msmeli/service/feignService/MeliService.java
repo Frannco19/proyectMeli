@@ -1,23 +1,34 @@
 package com.msmeli.service.feignService;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
-import com.msmeli.dto.response.CreateItemDTO;
+import com.msmeli.dto.*;
+import com.msmeli.dto.response.BuyBoxWinnerResponseDTO;
+import com.msmeli.dto.response.CatalogItemResponseDTO;
+import com.msmeli.dto.response.ItemResponseDTO;
 import com.msmeli.feignClient.MeliFeignClient;
 import com.msmeli.model.Category;
 import com.msmeli.model.Item;
+import com.msmeli.model.ListingType;
 import com.msmeli.model.Seller;
 import com.msmeli.repository.*;
+import feign.FeignException;
+import org.modelmapper.ModelMapper;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
+
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Service
 public class MeliService {
@@ -30,7 +41,17 @@ public class MeliService {
     private final SellerReputationRepository sellerReputationRepository;
     private final SellerTransactionRepository sellerTransactionRepository;
 
-    public MeliService(MeliFeignClient meliFeignClient, ItemRepository itemRepository, CategoryRepository categoryRepository, SellerRepository sellerRepository, SellerRatingRepository sellerRatingRepository, SellerReputationRepository sellerReputationRepository, SellerTransactionRepository sellerTransactionRepository) {
+    private final ListingTypeRepository listingTypeRepository;
+
+    private final ObjectMapper objectMapper;
+
+    private final ModelMapper modelMapper;
+
+    public MeliService(MeliFeignClient meliFeignClient, ItemRepository itemRepository,
+                       CategoryRepository categoryRepository, SellerRepository sellerRepository,
+                       SellerRatingRepository sellerRatingRepository, SellerReputationRepository sellerReputationRepository,
+                       SellerTransactionRepository sellerTransactionRepository, ObjectMapper objectMapper,
+                       ModelMapper modelMapper, ListingTypeRepository listingTypeRepository, ObjectMapper objectMapper1) {
         this.meliFeignClient = meliFeignClient;
         this.itemRepository = itemRepository;
         this.categoryRepository = categoryRepository;
@@ -38,8 +59,10 @@ public class MeliService {
         this.sellerRatingRepository = sellerRatingRepository;
         this.sellerReputationRepository = sellerReputationRepository;
         this.sellerTransactionRepository = sellerTransactionRepository;
+        this.listingTypeRepository = listingTypeRepository;
+        this.objectMapper = objectMapper1;
+        this.modelMapper = new ModelMapper();
     }
-
 
     public Item getItemById(String itemId) throws Exception {
         return itemRepository.findById(itemId).orElseThrow(() -> new Exception("Item not found"));
@@ -52,6 +75,28 @@ public class MeliService {
     public Seller getSeller(Integer sellerId) throws Exception {
         return sellerRepository.findById(sellerId).orElseThrow(() -> new Exception("Seller not found"));
     }
+
+//    public Integer getPosition(String categoryId, String itemId) throws JsonProcessingException, ResourceNotFoundException {
+//
+//        try {
+//            DocumentContext json = JsonPath.parse(meliFeignClient.getItemPositionByCategory(categoryId));
+//
+//            String content = json.read("$.content[*]").toString();
+//            List<PositionResponseDTO> positionList = objectMapper.readValue(content, new TypeReference<>(){});
+//
+//            AtomicReference<Integer> position = new AtomicReference<>(0);
+//
+//            positionList.forEach( e -> {
+//                if(e.getId().equals(itemId)){
+//                    position.set(e.getPosition());
+//                };
+//            });
+//            return position.get();
+//        } catch (ResourceNotFoundException e) {
+//            return null;
+//        }
+//
+//    }
 
 
     public Category saveCategory(String categoryId){
@@ -77,100 +122,214 @@ public class MeliService {
                         .build());
     }
 
-//    @EventListener(ApplicationReadyEvent.class)
-//    @Order(1)
-    public void saveSellerItems() throws Exception{
+    public String getListingTypeName(String listingTypeId){
+        DocumentContext jsonType = JsonPath.parse(meliFeignClient.getTypeName());
+        String content = jsonType.read("$.[*]").toString();
+
+        List<ListingTypeDTO> typesList = null;
         try {
-            DocumentContext json = JsonPath.parse(meliFeignClient.getSellerByNickname("MORO TECH"));
-            List<Object> items = json.read("$.results[*]");
-
-            int batchSize = 25;
-            List<Item> batch = new ArrayList<>(batchSize);
-
-            items.forEach((e) -> {
-                DocumentContext itemContext = JsonPath.parse(e);
-                Number price = itemContext.read("$.price");
-
-                Item item = Item
-                                .builder()
-                                .item_id(itemContext.read("$.id"))
-                                .catalog_product_id(itemContext.read("$.catalog_product_id"))
-                                .title(itemContext.read("$.title"))
-                                .category_id(saveCategory(itemContext.read("$.category_id")))
-                                .price(price.doubleValue())
-                                .sold_quantity(itemContext.read("$.sold_quantity"))
-                                .available_quantity(itemContext.read("$.available_quantity"))
-                                .sellerId(saveSeller(itemContext.read("$.seller.id")))
-                                .update_date(LocalDateTime.now())
-                                .listing_type_id(itemContext.read("$.listing_type_id"))
-                                .catalog_position(0)
-                                .build();
-
-                batch.add(item);
-
-                if (batch.size() >= batchSize) {
-                    itemRepository.saveAll(batch);
-                    batch.clear();
-                }
-            });
-            if (!batch.isEmpty()) {
-                itemRepository.saveAll(batch);
-            }
-        }catch (Exception e){
+            typesList = objectMapper.readValue(content, new TypeReference<>(){});
+        } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
+
+        String typeName;
+
+        for (ListingTypeDTO e : typesList) {
+            if (e.getId().equals(listingTypeId)) {
+                typeName = e.getName();
+                return typeName;
+            }
+        }
+
+        return null;
+
     }
 
-//    @EventListener(ApplicationReadyEvent.class)
-//    @Order(2)
-    private void saveItem(){
+
+    public Integer getPositionMethod(DocumentContext positionByItemId){
+        return positionByItemId.read("$.position");
+    }
+
+    public Integer getBestSellerPosition(String itemId, String productId) {
+
         try {
-            List<CreateItemDTO> itemAtribbutes = itemRepository.getItemAtribbutes();
+            DocumentContext positionByItemId = JsonPath.parse(meliFeignClient.getItemPositionByItemId(itemId));
+            return getPositionMethod(positionByItemId);
 
-            AtomicInteger i = new AtomicInteger(0);
+        } catch (FeignException.NotFound ignored) {
 
-            int batchSize = 10;
-            List<Item> batch = new ArrayList<>(batchSize);
-
-            itemAtribbutes.forEach((e) ->{
-                DocumentContext jsonProduct = JsonPath.parse(meliFeignClient.getProductSearch(e.getCatalog_product_id()));
-                List<Object> products = jsonProduct.read("$.results[0:5]");
-
-                products.forEach((product) -> {
-                    DocumentContext productContext = JsonPath.parse(product);
-                    Number price = productContext.read("$.price");
-
-                    Item item = Item
-                            .builder()
-                            .item_id(productContext.read("$.item_id"))
-                            .catalog_product_id(e.getCatalog_product_id())
-                            .title(e.getTitle())
-                            .category_id(saveCategory(productContext.read("$.category_id")))
-                            .price(price.doubleValue())
-                            .sold_quantity(productContext.read("$.sold_quantity"))
-                            .available_quantity(productContext.read("$.available_quantity"))
-                            .sellerId(saveSeller(productContext.read("$.seller_id")))
-                            .update_date(LocalDateTime.now())
-                            .listing_type_id(productContext.read("$.listing_type_id"))
-                            .catalog_position(i.incrementAndGet())
-                            .build();
-
-                    batch.add(item);
-
-                    if(i.get() == 5) i.set(0);
-
-                    if (batch.size() >= batchSize) {
-                        itemRepository.saveAll(batch);
-                        batch.clear();
-                    }
-                });
-                if (!batch.isEmpty()) {
-                    itemRepository.saveAll(batch);
-                }
-            });
-        }catch (Exception e){
-            throw new RuntimeException(e);
         }
+
+        try {
+            DocumentContext positionByProductId = JsonPath.parse(meliFeignClient.getItemPositionByProductId(productId));
+            return getPositionMethod(positionByProductId);
+        } catch (FeignException.NotFound ignored) {
+
+        }
+
+        return 0;
+
+    }
+
+    private String getItemSku(ItemAttributesDTO attributes){
+        List<AttributesDTO> sku = attributes.getAttributes()
+                .parallelStream()
+                .filter(att -> att.getName().equals("SKU"))
+                .toList();
+        if (!sku.isEmpty()) return sku.get(0).getValue_name();
+        return null;
+    }
+
+    @EventListener(ApplicationReadyEvent.class)
+    @Order(3)
+    public void saveListingTypes(){
+
+        List<ListingTypeDTO> listing = meliFeignClient.saveListingTypes();
+        List<ListingType> listingTypes = new ArrayList<>();
+
+        listing.parallelStream().forEach(e -> {
+            ListingType listType = modelMapper.map(e, ListingType.class);
+            listingTypes.add(listType);
+        });
+
+        listingTypeRepository.saveAll(listingTypes);
+
+    }
+
+    @EventListener(ApplicationReadyEvent.class)
+    @Order(4)
+    public void saveSellerItems() {
+        int offset = 0;
+        SellerDTO responseDTO;
+        List<Item> items = new ArrayList<>();
+
+        do {
+            items.clear();
+
+            responseDTO = meliFeignClient.getSellerByNickname("MORO TECH", offset);
+
+            SellerDTO finalResponseDTO = responseDTO;
+
+            responseDTO.getResults().parallelStream().forEach(e -> {
+
+                ItemAttributesDTO attributesDTO = meliFeignClient.getItemAtributtes(e.getId());
+
+                e.setImage_url(attributesDTO.getPictures().get(0).getUrl());
+                e.setCreated_date_item(attributesDTO.getDate_created());
+                e.setUpdated_date_item(attributesDTO.getLast_updated());
+                e.setStatus(attributesDTO.getStatus());
+
+                e.setSku(getItemSku(attributesDTO));
+
+//                e.setListing_type_id(getListingTypeName(e.getListing_type_id()));
+
+                Item item = modelMapper.map(e, Item.class);
+                item.setUpdate_date_db(LocalDateTime.now());
+                item.setSellerId(finalResponseDTO.getSeller().getId());
+                item.setBest_seller_position(getBestSellerPosition(e.getId(), e.getCatalog_product_id()));
+                item.setCatalog_position(getCatalogPosition(e.getId(), e.getCatalog_product_id()));
+
+                items.add(item);
+            });
+
+            itemRepository.saveAll(items);
+
+            offset = offset + 50;
+        } while (!responseDTO.getResults().isEmpty());
+    }
+
+//    //prueba
+//    public Page<ItemResponseDTO> getAllSellerItems(int offset){
+//
+//        SellerDTO responseDTO;
+//        List<ItemResponseDTO> itemResponseDTOs = new ArrayList<>();
+//
+//        responseDTO = meliFeignClient.getSellerByNickname("MORO TECH", offset);
+//
+//        SellerDTO finalResponseDTO = responseDTO;
+//
+//        responseDTO.getResults().parallelStream().forEach(e -> {
+//
+//            ItemAttributesDTO attributesDTO = meliFeignClient.getItemAtributtes(e.getId());
+//
+//            e.setImage_url(attributesDTO.getPictures().get(0).getUrl());
+//            e.setCreated_date_item(attributesDTO.getDate_created());
+//            e.setUpdated_date_item(attributesDTO.getLast_updated());
+//            e.setStatus(attributesDTO.getStatus());
+//
+//            e.setSku(getItemSku(attributesDTO));
+//
+//            e.setListing_type_id(getListingTypeName(e.getListing_type_id()));
+//
+//            Item item = modelMapper.map(e, Item.class);
+//            item.setUpdate_date_db(LocalDateTime.now());
+//            item.setSellerId(finalResponseDTO.getSeller().getId());
+//            item.setBest_seller_position(getBestSellerPosition(e.getId(), e.getCatalog_product_id()));
+//            item.setCatalog_position(getCatalogPosition(e.getId(), e.getCatalog_product_id()));
+//
+//            itemResponseDTOs.add(modelMapper.map(e, ItemResponseDTO.class));
+//
+//        });
+//
+//        return new PageImpl<>(itemResponseDTOs);
+//
+//    }
+
+
+    public List<CatalogItemResponseDTO> getSellerItemCatalog(String product_catalog_id) {
+
+        ItemCatalogDTO responseDTO = meliFeignClient.getProductSearch(product_catalog_id);
+
+        return responseDTO.getResults().parallelStream().peek(e ->{
+
+            int position = responseDTO.getResults().indexOf(e);
+
+            ItemAttributesDTO attributesDTO = meliFeignClient.getItemAtributtes(e.getItem_id());
+            SellerDTO sellerDTO = meliFeignClient.getSellerBySellerId(e.getSeller_id());
+
+            e.setCreated_date_item(attributesDTO.getDate_created());
+            e.setUpdated_date_item(attributesDTO.getLast_updated());
+            e.setSeller_nickname(sellerDTO.getSeller().getNickname());
+
+            e.setCatalogPosition(position + 1);
+
+        }).toList();
+    }
+
+    public BuyBoxWinnerResponseDTO getBuyBoxWinner(String productId){
+
+        BoxWinnerDTO result = meliFeignClient.getProductWinnerSearch(productId);
+        SellerDTO seller = meliFeignClient.getSellerBySellerId(result.getBuy_box_winner().getSeller_id());
+
+        BuyBoxWinnerResponseDTO responseDTO = modelMapper.map(result.getBuy_box_winner(), BuyBoxWinnerResponseDTO.class);
+
+        responseDTO.setSeller_nickname(seller.getSeller().getNickname());
+        responseDTO.setListing_type_id(getListingTypeName(responseDTO.getListing_type_id()));
+
+        return responseDTO;
+    }
+
+    public int getCatalogPosition(String itemId, String product_catalog_id){
+        if (product_catalog_id == null){
+            return -1;
+        }
+
+        try{
+
+            ItemCatalogDTO responseDTO = meliFeignClient.getProductSearch(product_catalog_id);
+
+            return IntStream.range(0, responseDTO.getResults().size())
+                    .parallel()
+                    .filter(index -> responseDTO.getResults().get(index).getItem_id().equals(itemId))
+                    .findFirst()
+                    .orElse(-1) + 1;
+
+        } catch (FeignException.NotFound ignored){
+
+        }
+
+        return -1;
     }
 
 }
