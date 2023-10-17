@@ -8,9 +8,11 @@ import com.jayway.jsonpath.JsonPath;
 import com.msmeli.dto.*;
 import com.msmeli.dto.response.BuyBoxWinnerResponseDTO;
 import com.msmeli.dto.response.CatalogItemResponseDTO;
+import com.msmeli.dto.response.ItemResponseDTO;
 import com.msmeli.feignClient.MeliFeignClient;
 import com.msmeli.model.Category;
 import com.msmeli.model.Item;
+import com.msmeli.model.ListingType;
 import com.msmeli.model.Seller;
 import com.msmeli.repository.*;
 import feign.FeignException;
@@ -18,15 +20,14 @@ import org.modelmapper.ModelMapper;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
 
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Service
@@ -40,6 +41,8 @@ public class MeliService {
     private final SellerReputationRepository sellerReputationRepository;
     private final SellerTransactionRepository sellerTransactionRepository;
 
+    private final ListingTypeRepository listingTypeRepository;
+
     private final ObjectMapper objectMapper;
 
     private final ModelMapper modelMapper;
@@ -48,7 +51,7 @@ public class MeliService {
                        CategoryRepository categoryRepository, SellerRepository sellerRepository,
                        SellerRatingRepository sellerRatingRepository, SellerReputationRepository sellerReputationRepository,
                        SellerTransactionRepository sellerTransactionRepository, ObjectMapper objectMapper,
-                       ModelMapper modelMapper, ObjectMapper objectMapper1) {
+                       ModelMapper modelMapper, ListingTypeRepository listingTypeRepository, ObjectMapper objectMapper1) {
         this.meliFeignClient = meliFeignClient;
         this.itemRepository = itemRepository;
         this.categoryRepository = categoryRepository;
@@ -56,6 +59,7 @@ public class MeliService {
         this.sellerRatingRepository = sellerRatingRepository;
         this.sellerReputationRepository = sellerReputationRepository;
         this.sellerTransactionRepository = sellerTransactionRepository;
+        this.listingTypeRepository = listingTypeRepository;
         this.objectMapper = objectMapper1;
         this.modelMapper = new ModelMapper();
     }
@@ -179,6 +183,22 @@ public class MeliService {
 
     @EventListener(ApplicationReadyEvent.class)
     @Order(3)
+    public void saveListingTypes(){
+
+        List<ListingTypeDTO> listing = meliFeignClient.saveListingTypes();
+        List<ListingType> listingTypes = new ArrayList<>();
+
+        listing.parallelStream().forEach(e -> {
+            ListingType listType = modelMapper.map(e, ListingType.class);
+            listingTypes.add(listType);
+        });
+
+        listingTypeRepository.saveAll(listingTypes);
+
+    }
+
+    @EventListener(ApplicationReadyEvent.class)
+    @Order(4)
     public void saveSellerItems() {
         int offset = 0;
         SellerDTO responseDTO;
@@ -202,7 +222,7 @@ public class MeliService {
 
                 e.setSku(getItemSku(attributesDTO));
 
-                e.setListing_type_id(getListingTypeName(e.getListing_type_id()));
+//                e.setListing_type_id(getListingTypeName(e.getListing_type_id()));
 
                 Item item = modelMapper.map(e, Item.class);
                 item.setUpdate_date_db(LocalDateTime.now());
@@ -218,6 +238,44 @@ public class MeliService {
             offset = offset + 50;
         } while (!responseDTO.getResults().isEmpty());
     }
+
+//    //prueba
+//    public Page<ItemResponseDTO> getAllSellerItems(int offset){
+//
+//        SellerDTO responseDTO;
+//        List<ItemResponseDTO> itemResponseDTOs = new ArrayList<>();
+//
+//        responseDTO = meliFeignClient.getSellerByNickname("MORO TECH", offset);
+//
+//        SellerDTO finalResponseDTO = responseDTO;
+//
+//        responseDTO.getResults().parallelStream().forEach(e -> {
+//
+//            ItemAttributesDTO attributesDTO = meliFeignClient.getItemAtributtes(e.getId());
+//
+//            e.setImage_url(attributesDTO.getPictures().get(0).getUrl());
+//            e.setCreated_date_item(attributesDTO.getDate_created());
+//            e.setUpdated_date_item(attributesDTO.getLast_updated());
+//            e.setStatus(attributesDTO.getStatus());
+//
+//            e.setSku(getItemSku(attributesDTO));
+//
+//            e.setListing_type_id(getListingTypeName(e.getListing_type_id()));
+//
+//            Item item = modelMapper.map(e, Item.class);
+//            item.setUpdate_date_db(LocalDateTime.now());
+//            item.setSellerId(finalResponseDTO.getSeller().getId());
+//            item.setBest_seller_position(getBestSellerPosition(e.getId(), e.getCatalog_product_id()));
+//            item.setCatalog_position(getCatalogPosition(e.getId(), e.getCatalog_product_id()));
+//
+//            itemResponseDTOs.add(modelMapper.map(e, ItemResponseDTO.class));
+//
+//        });
+//
+//        return new PageImpl<>(itemResponseDTOs);
+//
+//    }
+
 
     public List<CatalogItemResponseDTO> getSellerItemCatalog(String product_catalog_id) {
 
@@ -245,6 +303,7 @@ public class MeliService {
         SellerDTO seller = meliFeignClient.getSellerBySellerId(result.getBuy_box_winner().getSeller_id());
 
         BuyBoxWinnerResponseDTO responseDTO = modelMapper.map(result.getBuy_box_winner(), BuyBoxWinnerResponseDTO.class);
+
         responseDTO.setSeller_nickname(seller.getSeller().getNickname());
         responseDTO.setListing_type_id(getListingTypeName(responseDTO.getListing_type_id()));
 
