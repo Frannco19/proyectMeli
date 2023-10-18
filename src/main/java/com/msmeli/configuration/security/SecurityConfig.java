@@ -35,7 +35,6 @@ public class SecurityConfig {
         this.jwtAuthFilter = jwtAuthFilter;
     }
 
-
     @Bean
     public CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -43,6 +42,7 @@ public class SecurityConfig {
 
         // Configura los orígenes permitidos
         config.addAllowedOrigin("http://201.216.243.146:10080");
+        config.addAllowedOrigin("http://localhost:4200");
 
         // Configura los métodos HTTP permitidos (GET, POST, etc.)
         config.addAllowedMethod("*");
