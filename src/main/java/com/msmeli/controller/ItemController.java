@@ -15,7 +15,7 @@ import java.util.List;
 
 @RestController
 //@CrossOrigin(origins = "http://201.216.243.146:10080")
-@CrossOrigin(origins = "http://localhost:4200")
+//@CrossOrigin(origins = "http://localhost:4200")
 @RequestMapping("/item")
 public class ItemController {
 
@@ -35,6 +35,15 @@ public class ItemController {
             @RequestParam(value = "pageSize", defaultValue = "50", required = false) int pageSize
     ){
         return itemService.getSellerItems(sellerId,offset,pageSize);
+    }
+
+    @GetMapping("/seller/catalogItems")
+    public Page<ItemResponseDTO> sellerCatalogItems(
+            @RequestParam("sellerId") Integer sellerId,
+            @RequestParam(value = "offset",defaultValue = "0") int offset,
+            @RequestParam(value = "pageSize", defaultValue = "50", required = false) int pageSize
+    ){
+        return itemService.getCatalogItems(sellerId,offset,pageSize);
     }
 
     @GetMapping("/catalog/{product_catalog_id}")

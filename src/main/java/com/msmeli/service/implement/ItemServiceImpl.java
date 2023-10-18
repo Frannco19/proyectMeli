@@ -1,6 +1,5 @@
 package com.msmeli.service.implement;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.msmeli.dto.response.OneProductResponseDTO;
 import com.msmeli.dto.response.ItemResponseDTO;
 import com.msmeli.dto.SellerDTO;
@@ -9,7 +8,9 @@ import com.msmeli.model.Item;
 import com.msmeli.repository.ItemRepository;
 import com.msmeli.service.feignService.MeliService;
 import com.msmeli.service.services.ItemService;
+import com.msmeli.service.services.ListingTypeService;
 import com.msmeli.service.services.SellerService;
+import org.jetbrains.annotations.NotNull;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -18,7 +19,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class ItemServiceImpl implements ItemService {
@@ -29,14 +29,17 @@ public class ItemServiceImpl implements ItemService {
 
     private final SellerService sellerService;
 
+    private final ListingTypeService listingTypeService;
+
     private final MeliService meliService;
 
     private final ModelMapper mapper;
 
-    public ItemServiceImpl(ItemRepository itemRepository, MeliFeignClient meliFeignClient, SellerService sellerService, MeliService meliService, ModelMapper mapper) {
+    public ItemServiceImpl(ItemRepository itemRepository, MeliFeignClient meliFeignClient, SellerService sellerService, ListingTypeService listingTypeService, MeliService meliService, ModelMapper mapper) {
         this.itemRepository = itemRepository;
         this.meliFeignClient = meliFeignClient;
         this.sellerService = sellerService;
+        this.listingTypeService = listingTypeService;
         this.meliService = meliService;
         this.mapper = mapper;
     }
@@ -45,20 +48,29 @@ public class ItemServiceImpl implements ItemService {
     public Page<ItemResponseDTO> getSellerItems(Integer sellerId, int offset, int pageSize){
         Pageable pageable = PageRequest.of(offset,pageSize);
         Page<Item> itemPage = itemRepository.getItemsBySellerId(sellerId, pageable);
+        return getItemResponseDTOS(pageable, itemPage);
+    }
+
+    @Override
+    public Page<ItemResponseDTO> getCatalogItems(Integer sellerId, int offset, int pageSize){
+        Pageable pageable = PageRequest.of(offset,pageSize);
+        Page<Item> itemPage = itemRepository.getCatalogItems(sellerId, pageable);
+        return getItemResponseDTOS(pageable, itemPage);
+    }
+
+    private Page<ItemResponseDTO> getItemResponseDTOS(Pageable pageable, Page<Item> itemPage) {
         List<ItemResponseDTO> items = itemPage.getContent()
                 .stream()
                 .parallel()
-                .map(item -> mapper.map(item, ItemResponseDTO.class))
+                .map(item -> {
+                    ItemResponseDTO itemResponseDTO = mapper.map(item, ItemResponseDTO.class);
+                    String listingTypeName = listingTypeService.getListingTypeName(item.getListing_type_id());
+                    itemResponseDTO.setListing_type_id(listingTypeName);
+                    return itemResponseDTO;
+                })
                 .toList();
         return new PageImpl<>(items,pageable,itemPage.getTotalElements());
     }
-
-//    @Override
-//    public List<ItemResponseDTO> getCatalogItems(String productId) {
-//        List<Item> catalogItems = itemRepository.getCatalogItems(productId);
-//        return null;
-////        return getItemResponseDTOS(catalogItems);
-//    }
 
     @Override
     public OneProductResponseDTO getOneProduct(String productId){
