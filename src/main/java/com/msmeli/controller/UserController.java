@@ -27,7 +27,7 @@ import java.util.List;
 @RestController
 //@CrossOrigin(origins = "http://201.216.243.146:10080")
 //@CrossOrigin(origins = "http://localhost:4200")
-//@CrossOrigin(origins = "http://ml.gyl.com")
+//@CrossOrigin(origins = "http://ml.gylgroup.com")
 @RequestMapping("/meli/user")
 public class UserController {
 
