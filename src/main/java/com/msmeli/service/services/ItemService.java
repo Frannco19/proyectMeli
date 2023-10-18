@@ -15,4 +15,6 @@ public interface ItemService {
 
     public OneProductResponseDTO getOneProduct(String productId) throws JsonProcessingException;
 
+    public Page<ItemResponseDTO> getCatalogItems(Integer sellerId, int offset, int pageSize);
+
 }

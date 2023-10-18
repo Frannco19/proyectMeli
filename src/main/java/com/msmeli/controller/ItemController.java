@@ -38,6 +38,15 @@ public class ItemController {
         return itemService.getSellerItems(sellerId,offset,pageSize);
     }
 
+    @GetMapping("/seller/catalogItems")
+    public Page<ItemResponseDTO> sellerCatalogItems(
+            @RequestParam("sellerId") Integer sellerId,
+            @RequestParam(value = "offset",defaultValue = "0") int offset,
+            @RequestParam(value = "pageSize", defaultValue = "50", required = false) int pageSize
+    ){
+        return itemService.getCatalogItems(sellerId,offset,pageSize);
+    }
+
     @GetMapping("/catalog/{product_catalog_id}")
     public List<CatalogItemResponseDTO> getSellerItemCatalog (@PathVariable String product_catalog_id) throws ParseException {
         return meliService.getSellerItemCatalog(product_catalog_id);
