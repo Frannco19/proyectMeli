@@ -14,7 +14,7 @@ import java.text.ParseException;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = "http://201.216.243.146:10080")
+//@CrossOrigin(origins = "http://201.216.243.146:10080")
 //@CrossOrigin(origins = "http://localhost:4200")
 @RequestMapping("/item")
 public class ItemController {
