@@ -222,8 +222,6 @@ public class MeliService {
 
                 e.setSku(getItemSku(attributesDTO));
 
-//                e.setListing_type_id(getListingTypeName(e.getListing_type_id()));
-
                 Item item = modelMapper.map(e, Item.class);
                 item.setUpdate_date_db(LocalDateTime.now());
                 item.setSellerId(finalResponseDTO.getSeller().getId());
