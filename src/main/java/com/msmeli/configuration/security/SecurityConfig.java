@@ -36,26 +36,28 @@ public class SecurityConfig {
     }
 
 
-//    @Bean
-//    public CorsFilter corsFilter() {
-//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-//        CorsConfiguration config = new CorsConfiguration();
-//
-//        // Configura los orígenes permitidos
-//        config.addAllowedOrigin("http://201.216.243.146:10080");
-//
-//        // Configura los métodos HTTP permitidos (GET, POST, etc.)
-//        config.addAllowedMethod("*");
-//
-//        // Configura los encabezados permitidos
-//        config.addAllowedHeader("*");
-//
-//        // Habilita el uso de cookies en las solicitudes CORS
-//        config.setAllowCredentials(true);
-//
-//        source.registerCorsConfiguration("/**", config);
-//        return new CorsFilter(source);
-//    }
+    @Bean
+    public CorsFilter corsFilter() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        CorsConfiguration config = new CorsConfiguration();
+
+        // Configura los orígenes permitidos
+        config.addAllowedOrigin("http://ml.gyl.com");
+        config.addAllowedOrigin("http://201.216.243.146:10080");
+        config.addAllowedOrigin("http://localhost:4200");
+
+        // Configura los métodos HTTP permitidos (GET, POST, etc.)
+        config.addAllowedMethod("*");
+
+        // Configura los encabezados permitidos
+        config.addAllowedHeader("*");
+
+        // Habilita el uso de cookies en las solicitudes CORS
+        config.setAllowCredentials(true);
+
+        source.registerCorsConfiguration("/**", config);
+        return new CorsFilter(source);
+    }
 
     @Bean
     public UserDetailsService userDetailsService() {
