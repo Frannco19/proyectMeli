@@ -10,6 +10,7 @@ import com.msmeli.service.feignService.MeliService;
 import com.msmeli.service.services.ItemService;
 import com.msmeli.service.services.ListingTypeService;
 import com.msmeli.service.services.SellerService;
+import org.jetbrains.annotations.NotNull;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;

@@ -197,8 +197,8 @@ public class MeliService {
 
     }
 
-//    @EventListener(ApplicationReadyEvent.class)
-//    @Order(4)
+    @EventListener(ApplicationReadyEvent.class)
+    @Order(4)
     public void saveSellerItems() {
         int offset = 0;
         SellerDTO responseDTO;
