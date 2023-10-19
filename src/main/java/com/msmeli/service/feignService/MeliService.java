@@ -178,7 +178,7 @@ public class MeliService {
         SellerDTO responseDTO;
         List<Item> items = new ArrayList<>();
 
-//        do {
+        do {
             items.clear();
 
             responseDTO = meliFeignClient.getSellerByNickname("MORO TECH", offset);
@@ -208,7 +208,7 @@ public class MeliService {
             itemRepository.saveAll(items);
 
             offset = offset + 50;
-//        } while (!responseDTO.getResults().isEmpty());
+        } while (!responseDTO.getResults().isEmpty());
     }
 
 
