@@ -10,9 +10,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class UserEntityUserDetails implements UserDetails {
-    private String username;
-    private String password;
-    private List<GrantedAuthority> authorities;
+    private final String username;
+    private final String password;
+    private final List<GrantedAuthority> authorities;
 
     public UserEntityUserDetails(UserEntity userEntity) {
         username = userEntity.getUsername();
