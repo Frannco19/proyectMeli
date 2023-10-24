@@ -37,7 +37,8 @@ public class TokenServiceImpl implements TokenService {
         token.setRefresh_token(meliRefreshToken);
 
         //TODO CAMBIAR EN CASO DE EMERGENCIA
-        token.setAccess_token(meliAccessToken);
+//        token.setAccess_token(meliAccessToken);
+        token.setAccess_token(getAccessToken("ADMIN"));
 
         token.setUsername(meliUsernameToken);
 
