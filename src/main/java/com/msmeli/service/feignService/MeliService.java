@@ -6,8 +6,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.msmeli.dto.*;
+import com.msmeli.dto.request.FeeRequestDTO;
 import com.msmeli.dto.response.BuyBoxWinnerResponseDTO;
 import com.msmeli.dto.response.CatalogItemResponseDTO;
+import com.msmeli.dto.response.FeeResponseDTO;
+import com.msmeli.dto.response.OptionsDTO;
 import com.msmeli.feignClient.MeliFeignClient;
 import com.msmeli.model.Category;
 import com.msmeli.model.Item;
@@ -20,6 +23,7 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -178,37 +182,37 @@ public class MeliService {
         SellerDTO responseDTO;
         List<Item> items = new ArrayList<>();
 
-        do {
-            items.clear();
-
-            responseDTO = meliFeignClient.getSellerByNickname("MORO TECH", offset);
-
-            SellerDTO finalResponseDTO = responseDTO;
-
-            responseDTO.getResults().parallelStream().forEach(e -> {
-
-                ItemAttributesDTO attributesDTO = meliFeignClient.getItemAtributtes(e.getId());
-
-                e.setImage_url(attributesDTO.getPictures().get(0).getUrl());
-                e.setCreated_date_item(attributesDTO.getDate_created());
-                e.setUpdated_date_item(attributesDTO.getLast_updated());
-                e.setStatus(attributesDTO.getStatus());
-
-                e.setSku(getItemSku(attributesDTO));
-
-                Item item = modelMapper.map(e, Item.class);
-                item.setUpdate_date_db(LocalDateTime.now());
-                item.setSellerId(finalResponseDTO.getSeller().getId());
-                item.setBest_seller_position(getBestSellerPosition(e.getId(), e.getCatalog_product_id()));
-                item.setCatalog_position(getCatalogPosition(e.getId(), e.getCatalog_product_id()));
-
-                items.add(item);
-            });
-
-            itemRepository.saveAll(items);
-
-            offset = offset + 50;
-        } while (!responseDTO.getResults().isEmpty());
+//        do {
+//            items.clear();
+//
+//            responseDTO = meliFeignClient.getSellerByNickname("MORO TECH", offset);
+//
+//            SellerDTO finalResponseDTO = responseDTO;
+//
+//            responseDTO.getResults().parallelStream().forEach(e -> {
+//
+//                ItemAttributesDTO attributesDTO = meliFeignClient.getItemAtributtes(e.getId());
+//
+//                e.setImage_url(attributesDTO.getPictures().get(0).getUrl());
+//                e.setCreated_date_item(attributesDTO.getDate_created());
+//                e.setUpdated_date_item(attributesDTO.getLast_updated());
+//                e.setStatus(attributesDTO.getStatus());
+//
+//                e.setSku(getItemSku(attributesDTO));
+//
+//                Item item = modelMapper.map(e, Item.class);
+//                item.setUpdate_date_db(LocalDateTime.now());
+//                item.setSellerId(finalResponseDTO.getSeller().getId());
+//                item.setBest_seller_position(getBestSellerPosition(e.getId(), e.getCatalog_product_id()));
+//                item.setCatalog_position(getCatalogPosition(e.getId(), e.getCatalog_product_id()));
+//
+//                items.add(item);
+//            });
+//
+//            itemRepository.saveAll(items);
+//
+//            offset = offset + 50;
+//        } while (!responseDTO.getResults().isEmpty());
     }
 
 
@@ -267,4 +271,11 @@ public class MeliService {
         return -1;
     }
 
+    public OptionsDTO getShippingCostDTO(String itemId){
+       return meliFeignClient.getShippingCostDTO(itemId);
+    }
+
+    public FeeResponseDTO getItemFee(FeeRequestDTO feeRequestDTO){
+        return meliFeignClient.getItemFee(feeRequestDTO);
+    }
 }

@@ -16,5 +16,4 @@ public class FeeRequestDTO {
     private String categoryId;
 
     private String ListingTypeId;
-
 }

@@ -83,4 +83,8 @@ public class ItemServiceImpl implements ItemService {
         return responseDTO;
     }
 
+    public List<Item> findAll(){
+        return itemRepository.findAll();
+    }
+
 }

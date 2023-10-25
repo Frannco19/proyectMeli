@@ -5,6 +5,7 @@ import com.msmeli.dto.*;
 import com.msmeli.dto.request.FeeRequestDTO;
 import com.msmeli.dto.request.RefreshTokenRequestDTO;
 import com.msmeli.dto.response.FeeResponseDTO;
+import com.msmeli.dto.response.OptionsDTO;
 import com.msmeli.exception.ResourceNotFoundException;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -67,4 +68,6 @@ public interface MeliFeignClient {
     @GetMapping("/sites/MLA/listing_prices")
     public FeeResponseDTO getItemFee(@RequestBody FeeRequestDTO feeRequestDTO);
 
+    @GetMapping("/items/{itemId}/shipping_options?zip_code=1804")
+    OptionsDTO getShippingCostDTO(@PathVariable String itemId);
 }
