@@ -55,7 +55,7 @@ public class CostServiceImpl implements CostService {
                 double profit = item.getPrice() - (item.getPrice() * IIB + (cost.getComision_discount() + cost.getShipping()));
                 cost.setProfit(profit);
                 costRepository.save(cost);
-            } catch (FeignException.NotFound ignored) {
+            } catch (FeignException.NotFound | FeignException.InternalServerError ignored) {
 
             }
         }));
