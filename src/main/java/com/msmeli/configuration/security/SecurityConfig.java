@@ -43,6 +43,7 @@ public class SecurityConfig {
         config.addAllowedOrigin("http://ml.gylgroup.com");
         config.addAllowedOrigin("https://201.216.243.146:10080");
         config.addAllowedOrigin("https://localhost:4200");
+        config.addAllowedOrigin("http://localhost:4200");
 
         // Configura los métodos HTTP permitidos (GET, POST, etc.)
         config.addAllowedMethod("*");
