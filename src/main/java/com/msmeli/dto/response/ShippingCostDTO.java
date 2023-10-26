@@ -10,5 +10,6 @@ import lombok.*;
 @ToString
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ShippingCostDTO {
+    private String name;
     private double base_cost;
 }
