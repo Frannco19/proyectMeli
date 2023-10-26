@@ -1,6 +1,8 @@
 package com.msmeli.service.implement;
 
+import com.msmeli.dto.FeeDetailsDTO;
 import com.msmeli.dto.request.FeeRequestDTO;
+import com.msmeli.dto.response.FeeResponseDTO;
 import com.msmeli.model.Cost;
 import com.msmeli.model.Item;
 import com.msmeli.repository.CostRepository;
@@ -41,13 +43,15 @@ public class CostServiceImpl implements CostService {
             Cost cost = mapper.map(item, Cost.class);
             FeeRequestDTO feeRequestDTO = new FeeRequestDTO();
             try {
+                cost.setId(item.getId());
                 Double shippingCost = meliService.getShippingCostDTO(item.getId()).getOptions().stream().filter(option -> option.getName().equals("Estándar a sucursal de correo")).findFirst().get().getBase_cost();
                 cost.setShipping(shippingCost);
                 feeRequestDTO.setCategoryId(item.getCategory_id());
                 feeRequestDTO.setListingTypeId(item.getListing_type_id());
                 feeRequestDTO.setPrice(item.getPrice());
-                cost.setComision_fee(meliService.getItemFee(feeRequestDTO).getDetails().getPercentage_fee());
-                cost.setComision_discount(meliService.getItemFee(feeRequestDTO).getDetails().getGross_amount());
+                FeeDetailsDTO feeDetails = meliService.getItemFee(item.getPrice(),item.getCategory_id(),item.getListing_type_id()).getSale_fee_details();
+                cost.setComision_fee(feeDetails.getPercentage_fee());
+                cost.setComision_discount(feeDetails.getGross_amount());
                 double profit = item.getPrice() - (item.getPrice() * IIB + (cost.getComision_discount() + cost.getShipping()));
                 cost.setProfit(profit);
                 costRepository.save(cost);

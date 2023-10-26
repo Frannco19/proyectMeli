@@ -17,8 +17,7 @@ import lombok.Setter;
 public class Cost {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id_cost;
+    private String id;
 
     //Los obtenemos del item
     private String sku;

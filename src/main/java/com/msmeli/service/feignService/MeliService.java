@@ -276,7 +276,7 @@ public class MeliService {
         return meliFeignClient.getShippingCostDTO(itemId);
     }
 
-    public FeeResponseDTO getItemFee(FeeRequestDTO feeRequestDTO){
-        return meliFeignClient.getItemFee(feeRequestDTO);
+    public FeeResponseDTO getItemFee(double price, String category_id, String listing_type_id){
+        return meliFeignClient.getItemFee(price,category_id,listing_type_id);
     }
 }

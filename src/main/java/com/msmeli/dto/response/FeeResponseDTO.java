@@ -14,5 +14,5 @@ import lombok.Setter;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class FeeResponseDTO {
     private Double sale_fee_amount;
-    private FeeDetailsDTO details;
+    private FeeDetailsDTO sale_fee_details;
 }
