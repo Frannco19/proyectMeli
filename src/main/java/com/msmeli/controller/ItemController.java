@@ -16,6 +16,7 @@ import java.util.List;
 @RestController
 //@CrossOrigin(origins = "http://201.216.243.146:10080")
 //@CrossOrigin(origins = "http://localhost:4200")
+//@CrossOrigin(origins = "https://ml.gylgroup.com")
 @RequestMapping("/item")
 public class ItemController {
 
