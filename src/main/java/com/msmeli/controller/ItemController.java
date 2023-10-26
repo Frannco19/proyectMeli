@@ -14,8 +14,9 @@ import java.text.ParseException;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = "http://201.216.243.146:10080")
+//@CrossOrigin(origins = "http://201.216.243.146:10080")
 //@CrossOrigin(origins = "http://localhost:4200")
+//@CrossOrigin(origins = "https://ml.gylgroup.com")
 @RequestMapping("/item")
 public class ItemController {
 
@@ -37,10 +38,14 @@ public class ItemController {
         return itemService.getSellerItems(sellerId,offset,pageSize);
     }
 
-//    @GetMapping("/seller/allItems")
-//    public Page<ItemResponseDTO> sellerAllItems(@RequestParam(value = "offset",defaultValue = "0") int offset){
-//        return meliService.getAllSellerItems(offset);
-//    }
+    @GetMapping("/seller/catalogItems")
+    public Page<ItemResponseDTO> sellerCatalogItems(
+            @RequestParam("sellerId") Integer sellerId,
+            @RequestParam(value = "offset",defaultValue = "0") int offset,
+            @RequestParam(value = "pageSize", defaultValue = "50", required = false) int pageSize
+    ){
+        return itemService.getCatalogItems(sellerId,offset,pageSize);
+    }
 
     @GetMapping("/catalog/{product_catalog_id}")
     public List<CatalogItemResponseDTO> getSellerItemCatalog (@PathVariable String product_catalog_id) throws ParseException {

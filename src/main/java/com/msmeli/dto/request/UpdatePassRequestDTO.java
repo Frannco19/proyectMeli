@@ -12,11 +12,11 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UpdatePassRequestDTO {
-    @NotBlank(message = "password should not be empty")
+    @NotBlank(message = "Ingrese una contraseña actual.")
     private String currentPassword;
-    @NotBlank(message = "password should not be empty")
-    @Size(min = 3, message = "password should have at least 3 characters")
+    @NotBlank(message = "Ingrese una nueva contraseña.")
+    @Size(min = 3, message = "La nueva contraseña debe tener al menos 3 caracteres.")
     private String password;
-    @NotBlank
+    @NotBlank(message = "Reingrese la nueva contraseña.")
     private String rePassword;
 }

@@ -18,10 +18,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class UserEntityService implements IUserEntityService {
@@ -46,9 +43,9 @@ public class UserEntityService implements IUserEntityService {
     @Override
     public UserResponseDTO create(UserRegisterRequestDTO userRegisterRequestDTO) throws ResourceNotFoundException, AlreadyExistsException {
         if (userEntityRepository.findByUsername(userRegisterRequestDTO.getUsername()).isPresent())
-            throw new AlreadyExistsException("Username already taken");
+            throw new AlreadyExistsException("El nombre de usuario ya existe.");
         if (!userRegisterRequestDTO.getPassword().equals(userRegisterRequestDTO.getRePassword()))
-            throw new ResourceNotFoundException("Passwords don't match");
+            throw new ResourceNotFoundException("Las contraseñas ingresadas no coinciden.");
         UserEntity userEntity = mapper.map(userRegisterRequestDTO, UserEntity.class);
         userEntity.setPassword(passwordEncoder.encode(userRegisterRequestDTO.getPassword()));
         List<RoleEntity> roles = new ArrayList<>();
@@ -63,35 +60,35 @@ public class UserEntityService implements IUserEntityService {
     @Override
     public UserResponseDTO read(Long id) throws ResourceNotFoundException {
         Optional<UserEntity> userSearch = userEntityRepository.findById(id);
-        if (userSearch.isEmpty()) throw new ResourceNotFoundException("User not found");
+        if (userSearch.isEmpty()) throw new ResourceNotFoundException("Usuario no encontrado.");
         return mapper.map(userSearch.get(), UserResponseDTO.class);
     }
 
     @Override
     public List<UserResponseDTO> readAll() throws ResourceNotFoundException {
         List<UserEntity> usersSearch = userEntityRepository.findAll();
-        if (usersSearch.isEmpty()) throw new ResourceNotFoundException("No users found");
+        if (usersSearch.isEmpty()) throw new ResourceNotFoundException("No hay usuarios en la base de datos.");
         return usersSearch.stream().map(userEntity -> mapper.map(userEntity, UserResponseDTO.class)).toList();
     }
 
     @Override
     public UserEntity update(UserEntity userEntity) throws ResourceNotFoundException {
         Optional<UserEntity> userSearch = userEntityRepository.findById(userEntity.getId());
-        if (userSearch.isEmpty()) throw new ResourceNotFoundException("User not found");
+        if (userSearch.isEmpty()) throw new ResourceNotFoundException("Usuario no encontrado.");
         return userEntityRepository.save(userEntity);
     }
 
     @Override
     public void delete(Long id) throws ResourceNotFoundException {
         Optional<UserEntity> userSearch = userEntityRepository.findById(id);
-        if (userSearch.isEmpty()) throw new ResourceNotFoundException("User not found");
+        if (userSearch.isEmpty()) throw new ResourceNotFoundException("Usuario no encontrado.");
         userEntityRepository.deleteById(id);
     }
 
     @Override
     public UserResponseDTO modifyUserRoles(Long userId) throws ResourceNotFoundException {
         Optional<UserEntity> user = userEntityRepository.findById(userId);
-        if (user.isEmpty()) throw new ResourceNotFoundException("User not found");
+        if (user.isEmpty()) throw new ResourceNotFoundException("Usuario no encontrado.");
         UserEntity userEntity = user.get();
         RoleEntity admin = roleEntityService.findByName(Role.ADMIN);
         if (userEntity.getRoles().size() == 1) userEntity.getRoles().add(admin);
@@ -102,47 +99,47 @@ public class UserEntityService implements IUserEntityService {
     @Override
     public UserAuthResponseDTO findByUsername(String username) throws ResourceNotFoundException {
         Optional<UserEntity> userSearch = userEntityRepository.findByUsername(username);
-        if (userSearch.isEmpty()) throw new ResourceNotFoundException("User not found");
+        if (userSearch.isEmpty()) throw new ResourceNotFoundException("Usuario no encontrado.");
         return mapper.map(userSearch, UserAuthResponseDTO.class);
     }
 
-    public String recoverPassword(String username) throws ResourceNotFoundException {
+    public Map<String, String> recoverPassword(String username) throws ResourceNotFoundException {
         Optional<UserEntity> userSearch = userEntityRepository.findByUsername(username);
-        if (userSearch.isEmpty()) throw new ResourceNotFoundException("User not found");
+        if (userSearch.isEmpty()) throw new ResourceNotFoundException("Usuario no encontrado.");
         emailService.sendMail(userSearch.get().getEmail(), "Recuperar contraseña", emailRecoverPassword(username));
-        return "Recovery password email sent successfully to " + username;
+        return Map.of("message", "Correo electrónico de recuperación de contraseña enviado correctamente a " + username);
     }
 
-    public String resetPassword(String username) throws ResourceNotFoundException {
+    public Map<String, String> resetPassword(String username) throws ResourceNotFoundException {
         Optional<UserEntity> userSearch = userEntityRepository.findByUsername(username);
         if (userSearch.isEmpty()) throw new ResourceNotFoundException("User not found");
         String newPassword = String.valueOf(UUID.randomUUID()).substring(0, 7);
         userSearch.get().setPassword(passwordEncoder.encode(newPassword));
         emailService.sendMail(userSearch.get().getEmail(), "Restablecer la contraseña", emailResetPassword(username, newPassword));
         userEntityRepository.save(userSearch.get());
-        return "Correo electrónico para restablecer la contraseña enviado correctamente a" + username;
+        return Map.of("message", "Correo electrónico para restablecer la contraseña enviado correctamente a" + username);
     }
 
     @Override
-    public String updatePassword(UpdatePassRequestDTO updatePassRequestDTO, String username) throws ResourceNotFoundException {
+    public Map<String, String> updatePassword(UpdatePassRequestDTO updatePassRequestDTO, String username) throws ResourceNotFoundException {
         Optional<UserEntity> userSearch = userEntityRepository.findByUsername(username);
-        if (userSearch.isEmpty()) throw new ResourceNotFoundException("User not found");
+        if (userSearch.isEmpty()) throw new ResourceNotFoundException("Usuario no encontrado.");
         if (!updatePassRequestDTO.getPassword().equals(updatePassRequestDTO.getRePassword()))
-            throw new ResourceNotFoundException("new passwords don't match");
+            throw new ResourceNotFoundException("Las nuevas contraseñas no coinciden.");
         UserEntity userEntity = userSearch.get();
         if (!passwordEncoder.matches(updatePassRequestDTO.getCurrentPassword(), userEntity.getPassword()))
-            throw new ResourceNotFoundException("Current passwords don't match");
+            throw new ResourceNotFoundException("La contraseña actual es incorrecta.");
         userEntity.setPassword(passwordEncoder.encode(updatePassRequestDTO.getPassword()));
         userEntityRepository.save(userEntity);
-        return "Password updated Successfully";
+        return Map.of("message", "Contraseña actualizada correctamente.");
     }
 
     private String emailWelcomeBody(String username) {
-        return "Hola " + username + ",\n \n" + "Para iniciar sesión click aqui : http://201.216.243.146:10080/auth/login/" + "\n \n" + "Saludos, equipo de la 3ra Aceleracion.";
+        return "Hola " + username + ",\n \n" + "Para iniciar sesión click aqui : https://ml.gylgroup.com/auth/login/" + "\n \n" + "Saludos, equipo de la 3ra Aceleracion.";
     }
 
     private String emailRecoverPassword(String username) {
-        return "Hola " + username + ",\n \n" + "Para continuar con el restablecimiento de su contraseña haga click aquí: http://201.216.243.146:10080/recover-password/" + username + "\n \n" + "Si no has solicitado el restablecimiento descarta este correo. " + "\n \n" + "Saludos, equipo de la 3ra Aceleracion.";
+        return "Hola " + username + ",\n \n" + "Para continuar con el restablecimiento de su contraseña haga click aquí: https://ml.gylgroup.com/recover-password/" + username + "\n \n" + "Si no has solicitado el restablecimiento descarta este correo. " + "\n \n" + "Saludos, equipo de la 3ra Aceleracion.";
     }
 
     private String emailResetPassword(String username, String newPassword) {

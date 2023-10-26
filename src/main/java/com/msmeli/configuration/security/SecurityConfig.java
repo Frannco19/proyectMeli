@@ -18,11 +18,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-
 import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
 
 @Configuration
 @EnableWebSecurity
@@ -35,14 +33,17 @@ public class SecurityConfig {
         this.jwtAuthFilter = jwtAuthFilter;
     }
 
-
     @Bean
     public CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
 
         // Configura los orígenes permitidos
-        config.addAllowedOrigin("http://201.216.243.146:10080");
+        config.addAllowedOrigin("https://ml.gylgroup.com");
+        config.addAllowedOrigin("http://ml.gylgroup.com");
+        config.addAllowedOrigin("https://201.216.243.146:10080");
+        config.addAllowedOrigin("https://localhost:4200");
+        config.addAllowedOrigin("http://localhost:4200");
 
         // Configura los métodos HTTP permitidos (GET, POST, etc.)
         config.addAllowedMethod("*");
@@ -66,7 +67,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.csrf().disable()
                 .authorizeHttpRequests()
-                .requestMatchers("/meli/user/**", "/item/**", "/v3/api-docs/**", "/swagger-ui/**", "/v2/api-docs/**", "/swagger-resources/**").permitAll()
+                .requestMatchers("/meli/user/**", "/item/**", "/v3/api-docs/**", "/swagger-ui/**", "/v2/api-docs/**", "/swagger-resources/**","/stock/**").permitAll()
                 .and()
                 .authorizeHttpRequests().anyRequest().authenticated()
                 .and()

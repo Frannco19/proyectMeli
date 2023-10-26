@@ -10,6 +10,7 @@ import com.msmeli.service.feignService.MeliService;
 import com.msmeli.service.services.ItemService;
 import com.msmeli.service.services.ListingTypeService;
 import com.msmeli.service.services.SellerService;
+import org.jetbrains.annotations.NotNull;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -47,6 +48,17 @@ public class ItemServiceImpl implements ItemService {
     public Page<ItemResponseDTO> getSellerItems(Integer sellerId, int offset, int pageSize){
         Pageable pageable = PageRequest.of(offset,pageSize);
         Page<Item> itemPage = itemRepository.getItemsBySellerId(sellerId, pageable);
+        return getItemResponseDTOS(pageable, itemPage);
+    }
+
+    @Override
+    public Page<ItemResponseDTO> getCatalogItems(Integer sellerId, int offset, int pageSize){
+        Pageable pageable = PageRequest.of(offset,pageSize);
+        Page<Item> itemPage = itemRepository.getCatalogItems(sellerId, pageable);
+        return getItemResponseDTOS(pageable, itemPage);
+    }
+
+    private Page<ItemResponseDTO> getItemResponseDTOS(Pageable pageable, Page<Item> itemPage) {
         List<ItemResponseDTO> items = itemPage.getContent()
                 .stream()
                 .parallel()
@@ -59,13 +71,6 @@ public class ItemServiceImpl implements ItemService {
                 .toList();
         return new PageImpl<>(items,pageable,itemPage.getTotalElements());
     }
-
-//    @Override
-//    public List<ItemResponseDTO> getCatalogItems(String productId) {
-//        List<Item> catalogItems = itemRepository.getCatalogItems(productId);
-//        return null;
-////        return getItemResponseDTOS(catalogItems);
-//    }
 
     @Override
     public OneProductResponseDTO getOneProduct(String productId){

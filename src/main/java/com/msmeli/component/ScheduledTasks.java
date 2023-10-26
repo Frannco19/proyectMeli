@@ -56,8 +56,6 @@ public class ScheduledTasks {
 
         RefreshTokenDTO refreshToken = meliFeignClient.refreshToken(refreshTokenRequestDTO);
 
-        log.info("TOKEN ESTATICO : {}", tokenService.getAccessToken("ADMIN"));
-
         token = refreshToken.getAccess_token();
 
         tokenService.updateToken(token);
