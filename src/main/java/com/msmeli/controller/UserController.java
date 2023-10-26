@@ -23,6 +23,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 //@CrossOrigin(origins = "http://201.216.243.146:10080")
@@ -68,18 +69,16 @@ public class UserController {
 
     @PostMapping("/refreshToken")
     public UserAuthResponseDTO refreshToken(@RequestBody UserRefreshTokenRequestDTO refreshTokenRequestDTO) throws ResourceNotFoundException {
-        return refreshTokenService.findByToken(refreshTokenRequestDTO.getRefreshToken())
-                .map(UserEntityRefreshToken::getUserEntity)
-                .map(userEntity -> new UserAuthResponseDTO(userEntity.getId(), userEntity.getUsername(), userEntity.getEmail(), jwtService.generateToken(userEntity.getUsername()), refreshTokenRequestDTO.getRefreshToken())).orElseThrow(() -> new ResourceNotFoundException("Refresh token is not in database"));
+        return refreshTokenService.findByToken(refreshTokenRequestDTO.getRefreshToken()).map(UserEntityRefreshToken::getUserEntity).map(userEntity -> new UserAuthResponseDTO(userEntity.getId(), userEntity.getUsername(), userEntity.getEmail(), jwtService.generateToken(userEntity.getUsername()), refreshTokenRequestDTO.getRefreshToken())).orElseThrow(() -> new ResourceNotFoundException("Refresh token is not in database"));
     }
 
     @GetMapping("/recover_password/{username}")
-    public ResponseEntity<String> recoverPassword(@PathVariable String username) throws ResourceNotFoundException {
+    public ResponseEntity<Map<String, String>> recoverPassword(@PathVariable String username) throws ResourceNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(userEntityService.recoverPassword(username));
     }
 
     @GetMapping("/reset_password/{username}")
-    public ResponseEntity<String> resetPassword(@PathVariable String username) throws ResourceNotFoundException {
+    public ResponseEntity<Map<String, String>> resetPassword(@PathVariable String username) throws ResourceNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(userEntityService.resetPassword(username));
     }
 
@@ -91,7 +90,7 @@ public class UserController {
 
     @PatchMapping("/modify_password")
     @PreAuthorize("hasAnyAuthority('USER','ADMIN')")
-    public ResponseEntity<String> modifyPassword(@RequestBody UpdatePassRequestDTO updatePassRequestDTO, Authentication authentication) throws ResourceNotFoundException {
+    public ResponseEntity<Map<String, String>> modifyPassword(@RequestBody UpdatePassRequestDTO updatePassRequestDTO, Authentication authentication) throws ResourceNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(userEntityService.updatePassword(updatePassRequestDTO, authentication.getName()));
     }
 }

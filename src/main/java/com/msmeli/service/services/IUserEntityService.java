@@ -9,6 +9,7 @@ import com.msmeli.exception.ResourceNotFoundException;
 import com.msmeli.model.UserEntity;
 
 import java.util.List;
+import java.util.Map;
 
 public interface IUserEntityService {
     UserResponseDTO create(UserRegisterRequestDTO userRegisterRequestDTO) throws ResourceNotFoundException, AlreadyExistsException;
@@ -25,9 +26,9 @@ public interface IUserEntityService {
 
     UserAuthResponseDTO findByUsername(String username) throws ResourceNotFoundException;
 
-    String recoverPassword(String username) throws ResourceNotFoundException;
+    Map<String, String> recoverPassword(String username) throws ResourceNotFoundException;
 
-    String resetPassword(String username) throws ResourceNotFoundException;
+    Map<String, String> resetPassword(String username) throws ResourceNotFoundException;
 
-    String updatePassword(UpdatePassRequestDTO updatePassRequestDTO, String username) throws ResourceNotFoundException;
+    Map<String, String> updatePassword(UpdatePassRequestDTO updatePassRequestDTO, String username) throws ResourceNotFoundException;
 }
