@@ -154,11 +154,11 @@ public class UserEntityService implements IUserEntityService {
     }
 
     private String emailWelcomeBody(String username) {
-        return "Hola " + username + ",\n \n" + "Para iniciar sesión click aqui : http://201.216.243.146:10080/auth/login/" + "\n \n" + "Saludos, equipo de la 3ra Aceleracion.";
+        return "Hola " + username + ",\n \n" + "Para iniciar sesión click aqui : https://ml.gylgroup.com/auth/login/" + "\n \n" + "Saludos, equipo de la 3ra Aceleracion.";
     }
 
     private String emailRecoverPassword(String username) {
-        return "Hola " + username + ",\n \n" + "Para continuar con el restablecimiento de su contraseña haga click aquí: http://201.216.243.146:10080/recover-password/" + username + "\n \n" + "Si no has solicitado el restablecimiento descarta este correo. " + "\n \n" + "Saludos, equipo de la 3ra Aceleracion.";
+        return "Hola " + username + ",\n \n" + "Para continuar con el restablecimiento de su contraseña haga click aquí: https://ml.gylgroup.com/recover-password/" + username + "\n \n" + "Si no has solicitado el restablecimiento descarta este correo. " + "\n \n" + "Saludos, equipo de la 3ra Aceleracion.";
     }
 
     private String emailResetPassword(String username, String newPassword) {
