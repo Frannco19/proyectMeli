@@ -40,8 +40,8 @@ public class CostServiceImpl implements CostService {
         this.stockService = stockService1;
     }
 
-//    @EventListener(ApplicationReadyEvent.class)
-//    @Order(5)
+    @EventListener(ApplicationReadyEvent.class)
+    @Order(5)
     public void createProductsCosts() {
         List<Item> items = itemService.findAll();
         items.parallelStream().forEach((item -> {
