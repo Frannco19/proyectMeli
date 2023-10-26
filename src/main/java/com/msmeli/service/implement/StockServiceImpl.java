@@ -9,6 +9,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -39,5 +40,7 @@ public class StockServiceImpl {
         }).collect(Collectors.toList()));
     }
 
-
+    public Stock getBySku(String sku){
+        return stockRepository.findBySku(sku);
+    }
 }
