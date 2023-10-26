@@ -18,11 +18,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-
 import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
 
 @Configuration
 @EnableWebSecurity
@@ -41,7 +39,10 @@ public class SecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
 
         // Configura los orígenes permitidos
-        config.addAllowedOrigin("http://201.216.243.146:10080");
+        config.addAllowedOrigin("https://ml.gylgroup.com");
+        config.addAllowedOrigin("http://ml.gylgroup.com");
+        config.addAllowedOrigin("https://201.216.243.146:10080");
+        config.addAllowedOrigin("https://localhost:4200");
         config.addAllowedOrigin("http://localhost:4200");
 
         // Configura los métodos HTTP permitidos (GET, POST, etc.)
