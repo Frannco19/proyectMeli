@@ -19,4 +19,5 @@ public interface ItemService {
     public Page<ItemResponseDTO> getCatalogItems(Integer sellerId, int offset, int pageSize);
 
     List<Item> findAll();
+    Item save(Item item);
 }

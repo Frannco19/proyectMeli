@@ -56,5 +56,5 @@ public class Item {
     private String sku;
 
     @OneToOne
-    private Cost cost_id;
+    private Cost cost;
 }

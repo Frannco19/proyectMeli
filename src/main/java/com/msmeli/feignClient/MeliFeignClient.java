@@ -2,7 +2,6 @@ package com.msmeli.feignClient;
 
 import com.msmeli.configuration.feign.FeignClientConfiguration;
 import com.msmeli.dto.*;
-import com.msmeli.dto.request.FeeRequestDTO;
 import com.msmeli.dto.request.RefreshTokenRequestDTO;
 import com.msmeli.dto.response.FeeResponseDTO;
 import com.msmeli.dto.response.OptionsDTO;

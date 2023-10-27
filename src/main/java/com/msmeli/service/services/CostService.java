@@ -1,5 +1,8 @@
 package com.msmeli.service.services;
 
+import com.msmeli.model.Item;
+import com.msmeli.model.Stock;
+
 public interface CostService {
-    void createProductsCosts();
+    Item createProductsCosts(Item item, Stock stock);
 }

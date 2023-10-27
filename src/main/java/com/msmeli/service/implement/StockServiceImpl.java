@@ -1,5 +1,6 @@
 package com.msmeli.service.implement;
 
+import com.msmeli.dto.StockDTO;
 import com.msmeli.dto.request.StockRequestDTO;
 import com.msmeli.model.Stock;
 import com.msmeli.model.UserEntity;
@@ -17,7 +18,6 @@ public class StockServiceImpl {
 
     private final StockRepository stockRepository;
     private final UserEntityRepository userEntityRepository;
-
     private final ModelMapper modelMapper;
 
     public StockServiceImpl(StockRepository stockRepository, UserEntityRepository userEntityRepository, ModelMapper modelMapper) {
@@ -26,21 +26,29 @@ public class StockServiceImpl {
         this.modelMapper = new ModelMapper();
     }
 
-    public UserEntity getUserById(Long id){
-        return userEntityRepository.findById(id).orElseThrow(()-> new EntityNotFoundException("User with id "+id+" not found"));
+    public UserEntity getUserById(Long id) {
+        return userEntityRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("User with id " + id + " not found"));
     }
 
-    public void saveUserStock(StockRequestDTO requestDTO){
-         stockRepository.saveAll(requestDTO.getContent()
-                 .parallelStream()
-                 .map(e -> {
-                    Stock userStock = modelMapper.map(e,Stock.class);
+    public void saveUserStock(StockRequestDTO requestDTO) {
+        stockRepository.saveAll(requestDTO.getContent()
+                .parallelStream()
+                .map(e -> {
+                    Stock userStock = modelMapper.map(e, Stock.class);
                     userStock.setUser_id(getUserById(requestDTO.getUser_id()));
                     return userStock;
-        }).collect(Collectors.toList()));
+                }).collect(Collectors.toList()));
     }
 
-    public Stock getBySku(String sku){
+    public Stock findLastBySku(String sku) {
         return stockRepository.findBySku(sku);
+    }
+
+    public Integer getTotalStockBySku(String sku){
+        return stockRepository.getTotalBySku(sku);
+    }
+
+    public List<StockDTO> findAll() {
+        return stockRepository.findAll().stream().map(stock -> modelMapper.map(stock, StockDTO.class)).toList();
     }
 }

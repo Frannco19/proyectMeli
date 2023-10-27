@@ -12,7 +12,7 @@ import com.msmeli.model.UserEntity;
 import java.util.List;
 import java.util.Map;
 
-public interface IUserEntityService {
+public interface UserEntityService {
     UserResponseDTO create(UserRegisterRequestDTO userRegisterRequestDTO) throws ResourceNotFoundException, AlreadyExistsException;
 
     UserResponseDTO read(Long id) throws ResourceNotFoundException;

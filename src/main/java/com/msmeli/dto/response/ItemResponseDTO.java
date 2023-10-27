@@ -3,7 +3,6 @@ package com.msmeli.dto.response;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.msmeli.model.Cost;
 import lombok.*;
 
 import java.util.Date;
@@ -40,5 +39,6 @@ public class ItemResponseDTO {
     private Date created_date_item;
     @JsonFormat(pattern = "dd-MM-yyyy")
     private Date updated_date_item;
-    private Cost cost;
+    private CostResponseDTO item_cost;
+    private Integer total_stock;
 }

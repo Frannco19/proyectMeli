@@ -13,9 +13,8 @@ import com.msmeli.model.RoleEntity;
 import com.msmeli.model.UserEntity;
 import com.msmeli.model.UserEntityRefreshToken;
 import com.msmeli.repository.UserEntityRepository;
-import com.msmeli.service.services.IEmailService;
-import com.msmeli.service.services.IRoleEntityService;
-import com.msmeli.service.services.IUserEntityService;
+import com.msmeli.service.services.EmailService;
+import com.msmeli.service.services.RoleEntityService;
 import com.msmeli.util.Role;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,19 +23,19 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 @Service
-public class UserEntityService implements IUserEntityService {
+public class UserEntityService implements com.msmeli.service.services.UserEntityService {
 
     private final UserEntityRepository userEntityRepository;
     private final PasswordEncoder passwordEncoder;
     private final ModelMapper mapper;
-    private final IRoleEntityService roleEntityService;
-    private final IEmailService emailService;
+    private final RoleEntityService roleEntityService;
+    private final EmailService emailService;
     private final UserEntityRefreshTokenService refreshTokenService;
     private final JwtService jwtService;
     private static final String NOT_FOUND = "Usuario no encontrado.";
 
 
-    public UserEntityService(UserEntityRepository userEntityRepository, PasswordEncoder passwordEncoder, ModelMapper mapper, IRoleEntityService roleEntityService, IEmailService emailService, UserEntityRefreshTokenService refreshTokenService, JwtService jwtService) {
+    public UserEntityService(UserEntityRepository userEntityRepository, PasswordEncoder passwordEncoder, ModelMapper mapper, RoleEntityService roleEntityService, EmailService emailService, UserEntityRefreshTokenService refreshTokenService, JwtService jwtService) {
         this.userEntityRepository = userEntityRepository;
         this.passwordEncoder = passwordEncoder;
         this.mapper = mapper;

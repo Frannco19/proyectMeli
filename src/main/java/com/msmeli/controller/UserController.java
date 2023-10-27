@@ -8,7 +8,7 @@ import com.msmeli.dto.response.UserAuthResponseDTO;
 import com.msmeli.dto.response.UserResponseDTO;
 import com.msmeli.exception.AlreadyExistsException;
 import com.msmeli.exception.ResourceNotFoundException;
-import com.msmeli.service.services.IUserEntityService;
+import com.msmeli.service.services.UserEntityService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -34,10 +34,10 @@ import java.util.Map;
 @RequestMapping("/meli/user")
 public class UserController {
 
-    private final IUserEntityService userEntityService;
+    private final UserEntityService userEntityService;
     private final AuthenticationManager authenticationManager;
 
-    public UserController(IUserEntityService userEntityService, AuthenticationManager authenticationManager) {
+    public UserController(UserEntityService userEntityService, AuthenticationManager authenticationManager) {
         this.userEntityService = userEntityService;
         this.authenticationManager = authenticationManager;
     }
