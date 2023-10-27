@@ -24,6 +24,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ItemServiceImpl implements ItemService {
@@ -74,7 +75,7 @@ public class ItemServiceImpl implements ItemService {
                 .parallel()
                 .map(item -> {
                     CostResponseDTO costResponseDTO = mapper.map(item.getCost(), CostResponseDTO.class);
-                    costResponseDTO.setIIBB(GrossIncome.IIBB.iibPercentage*100);
+                    costResponseDTO.setIIBB(GrossIncome.IIBB.iibPercentage * 100);
                     ItemResponseDTO itemResponseDTO = mapper.map(item, ItemResponseDTO.class);
                     itemResponseDTO.setItem_cost(costResponseDTO);
                     String listingTypeName = listingTypeService.getListingTypeName(item.getListing_type_id());
@@ -84,6 +85,19 @@ public class ItemServiceImpl implements ItemService {
                 })
                 .toList();
         return new PageImpl<>(items, pageable, itemPage.getTotalElements());
+    }
+
+    public List<ItemResponseDTO> getItems() {
+        return itemRepository.findAll().stream().map(item -> {
+            CostResponseDTO costResponseDTO = mapper.map(item.getCost(), CostResponseDTO.class);
+            costResponseDTO.setIIBB(GrossIncome.IIBB.iibPercentage * 100);
+            ItemResponseDTO itemResponseDTO = mapper.map(item, ItemResponseDTO.class);
+            itemResponseDTO.setItem_cost(costResponseDTO);
+            String listingTypeName = listingTypeService.getListingTypeName(item.getListing_type_id());
+            itemResponseDTO.setListing_type_id(listingTypeName);
+            itemResponseDTO.setTotal_stock(stockService.getTotalStockBySku(item.getSku()));
+            return itemResponseDTO;
+        }).toList();
     }
 
     @Override

@@ -16,4 +16,6 @@ public class CostResponseDTO {
     private double replacement_cost;
     private double profit;
     private double IIBB;
+    private double total_cost;
+    private double margin;
 }

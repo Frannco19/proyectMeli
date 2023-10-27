@@ -31,6 +31,8 @@ public class Cost {
     private double replacement_cost;
     private double profit;
     private boolean published;
+    private double total_cost;
+    private double margin;
     /*Crear servicio Costo: (sku, item_name, status, stock_ml, comision_fee,costo_compra, ganancia, envio, precio_final, publicado booleano) itemService, stockService, feign shipping y comision.*/
 
 }

@@ -41,7 +41,11 @@ public class CostServiceImpl implements CostService {
             if (item.getSku() != null && stock != null) cost.setReplacement_cost(stock.getPrice());
             Double shippingCost = meliService.getShippingCostDTO(item.getId()).getOptions().stream().filter(option -> option.getName().equals("Estándar a sucursal de correo")).findFirst().get().getBase_cost();
             cost.setShipping(shippingCost);
-            double profit = item.getPrice() - (item.getPrice() * GrossIncome.IIBB.iibPercentage + (cost.getComision_discount() + cost.getShipping() + cost.getReplacement_cost()));
+            double total_cost = item.getPrice() * GrossIncome.IIBB.iibPercentage + (cost.getComision_discount() + cost.getShipping() + cost.getReplacement_cost());
+            cost.setTotal_cost(total_cost);
+            double margin = (item.getPrice() - total_cost) *100/item.getPrice();
+            cost.setMargin(margin);
+            double profit = item.getPrice() - total_cost;
             cost.setProfit(profit);
         } catch (FeignException.NotFound | FeignException.InternalServerError ignored) {
             cost.setShipping(0);
