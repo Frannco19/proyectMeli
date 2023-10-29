@@ -8,10 +8,7 @@ import com.msmeli.feignClient.MeliFeignClient;
 import com.msmeli.model.Item;
 import com.msmeli.repository.ItemRepository;
 import com.msmeli.service.feignService.MeliService;
-import com.msmeli.service.services.CostService;
-import com.msmeli.service.services.ItemService;
-import com.msmeli.service.services.ListingTypeService;
-import com.msmeli.service.services.SellerService;
+import com.msmeli.service.services.*;
 import com.msmeli.util.GrossIncome;
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -24,7 +21,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class ItemServiceImpl implements ItemService {
@@ -33,21 +29,19 @@ public class ItemServiceImpl implements ItemService {
 
     private final MeliFeignClient meliFeignClient;
 
-    private final SellerService sellerService;
-
     private final ListingTypeService listingTypeService;
 
     private final MeliService meliService;
 
     private final ModelMapper mapper;
 
-    private final StockServiceImpl stockService;
+    private final StockService stockService;
+
     private final CostService costService;
 
-    public ItemServiceImpl(ItemRepository itemRepository, MeliFeignClient meliFeignClient, SellerService sellerService, ListingTypeService listingTypeService, MeliService meliService, ModelMapper mapper, StockServiceImpl stockService, CostService costService) {
+    public ItemServiceImpl(ItemRepository itemRepository, MeliFeignClient meliFeignClient, ListingTypeService listingTypeService, MeliService meliService, ModelMapper mapper, StockServiceImpl stockService, CostService costService) {
         this.itemRepository = itemRepository;
         this.meliFeignClient = meliFeignClient;
-        this.sellerService = sellerService;
         this.listingTypeService = listingTypeService;
         this.meliService = meliService;
         this.mapper = mapper;
@@ -122,7 +116,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @EventListener(ApplicationReadyEvent.class)
-    @Order(5)
+    @Order(8)
     public void createProductsCosts() {
         List<Item> items = findAll();
         items.parallelStream().forEach((item -> {

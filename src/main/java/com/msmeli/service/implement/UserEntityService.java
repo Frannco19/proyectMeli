@@ -17,6 +17,9 @@ import com.msmeli.service.services.EmailService;
 import com.msmeli.service.services.RoleEntityService;
 import com.msmeli.util.Role;
 import org.modelmapper.ModelMapper;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -162,5 +165,12 @@ public class UserEntityService implements com.msmeli.service.services.UserEntity
 
     private String emailResetPassword(String username, String newPassword) {
         return "Hola " + username + ",\n \n" + "Restablecimiento de contraseña exitoso." + "\n \n" + "Tu nueva contraseña es :  " + newPassword + "\n \n" + "Saludos, equipo de la 3ra Aceleracion.";
+    }
+
+    @EventListener(ApplicationReadyEvent.class)
+    @Order(6)
+    public void defaultUser() throws AlreadyExistsException, ResourceNotFoundException {
+        if (userEntityRepository.findAll().isEmpty())
+            create(new UserRegisterRequestDTO("user1", "123456", "123456", "mt.soporte.usuario@gmail.com"));
     }
 }

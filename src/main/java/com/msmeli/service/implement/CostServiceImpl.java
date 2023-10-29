@@ -42,8 +42,10 @@ public class CostServiceImpl implements CostService {
         } catch (FeignException.NotFound | FeignException.InternalServerError ignored) {
         } finally {
             if (item.getSku() != null && stock != null) cost.setReplacement_cost(stock.getPrice());
-            cost.setComision_fee(feeDetails.getPercentage_fee());
-            cost.setComision_discount(feeDetails.getGross_amount());
+            if (feeDetails != null) {
+                cost.setComision_fee(feeDetails.getPercentage_fee());
+                cost.setComision_discount(feeDetails.getGross_amount());
+            }
             cost.setShipping(shippingCost);
             double total_cost = item.getPrice() * GrossIncome.IIBB.iibPercentage + (cost.getComision_discount() + cost.getShipping() + cost.getReplacement_cost());
             cost.setTotal_cost(total_cost);

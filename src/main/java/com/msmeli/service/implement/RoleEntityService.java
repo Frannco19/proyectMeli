@@ -6,6 +6,7 @@ import com.msmeli.repository.RoleRepository;
 import com.msmeli.util.Role;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -20,8 +21,9 @@ public class RoleEntityService implements com.msmeli.service.services.RoleEntity
     }
 
     @EventListener(ApplicationReadyEvent.class)
+    @Order(5)
     public void createRoles() {
-        if (roleRepository.findByName(Role.ADMIN).isEmpty()) {
+        if (roleRepository.findAll().isEmpty()) {
             for (Role role : Role.values()) {
                 roleRepository.save(RoleEntity.builder().name(role).build());
             }
