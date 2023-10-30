@@ -1,5 +1,6 @@
 package com.msmeli.dto.request;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -11,6 +12,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Schema(description = "Clase de solicitud para actualizar la contraseña de usuario")
 public class UpdatePassRequestDTO {
     @NotBlank(message = "Ingrese una contraseña actual.")
     private String currentPassword;

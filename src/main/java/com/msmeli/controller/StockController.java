@@ -1,11 +1,13 @@
 package com.msmeli.controller;
 
+import com.msmeli.dto.StockDTO;
 import com.msmeli.dto.request.StockRequestDTO;
 import com.msmeli.service.implement.StockServiceImpl;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/stock")
@@ -18,7 +20,12 @@ public class StockController {
     }
 
     @PostMapping("/save")
-    public void saveUserStock(@RequestBody StockRequestDTO requestDTO){
+    public void saveUserStock(@RequestBody StockRequestDTO requestDTO) {
         stockService.saveUserStock(requestDTO);
+    }
+
+    @GetMapping("/list")
+    public ResponseEntity<List<StockDTO>> findAll() {
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(stockService.findAll());
     }
 }
