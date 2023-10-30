@@ -8,6 +8,8 @@ import com.msmeli.dto.response.OneProductResponseDTO;
 import com.msmeli.service.feignService.MeliService;
 import com.msmeli.service.services.ItemService;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
@@ -36,6 +38,11 @@ public class ItemController {
             @RequestParam(value = "pageSize", defaultValue = "50", required = false) int pageSize
     ){
         return itemService.getSellerItems(sellerId,offset,pageSize);
+    }
+
+    @GetMapping("/seller/list")
+    public ResponseEntity<List<ItemResponseDTO>> sellerItemsList(@RequestParam Integer sellerId){
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(itemService.getItems());
     }
 
     @GetMapping("/seller/catalogItems")

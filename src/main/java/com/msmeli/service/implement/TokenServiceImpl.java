@@ -31,14 +31,16 @@ public class TokenServiceImpl implements TokenService {
     @Override
     @EventListener(ApplicationReadyEvent.class)
     @Order(1)
-    public void saveToken(){
+    public void saveToken() {
         Token token = new Token();
 
         token.setRefresh_token(meliRefreshToken);
 
         //TODO CAMBIAR EN CASO DE EMERGENCIA
+        if (tokenRepository.findAll().isEmpty()) token.setAccess_token(meliAccessToken);
+        else token.setAccess_token(getAccessToken("ADMIN"));
 //        token.setAccess_token(meliAccessToken);
-        token.setAccess_token(getAccessToken("ADMIN"));
+//        token.setAccess_token(getAccessToken("ADMIN"));
 
         token.setUsername(meliUsernameToken);
 
@@ -62,7 +64,7 @@ public class TokenServiceImpl implements TokenService {
         return token.getRefresh_token();
     }
 
-    public String getAccessToken(String username){
+    public String getAccessToken(String username) {
         Token token = tokenRepository.findByUsername(username);
         return token.getAccess_token();
     }

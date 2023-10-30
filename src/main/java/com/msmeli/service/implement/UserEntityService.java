@@ -1,7 +1,9 @@
 package com.msmeli.service.implement;
 
+import com.msmeli.configuration.security.service.JwtService;
 import com.msmeli.configuration.security.service.UserEntityRefreshTokenService;
 import com.msmeli.dto.request.UpdatePassRequestDTO;
+import com.msmeli.dto.request.UserRefreshTokenRequestDTO;
 import com.msmeli.dto.request.UserRegisterRequestDTO;
 import com.msmeli.dto.response.UserAuthResponseDTO;
 import com.msmeli.dto.response.UserResponseDTO;
@@ -9,43 +11,49 @@ import com.msmeli.exception.AlreadyExistsException;
 import com.msmeli.exception.ResourceNotFoundException;
 import com.msmeli.model.RoleEntity;
 import com.msmeli.model.UserEntity;
+import com.msmeli.model.UserEntityRefreshToken;
 import com.msmeli.repository.UserEntityRepository;
-import com.msmeli.service.services.IEmailService;
-import com.msmeli.service.services.IRoleEntityService;
-import com.msmeli.service.services.IUserEntityService;
+import com.msmeli.service.services.EmailService;
+import com.msmeli.service.services.RoleEntityService;
 import com.msmeli.util.Role;
 import org.modelmapper.ModelMapper;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
 @Service
-public class UserEntityService implements IUserEntityService {
+public class UserEntityService implements com.msmeli.service.services.UserEntityService {
 
     private final UserEntityRepository userEntityRepository;
     private final PasswordEncoder passwordEncoder;
     private final ModelMapper mapper;
-    private final IRoleEntityService roleEntityService;
-    private final IEmailService emailService;
+    private final RoleEntityService roleEntityService;
+    private final EmailService emailService;
     private final UserEntityRefreshTokenService refreshTokenService;
+    private final JwtService jwtService;
+    private static final String NOT_FOUND = "Usuario no encontrado.";
 
 
-    public UserEntityService(UserEntityRepository userEntityRepository, PasswordEncoder passwordEncoder, ModelMapper mapper, IRoleEntityService roleEntityService, IEmailService emailService, UserEntityRefreshTokenService refreshTokenService) {
+    public UserEntityService(UserEntityRepository userEntityRepository, PasswordEncoder passwordEncoder, ModelMapper mapper, RoleEntityService roleEntityService, EmailService emailService, UserEntityRefreshTokenService refreshTokenService, JwtService jwtService) {
         this.userEntityRepository = userEntityRepository;
         this.passwordEncoder = passwordEncoder;
         this.mapper = mapper;
         this.roleEntityService = roleEntityService;
         this.emailService = emailService;
         this.refreshTokenService = refreshTokenService;
+        this.jwtService = jwtService;
     }
 
     @Override
     public UserResponseDTO create(UserRegisterRequestDTO userRegisterRequestDTO) throws ResourceNotFoundException, AlreadyExistsException {
-        if (userEntityRepository.findByUsername(userRegisterRequestDTO.getUsername()).isPresent())
-            throw new AlreadyExistsException("El nombre de usuario ya existe.");
         if (!userRegisterRequestDTO.getPassword().equals(userRegisterRequestDTO.getRePassword()))
             throw new ResourceNotFoundException("Las contraseñas ingresadas no coinciden.");
+        if (userEntityRepository.findByUsername(userRegisterRequestDTO.getUsername()).isPresent())
+            throw new AlreadyExistsException("El nombre de usuario ya existe.");
         UserEntity userEntity = mapper.map(userRegisterRequestDTO, UserEntity.class);
         userEntity.setPassword(passwordEncoder.encode(userRegisterRequestDTO.getPassword()));
         List<RoleEntity> roles = new ArrayList<>();
@@ -60,7 +68,7 @@ public class UserEntityService implements IUserEntityService {
     @Override
     public UserResponseDTO read(Long id) throws ResourceNotFoundException {
         Optional<UserEntity> userSearch = userEntityRepository.findById(id);
-        if (userSearch.isEmpty()) throw new ResourceNotFoundException("Usuario no encontrado.");
+        if (userSearch.isEmpty()) throw new ResourceNotFoundException(NOT_FOUND);
         return mapper.map(userSearch.get(), UserResponseDTO.class);
     }
 
@@ -74,21 +82,21 @@ public class UserEntityService implements IUserEntityService {
     @Override
     public UserEntity update(UserEntity userEntity) throws ResourceNotFoundException {
         Optional<UserEntity> userSearch = userEntityRepository.findById(userEntity.getId());
-        if (userSearch.isEmpty()) throw new ResourceNotFoundException("Usuario no encontrado.");
+        if (userSearch.isEmpty()) throw new ResourceNotFoundException(NOT_FOUND);
         return userEntityRepository.save(userEntity);
     }
 
     @Override
     public void delete(Long id) throws ResourceNotFoundException {
         Optional<UserEntity> userSearch = userEntityRepository.findById(id);
-        if (userSearch.isEmpty()) throw new ResourceNotFoundException("Usuario no encontrado.");
+        if (userSearch.isEmpty()) throw new ResourceNotFoundException(NOT_FOUND);
         userEntityRepository.deleteById(id);
     }
 
     @Override
     public UserResponseDTO modifyUserRoles(Long userId) throws ResourceNotFoundException {
         Optional<UserEntity> user = userEntityRepository.findById(userId);
-        if (user.isEmpty()) throw new ResourceNotFoundException("Usuario no encontrado.");
+        if (user.isEmpty()) throw new ResourceNotFoundException(NOT_FOUND);
         UserEntity userEntity = user.get();
         RoleEntity admin = roleEntityService.findByName(Role.ADMIN);
         if (userEntity.getRoles().size() == 1) userEntity.getRoles().add(admin);
@@ -99,13 +107,13 @@ public class UserEntityService implements IUserEntityService {
     @Override
     public UserAuthResponseDTO findByUsername(String username) throws ResourceNotFoundException {
         Optional<UserEntity> userSearch = userEntityRepository.findByUsername(username);
-        if (userSearch.isEmpty()) throw new ResourceNotFoundException("Usuario no encontrado.");
+        if (userSearch.isEmpty()) throw new ResourceNotFoundException(NOT_FOUND);
         return mapper.map(userSearch, UserAuthResponseDTO.class);
     }
 
     public Map<String, String> recoverPassword(String username) throws ResourceNotFoundException {
         Optional<UserEntity> userSearch = userEntityRepository.findByUsername(username);
-        if (userSearch.isEmpty()) throw new ResourceNotFoundException("Usuario no encontrado.");
+        if (userSearch.isEmpty()) throw new ResourceNotFoundException(NOT_FOUND);
         emailService.sendMail(userSearch.get().getEmail(), "Recuperar contraseña", emailRecoverPassword(username));
         return Map.of("message", "Correo electrónico de recuperación de contraseña enviado correctamente a " + username);
     }
@@ -123,7 +131,7 @@ public class UserEntityService implements IUserEntityService {
     @Override
     public Map<String, String> updatePassword(UpdatePassRequestDTO updatePassRequestDTO, String username) throws ResourceNotFoundException {
         Optional<UserEntity> userSearch = userEntityRepository.findByUsername(username);
-        if (userSearch.isEmpty()) throw new ResourceNotFoundException("Usuario no encontrado.");
+        if (userSearch.isEmpty()) throw new ResourceNotFoundException(NOT_FOUND);
         if (!updatePassRequestDTO.getPassword().equals(updatePassRequestDTO.getRePassword()))
             throw new ResourceNotFoundException("Las nuevas contraseñas no coinciden.");
         UserEntity userEntity = userSearch.get();
@@ -132,6 +140,19 @@ public class UserEntityService implements IUserEntityService {
         userEntity.setPassword(passwordEncoder.encode(updatePassRequestDTO.getPassword()));
         userEntityRepository.save(userEntity);
         return Map.of("message", "Contraseña actualizada correctamente.");
+    }
+
+    @Override
+    public UserAuthResponseDTO userRefreshToken(UserRefreshTokenRequestDTO refreshTokenRequestDTO) throws ResourceNotFoundException {
+        return refreshTokenService.findByToken(refreshTokenRequestDTO.getRefreshToken()).map(UserEntityRefreshToken::getUserEntity).map(userEntity -> new UserAuthResponseDTO(userEntity.getId(), userEntity.getUsername(), userEntity.getEmail(), jwtService.generateToken(userEntity.getUsername()), refreshTokenRequestDTO.getRefreshToken())).orElseThrow(() -> new ResourceNotFoundException("El token de refresco no se encuentra en la base de datos."));
+    }
+
+    @Override
+    public UserAuthResponseDTO userAuthenticateAndGetToken(String username) throws ResourceNotFoundException {
+        UserAuthResponseDTO userAuthResponseDTO = findByUsername(username);
+        userAuthResponseDTO.setToken(jwtService.generateToken(username));
+        userAuthResponseDTO.setRefreshToken(refreshTokenService.findByUsername(userAuthResponseDTO.getUsername()).get().getToken());
+        return userAuthResponseDTO;
     }
 
     private String emailWelcomeBody(String username) {
@@ -144,5 +165,12 @@ public class UserEntityService implements IUserEntityService {
 
     private String emailResetPassword(String username, String newPassword) {
         return "Hola " + username + ",\n \n" + "Restablecimiento de contraseña exitoso." + "\n \n" + "Tu nueva contraseña es :  " + newPassword + "\n \n" + "Saludos, equipo de la 3ra Aceleracion.";
+    }
+
+    @EventListener(ApplicationReadyEvent.class)
+    @Order(6)
+    public void defaultUser() throws AlreadyExistsException, ResourceNotFoundException {
+        if (userEntityRepository.findAll().isEmpty())
+            create(new UserRegisterRequestDTO("user1", "123456", "123456", "mt.soporte.usuario@gmail.com"));
     }
 }

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.msmeli.dto.ShippingDTO;
 import lombok.*;
 
-
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter

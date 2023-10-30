@@ -8,6 +8,8 @@ import com.jayway.jsonpath.JsonPath;
 import com.msmeli.dto.*;
 import com.msmeli.dto.response.BuyBoxWinnerResponseDTO;
 import com.msmeli.dto.response.CatalogItemResponseDTO;
+import com.msmeli.dto.response.FeeResponseDTO;
+import com.msmeli.dto.response.OptionsDTO;
 import com.msmeli.feignClient.MeliFeignClient;
 import com.msmeli.model.Category;
 import com.msmeli.model.Item;
@@ -267,4 +269,12 @@ public class MeliService {
         return -1;
     }
 
+    public OptionsDTO getShippingCostDTO(String itemId){
+
+        return meliFeignClient.getShippingCostDTO(itemId);
+    }
+
+    public FeeResponseDTO getItemFee(double price, String category_id, String listing_type_id){
+        return meliFeignClient.getItemFee(price,category_id,listing_type_id);
+    }
 }

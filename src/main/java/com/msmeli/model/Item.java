@@ -54,4 +54,7 @@ public class Item {
     private String image_url;
 
     private String sku;
+
+    @OneToOne
+    private Cost cost;
 }
