@@ -48,11 +48,11 @@ public class CostServiceImpl implements CostService {
             }
             cost.setShipping(shippingCost);
             double total_cost = item.getPrice() * GrossIncome.IIBB.iibPercentage + (cost.getComision_discount() + cost.getShipping() + cost.getReplacement_cost());
-            cost.setTotal_cost(total_cost);
+            cost.setTotal_cost(Math.round(total_cost * 100) / 100d);
             double margin = (item.getPrice() - total_cost) * 100 / item.getPrice();
-            cost.setMargin(margin);
+            cost.setMargin(Math.round(margin * 100) / 100d);
             double profit = item.getPrice() - total_cost;
-            cost.setProfit(profit);
+            cost.setProfit(Math.round(profit * 100) / 100d);
             item.setCost(costRepository.save(cost));
             return item;
         }
