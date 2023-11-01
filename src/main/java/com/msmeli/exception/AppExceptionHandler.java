@@ -18,13 +18,13 @@ import java.util.Map;
 @RestControllerAdvice
 public class AppExceptionHandler {
 
+    private static final String ACCESS_DENIED = "access_denied_reason";
+
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public Map<String, String> handleInvalidArguments(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
-        ex.getBindingResult().getFieldErrors().forEach(error -> {
-            errors.put(error.getField(), error.getDefaultMessage());
-        });
+        ex.getBindingResult().getFieldErrors().forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
         return errors;
     }
 
@@ -49,19 +49,19 @@ public class AppExceptionHandler {
         ProblemDetail errorDetail = null;
         if (ex instanceof BadCredentialsException) {
             errorDetail = ProblemDetail.forStatusAndDetail(HttpStatusCode.valueOf(401), ex.getMessage());
-            errorDetail.setProperty("access_denied_reason", "Authentication Failure");
+            errorDetail.setProperty(ACCESS_DENIED, "Authentication Failure");
         }
         if (ex instanceof AccessDeniedException) {
             errorDetail = ProblemDetail.forStatusAndDetail(HttpStatusCode.valueOf(403), ex.getMessage());
-            errorDetail.setProperty("access_denied_reason", "not_authorized!");
+            errorDetail.setProperty(ACCESS_DENIED, "not_authorized!");
         }
         if (ex instanceof SignatureException) {
             errorDetail = ProblemDetail.forStatusAndDetail(HttpStatusCode.valueOf(403), ex.getMessage());
-            errorDetail.setProperty("access_denied_reason", "JWT signature not valid!");
+            errorDetail.setProperty(ACCESS_DENIED, "JWT signature not valid!");
         }
         if (ex instanceof ExpiredJwtException) {
             errorDetail = ProblemDetail.forStatusAndDetail(HttpStatusCode.valueOf(403), ex.getMessage());
-            errorDetail.setProperty("access_denied_reason", "JWT token alredy expired!");
+            errorDetail.setProperty(ACCESS_DENIED, "JWT token alredy expired!");
         }
         return errorDetail;
     }

@@ -1,17 +1,14 @@
 package com.msmeli.service.implement;
 
-import com.msmeli.dto.request.UserRegisterRequestDTO;
 import com.msmeli.dto.response.UserAuthResponseDTO;
 import com.msmeli.dto.response.UserResponseDTO;
-import com.msmeli.exception.AlreadyExistsException;
 import com.msmeli.exception.ResourceNotFoundException;
 import com.msmeli.model.RoleEntity;
 import com.msmeli.model.UserEntity;
 import com.msmeli.repository.UserEntityRepository;
-import com.msmeli.service.services.IRoleEntityService;
+import com.msmeli.service.services.RoleEntityService;
 import com.msmeli.util.Role;
 import lombok.SneakyThrows;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -42,7 +39,7 @@ public class UserEntityServiceTest {
     private ModelMapper mapper;
 
     @Mock
-    private IRoleEntityService roleEntityService;
+    private RoleEntityService roleEntityService;
 
     @BeforeEach
     public void setUp() {

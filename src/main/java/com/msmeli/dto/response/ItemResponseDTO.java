@@ -39,4 +39,6 @@ public class ItemResponseDTO {
     private Date created_date_item;
     @JsonFormat(pattern = "dd-MM-yyyy")
     private Date updated_date_item;
+    private CostResponseDTO item_cost;
+    private Integer total_stock;
 }

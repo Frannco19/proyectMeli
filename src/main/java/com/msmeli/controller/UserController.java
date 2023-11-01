@@ -1,7 +1,5 @@
 package com.msmeli.controller;
 
-import com.msmeli.configuration.security.service.JwtService;
-import com.msmeli.configuration.security.service.UserEntityRefreshTokenService;
 import com.msmeli.dto.request.AuthRequestDTO;
 import com.msmeli.dto.request.UpdatePassRequestDTO;
 import com.msmeli.dto.request.UserRefreshTokenRequestDTO;
@@ -10,8 +8,12 @@ import com.msmeli.dto.response.UserAuthResponseDTO;
 import com.msmeli.dto.response.UserResponseDTO;
 import com.msmeli.exception.AlreadyExistsException;
 import com.msmeli.exception.ResourceNotFoundException;
-import com.msmeli.model.UserEntityRefreshToken;
-import com.msmeli.service.services.IUserEntityService;
+import com.msmeli.service.services.UserEntityService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,63 +34,72 @@ import java.util.Map;
 @RequestMapping("/meli/user")
 public class UserController {
 
-    private final IUserEntityService userEntityService;
-    private final JwtService jwtService;
+    private final UserEntityService userEntityService;
     private final AuthenticationManager authenticationManager;
-    private final UserEntityRefreshTokenService refreshTokenService;
 
-    public UserController(IUserEntityService userEntityService, JwtService jwtService, AuthenticationManager authenticationManager, UserEntityRefreshTokenService refreshTokenService) {
+    public UserController(UserEntityService userEntityService, AuthenticationManager authenticationManager) {
         this.userEntityService = userEntityService;
-        this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
-        this.refreshTokenService = refreshTokenService;
     }
 
     @PostMapping("/create")
+    @Operation(summary = "Endpoint para crear usuario, se espera UserRegisterRequestDTO.")
+    @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "Usuario creado correctamente.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDTO.class))}), @ApiResponse(responseCode = "400", description = "Solicitud erronea.", content = @Content), @ApiResponse(responseCode = "500", description = "Error del servidor.", content = @Content)})
     public ResponseEntity<UserResponseDTO> createUser(@Valid @RequestBody UserRegisterRequestDTO userEntity) throws ResourceNotFoundException, AlreadyExistsException {
         return ResponseEntity.status(HttpStatus.CREATED).body(userEntityService.create(userEntity));
     }
 
     @GetMapping("/list")
+    @Operation(summary = "Endpoint para listar usuarios.")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Usuarios registrados en BD.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDTO.class))}), @ApiResponse(responseCode = "400", description = "Solicitud erronea.", content = @Content), @ApiResponse(responseCode = "404", description = "No hay usuarios registrados.", content = @Content), @ApiResponse(responseCode = "500", description = "Error del servidor", content = @Content)})
     @PreAuthorize("hasAuthority('USER')")
     public ResponseEntity<List<UserResponseDTO>> listarUsers() throws ResourceNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(userEntityService.readAll());
     }
 
     @PostMapping("/authenticate")
+    @Operation(summary = "Endpoint para autenticar usuario.")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Devuelve el token y refreshToken del usuario.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = UserAuthResponseDTO.class))}), @ApiResponse(responseCode = "400", description = "Solicitud erronea.", content = @Content), @ApiResponse(responseCode = "404", description = "Usuario no registrado.", content = @Content), @ApiResponse(responseCode = "500", description = "Error del servidor", content = @Content)})
     public ResponseEntity<UserAuthResponseDTO> authenticateAndGetToken(@Valid @RequestBody AuthRequestDTO authRequestDTO) throws ResourceNotFoundException {
         Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequestDTO.getUsername(), authRequestDTO.getPassword()));
         if (authenticate.isAuthenticated()) {
-            UserAuthResponseDTO userAuthResponseDTO = userEntityService.findByUsername(authRequestDTO.getUsername());
-            userAuthResponseDTO.setToken(jwtService.generateToken(authRequestDTO.getUsername()));
-            userAuthResponseDTO.setRefreshToken(refreshTokenService.findByUsername(userAuthResponseDTO.getUsername()).get().getToken());
-            return ResponseEntity.status(HttpStatus.OK).body(userAuthResponseDTO);
+            return ResponseEntity.status(HttpStatus.OK).body(userEntityService.userAuthenticateAndGetToken(authRequestDTO.getUsername()));
         }
-        throw new UsernameNotFoundException("Invalid user request");
+        throw new UsernameNotFoundException("Solicitud de usuario invalida");
     }
 
     @PostMapping("/refreshToken")
-    public UserAuthResponseDTO refreshToken(@RequestBody UserRefreshTokenRequestDTO refreshTokenRequestDTO) throws ResourceNotFoundException {
-        return refreshTokenService.findByToken(refreshTokenRequestDTO.getRefreshToken()).map(UserEntityRefreshToken::getUserEntity).map(userEntity -> new UserAuthResponseDTO(userEntity.getId(), userEntity.getUsername(), userEntity.getEmail(), jwtService.generateToken(userEntity.getUsername()), refreshTokenRequestDTO.getRefreshToken())).orElseThrow(() -> new ResourceNotFoundException("Refresh token is not in database"));
+    @Operation(summary = "Endpoint para refrescar token.")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Devuelve el token y refreshToken del usuario.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = UserAuthResponseDTO.class))}), @ApiResponse(responseCode = "400", description = "Solicitud erronea.", content = @Content), @ApiResponse(responseCode = "404", description = "Usuario no registrado.", content = @Content), @ApiResponse(responseCode = "500", description = "Error del servidor", content = @Content)})
+    public ResponseEntity<UserAuthResponseDTO> refreshToken(@RequestBody UserRefreshTokenRequestDTO refreshTokenRequestDTO) throws ResourceNotFoundException {
+        return ResponseEntity.status(HttpStatus.OK).body(userEntityService.userRefreshToken(refreshTokenRequestDTO));
     }
 
     @GetMapping("/recover_password/{username}")
+    @Operation(summary = "Endpoint para recuperar contraseña al recibir un mail.")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Envia un mail con link al usuario para recuperar la contraseña.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = Map.class))}), @ApiResponse(responseCode = "400", description = "Solicitud erronea.", content = @Content), @ApiResponse(responseCode = "404", description = "Usuario no registrado.", content = @Content), @ApiResponse(responseCode = "500", description = "Error del servidor", content = @Content)})
     public ResponseEntity<Map<String, String>> recoverPassword(@PathVariable String username) throws ResourceNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(userEntityService.recoverPassword(username));
     }
 
     @GetMapping("/reset_password/{username}")
+    @Operation(summary = "Endpoint para resetar la contraseña del usuario.")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Se reseteo la contraseña correctamente.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = Map.class))}), @ApiResponse(responseCode = "400", description = "Solicitud erronea.", content = @Content), @ApiResponse(responseCode = "404", description = "Usuario no registrado.", content = @Content), @ApiResponse(responseCode = "500", description = "Error del servidor", content = @Content)})
     public ResponseEntity<Map<String, String>> resetPassword(@PathVariable String username) throws ResourceNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(userEntityService.resetPassword(username));
     }
 
     @PatchMapping("/add_role/{userId}")
+    @Operation(summary = "Endpoint para agregar o quitar rol de ADMIN.")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Rol ADMIN agregado o eliminado correctamente.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDTO.class))}), @ApiResponse(responseCode = "400", description = "Solicitud erronea.", content = @Content), @ApiResponse(responseCode = "404", description = "Usuario no registrado.", content = @Content), @ApiResponse(responseCode = "500", description = "Error del servidor", content = @Content)})
     public ResponseEntity<UserResponseDTO> modifyUserRoles(@PathVariable Long userId) throws ResourceNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(userEntityService.modifyUserRoles(userId));
     }
 
 
     @PatchMapping("/modify_password")
+    @Operation(summary = "Endpoint para recuperar actualizar la contraseña.")
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Se actualizó la contraseña correctamente.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = Map.class))}), @ApiResponse(responseCode = "400", description = "Solicitud erronea.", content = @Content), @ApiResponse(responseCode = "404", description = "Usuario no registrado.", content = @Content), @ApiResponse(responseCode = "500", description = "Error del servidor", content = @Content)})
     @PreAuthorize("hasAnyAuthority('USER','ADMIN')")
     public ResponseEntity<Map<String, String>> modifyPassword(@RequestBody UpdatePassRequestDTO updatePassRequestDTO, Authentication authentication) throws ResourceNotFoundException {
         return ResponseEntity.status(HttpStatus.OK).body(userEntityService.updatePassword(updatePassRequestDTO, authentication.getName()));
