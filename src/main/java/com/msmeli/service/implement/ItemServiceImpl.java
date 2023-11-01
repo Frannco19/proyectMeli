@@ -127,13 +127,13 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<Item> searchProducts(String searchType, String searchInput) {
+    public List<Item> searchProducts(String searchType, String searchInput, Pageable pageable) {
         List<Item> results;
 
         if ("sku".equals(searchType)) {
             results = itemRepository.findBySkuContaining(searchInput);
         } else if ("id".equals(searchType)) {
-            results = itemRepository.findByMlaContaining(searchInput);
+            results = itemRepository.findByIdContaining(searchInput);
 //        } else if ("publicationNumber".equals(searchType)) {
 //            results = itemRepository.findByPublicationNumberContaining(searchInput);
         } else {

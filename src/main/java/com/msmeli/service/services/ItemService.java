@@ -5,6 +5,7 @@ import com.msmeli.dto.response.ItemResponseDTO;
 import com.msmeli.dto.response.OneProductResponseDTO;
 import com.msmeli.model.Item;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -20,7 +21,7 @@ public interface ItemService {
     List<ItemResponseDTO> getItems();
     List<Item> findAll();
     Item save(Item item);
-    List<Item> searchProducts(String searchType, String searchInput);
+    List<Item> searchProducts(String searchType, String searchInput, Pageable pageable);
 
 
 }

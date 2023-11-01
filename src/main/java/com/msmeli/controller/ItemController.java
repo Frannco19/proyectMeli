@@ -9,6 +9,8 @@ import com.msmeli.model.Item;
 import com.msmeli.service.feignService.MeliService;
 import com.msmeli.service.services.ItemService;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -44,18 +46,21 @@ public class ItemController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<Item>> searchItems(
+    public ResponseEntity<Page<Item>> searchItems(
             @RequestParam("searchType") String searchType,
-            @RequestParam("searchInput") String searchInput
+            @RequestParam("searchInput") String searchInput,
+            Pageable pageable
     ) {
-        List<Item> searchResults = itemService.searchProducts(searchType, searchInput);
+        List<Item> searchResults = itemService.searchProducts(searchType, searchInput, pageable);
 
         if (searchResults.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(searchResults);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body((Page<Item>) searchResults);
         } else {
-            return ResponseEntity.ok(searchResults);
+            return ResponseEntity.ok((Page<Item>) searchResults);
         }
     }
+
+
 
     @GetMapping("/seller/list")
     public ResponseEntity<List<ItemResponseDTO>> sellerItemsList(@RequestParam Integer sellerId){

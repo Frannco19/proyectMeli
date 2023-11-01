@@ -27,7 +27,7 @@ public interface ItemRepository extends JpaRepository<Item, String> {
 
     List<Item> findBySkuContaining(String sku);
 
-    List<Item> findByMlaContaining(String id);
+    List<Item> findByIdContaining(String id);
 
 //    List<Item> findByPublicationNumberContaining(String publicationNumber);
 
