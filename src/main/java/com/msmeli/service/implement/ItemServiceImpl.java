@@ -20,6 +20,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -115,6 +116,7 @@ public class ItemServiceImpl implements ItemService {
         return itemRepository.save(item);
     }
 
+
     @EventListener(ApplicationReadyEvent.class)
     @Order(8)
     public void createProductsCosts() {
@@ -122,5 +124,22 @@ public class ItemServiceImpl implements ItemService {
         items.parallelStream().forEach((item -> {
             save(costService.createProductsCosts(item, stockService.findLastBySku(item.getSku())));
         }));
+    }
+
+    @Override
+    public List<Item> searchProducts(String searchType, String searchInput) {
+        List<Item> results;
+
+        if ("sku".equals(searchType)) {
+            results = itemRepository.findBySkuContaining(searchInput);
+        } else if ("id".equals(searchType)) {
+            results = itemRepository.findByMlaContaining(searchInput);
+//        } else if ("publicationNumber".equals(searchType)) {
+//            results = itemRepository.findByPublicationNumberContaining(searchInput);
+        } else {
+            results = new ArrayList<>(); // Maneja el caso en el que el tipo de búsqueda no coincide
+        }
+
+        return results;
     }
 }

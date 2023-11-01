@@ -5,6 +5,7 @@ import com.msmeli.dto.response.BuyBoxWinnerResponseDTO;
 import com.msmeli.dto.response.CatalogItemResponseDTO;
 import com.msmeli.dto.response.ItemResponseDTO;
 import com.msmeli.dto.response.OneProductResponseDTO;
+import com.msmeli.model.Item;
 import com.msmeli.service.feignService.MeliService;
 import com.msmeli.service.services.ItemService;
 import org.springframework.data.domain.Page;
@@ -26,6 +27,8 @@ public class ItemController {
 
     private final MeliService meliService;
 
+
+
     public ItemController(ItemService itemService, MeliService meliService) {
         this.itemService = itemService;
         this.meliService = meliService;
@@ -38,6 +41,20 @@ public class ItemController {
             @RequestParam(value = "pageSize", defaultValue = "50", required = false) int pageSize
     ){
         return itemService.getSellerItems(sellerId,offset,pageSize);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<Item>> searchItems(
+            @RequestParam("searchType") String searchType,
+            @RequestParam("searchInput") String searchInput
+    ) {
+        List<Item> searchResults = itemService.searchProducts(searchType, searchInput);
+
+        if (searchResults.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(searchResults);
+        } else {
+            return ResponseEntity.ok(searchResults);
+        }
     }
 
     @GetMapping("/seller/list")
