@@ -20,7 +20,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -127,19 +126,25 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<Item> searchProducts(String searchType, String searchInput, Pageable pageable) {
-        List<Item> results;
+    public Page<ItemResponseDTO> searchProducts(String searchType, String searchInput, Pageable pageable) {
+        Page<Item> results = null;
 
         if ("sku".equals(searchType)) {
-            results = itemRepository.findBySkuContaining(searchInput);
+            results = itemRepository.findBySkuContaining(searchInput, pageable);
         } else if ("id".equals(searchType)) {
-            results = itemRepository.findByIdContaining(searchInput);
-//        } else if ("publicationNumber".equals(searchType)) {
-//            results = itemRepository.findByPublicationNumberContaining(searchInput);
-        } else {
-            results = new ArrayList<>(); // Maneja el caso en el que el tipo de búsqueda no coincide
+            results = itemRepository.findByIdContaining(searchInput, pageable);
         }
 
-        return results;
+        // Convierte Page<Item> a Page<ItemResponseDTO> si es necesario
+        // Puedes usar una función de mapeo para convertir Item a ItemResponseDTO
+
+        Page<ItemResponseDTO> itemResponsePage = results.map(item -> {
+            ItemResponseDTO itemResponseDTO = new ItemResponseDTO();
+            // Mapea los atributos de item a itemResponseDTO
+            return itemResponseDTO;
+        });
+
+        return itemResponsePage;
     }
+
 }

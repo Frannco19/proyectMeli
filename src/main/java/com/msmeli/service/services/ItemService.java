@@ -21,7 +21,7 @@ public interface ItemService {
     List<ItemResponseDTO> getItems();
     List<Item> findAll();
     Item save(Item item);
-    List<Item> searchProducts(String searchType, String searchInput, Pageable pageable);
+    Page<ItemResponseDTO> searchProducts(String searchType, String searchInput, Pageable pageable);
 
 
 }

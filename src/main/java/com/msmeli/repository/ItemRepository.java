@@ -25,9 +25,9 @@ public interface ItemRepository extends JpaRepository<Item, String> {
     @Query("SELECT i FROM Item i WHERE i.catalog_position != -1 AND i.sellerId = :sellerId")
     Page<Item> getCatalogItems(@Param("sellerId") Integer sellerId, Pageable pageable);
 
-    List<Item> findBySkuContaining(String sku);
+    Page<Item> findBySkuContaining(String sku, Pageable pageable);
 
-    List<Item> findByIdContaining(String id);
+    Page<Item> findByIdContaining(String id, Pageable pageable);
 
 //    List<Item> findByPublicationNumberContaining(String publicationNumber);
 
