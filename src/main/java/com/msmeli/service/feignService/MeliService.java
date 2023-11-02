@@ -6,16 +6,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.msmeli.dto.*;
-import com.msmeli.dto.response.BuyBoxWinnerResponseDTO;
-import com.msmeli.dto.response.CatalogItemResponseDTO;
-import com.msmeli.dto.response.FeeResponseDTO;
-import com.msmeli.dto.response.OptionsDTO;
+import com.msmeli.dto.response.*;
 import com.msmeli.feignClient.MeliFeignClient;
 import com.msmeli.model.Category;
 import com.msmeli.model.Item;
 import com.msmeli.model.ListingType;
 import com.msmeli.model.Seller;
 import com.msmeli.repository.*;
+import com.msmeli.service.services.ItemService;
 import feign.FeignException;
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -39,7 +37,7 @@ public class MeliService {
     private final SellerReputationRepository sellerReputationRepository;
     private final SellerTransactionRepository sellerTransactionRepository;
 
-    private final ListingTypeRepository listingTypeRepository;
+        private final ListingTypeRepository listingTypeRepository;
 
     private final ObjectMapper objectMapper;
 
@@ -204,6 +202,13 @@ public class MeliService {
                 item.setBest_seller_position(getBestSellerPosition(e.getId(), e.getCatalog_product_id()));
                 item.setCatalog_position(getCatalogPosition(e.getId(), e.getCatalog_product_id()));
 
+                String description;
+
+                if(item.getCatalog_product_id() == null   ) description = meliFeignClient.getProductDescription(item.getId()).getPlain_text();
+                else  description = meliFeignClient.getCatalogDescription(item.getCatalog_product_id()).getShort_description().getContent();
+                if(description == null || description.isEmpty()) description = "No posee descripcion";
+                item.setDescription(description);
+
                 items.add(item);
             });
 
@@ -212,6 +217,10 @@ public class MeliService {
             offset = offset + 50;
         } while (!responseDTO.getResults().isEmpty());
     }
+
+
+
+
 
 
     public List<CatalogItemResponseDTO> getSellerItemCatalog(String product_catalog_id) {
@@ -277,4 +286,5 @@ public class MeliService {
     public FeeResponseDTO getItemFee(double price, String category_id, String listing_type_id){
         return meliFeignClient.getItemFee(price,category_id,listing_type_id);
     }
+
 }
