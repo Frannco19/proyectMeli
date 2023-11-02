@@ -21,7 +21,8 @@ public class Item {
     private String title;
 
     private String catalog_product_id;
-
+    @Column(length = 5000)
+    private String description;
     private Double price;
 
     private int sold_quantity;
