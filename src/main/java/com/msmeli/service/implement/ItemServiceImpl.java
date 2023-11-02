@@ -139,7 +139,7 @@ public class ItemServiceImpl implements ItemService {
         // Puedes usar una función de mapeo para convertir Item a ItemResponseDTO
 
         Page<ItemResponseDTO> itemResponsePage = results.map(item -> {
-            ItemResponseDTO itemResponseDTO = new ItemResponseDTO();
+            ItemResponseDTO itemResponseDTO = mapper.map(item, ItemResponseDTO.class);
             // Mapea los atributos de item a itemResponseDTO
             return itemResponseDTO;
         });
