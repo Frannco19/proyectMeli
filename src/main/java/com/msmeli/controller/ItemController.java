@@ -46,19 +46,17 @@ public class ItemController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<Page<Item>> searchItems(
+    public List<Item> searchItems(
             @RequestParam("searchType") String searchType,
             @RequestParam("searchInput") String searchInput,
-            Pageable pageable
+            @RequestParam(value = "offset", defaultValue = "0") int offset,
+            @RequestParam(value = "pageSize", defaultValue = "50") int pageSize
     ) {
-        List<Item> searchResults = itemService.searchProducts(searchType, searchInput, pageable);
-
-        if (searchResults.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body((Page<Item>) searchResults);
-        } else {
-            return ResponseEntity.ok((Page<Item>) searchResults);
-        }
+        Pageable pageable = PageRequest.of(offset, pageSize);
+        return itemService.searchProducts(searchType, searchInput, pageable);
     }
+
+
 
 
 
