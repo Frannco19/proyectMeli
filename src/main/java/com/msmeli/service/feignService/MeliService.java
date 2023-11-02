@@ -202,13 +202,18 @@ public class MeliService {
                 item.setBest_seller_position(getBestSellerPosition(e.getId(), e.getCatalog_product_id()));
                 item.setCatalog_position(getCatalogPosition(e.getId(), e.getCatalog_product_id()));
 
-                String description;
-
-                if(item.getCatalog_product_id() == null   ) description = meliFeignClient.getProductDescription(item.getId()).getPlain_text();
-                else  description = meliFeignClient.getCatalogDescription(item.getCatalog_product_id()).getShort_description().getContent();
-                if(description == null || description.isEmpty()) description = "No posee descripcion";
-                item.setDescription(description);
-
+                String description = "";
+                try {
+                    if (item.getCatalog_product_id() == null)
+                        description = meliFeignClient.getProductDescription(item.getId()).getPlain_text();
+                    else
+                        description = meliFeignClient.getCatalogDescription(item.getCatalog_product_id()).getShort_description().getContent();
+                } catch (FeignException.NotFound | FeignException.InternalServerError ex) {
+                    ex.printStackTrace();
+                } finally {
+                    if(description.isEmpty() || description.matches("^\\s*$")) description = "No posee descripción";
+                    item.setDescription(description);
+                }
                 items.add(item);
             });
 
