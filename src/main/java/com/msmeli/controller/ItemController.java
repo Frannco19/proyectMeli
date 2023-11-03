@@ -8,6 +8,8 @@ import com.msmeli.dto.response.OneProductResponseDTO;
 import com.msmeli.service.feignService.MeliService;
 import com.msmeli.service.services.ItemService;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +28,8 @@ public class ItemController {
 
     private final MeliService meliService;
 
+
+
     public ItemController(ItemService itemService, MeliService meliService) {
         this.itemService = itemService;
         this.meliService = meliService;
@@ -39,6 +43,21 @@ public class ItemController {
     ){
         return itemService.getSellerItems(sellerId,offset,pageSize);
     }
+
+    @GetMapping("/search")
+    public Page<ItemResponseDTO> searchItems(
+            @RequestParam("searchType") String searchType,
+            @RequestParam("searchInput") String searchInput,
+            @RequestParam(value = "offset", defaultValue = "0") int offset,
+            @RequestParam(value = "pageSize", defaultValue = "50") int pageSize
+    ) {
+        Pageable pageable = PageRequest.of(offset, pageSize); // Crea el objeto Pageable
+        return itemService.searchProducts(searchType, searchInput, pageable);
+    }
+
+
+
+
 
     @GetMapping("/seller/list")
     public ResponseEntity<List<ItemResponseDTO>> sellerItemsList(@RequestParam Integer sellerId){

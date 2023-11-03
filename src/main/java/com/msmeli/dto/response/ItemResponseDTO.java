@@ -27,6 +27,7 @@ public class ItemResponseDTO {
     private int catalog_position;
     private String seller_nickname;
     private String category_id;
+    private String description;
 
     private int best_seller_position;
 
