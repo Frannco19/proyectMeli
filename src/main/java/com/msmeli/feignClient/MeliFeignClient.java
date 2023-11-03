@@ -3,6 +3,8 @@ package com.msmeli.feignClient;
 import com.msmeli.configuration.feign.FeignClientConfiguration;
 import com.msmeli.dto.*;
 import com.msmeli.dto.request.RefreshTokenRequestDTO;
+import com.msmeli.dto.request.description.DescriptionCatalogDTO;
+import com.msmeli.dto.request.description.DescriptionProductDTO;
 import com.msmeli.dto.response.FeeResponseDTO;
 import com.msmeli.dto.response.OptionsDTO;
 import com.msmeli.exception.ResourceNotFoundException;
@@ -66,4 +68,13 @@ public interface MeliFeignClient {
 
     @GetMapping("/items/{itemId}/shipping_options?zip_code=1804")
     OptionsDTO getShippingCostDTO(@PathVariable String itemId);
+
+
+
+
+    @GetMapping("/products/{catalog_Product_Id}")
+    DescriptionCatalogDTO getCatalogDescription(@PathVariable String catalog_Product_Id);
+
+  @GetMapping("/items/{itemId}/description")
+  DescriptionProductDTO getProductDescription(@PathVariable String itemId);
 }
