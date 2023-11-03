@@ -68,15 +68,4 @@ public class StockServiceImpl implements StockService {
         return stockRepository.findAll().stream().map(stock -> modelMapper.map(stock, StockDTO.class)).toList();
     }
 
-    @EventListener(ApplicationReadyEvent.class)
-    @Order(7)
-    public void stockFromJson() throws IOException {
-        System.out.println(stockRepository.findAll());
-        if (stockRepository.findAll().isEmpty()) {
-            ClassPathResource resource = new ClassPathResource("stock_example.json");
-            ObjectMapper map = new ObjectMapper();
-            StockRequestDTO requestDTO = map.readValue(resource.getInputStream(), StockRequestDTO.class);
-            saveUserStock(requestDTO);
-        }
-    }
 }

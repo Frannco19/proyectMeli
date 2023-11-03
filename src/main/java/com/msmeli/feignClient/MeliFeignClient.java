@@ -44,7 +44,10 @@ public interface MeliFeignClient {
 //    public String getBestSellerPosition(@PathVariable String product_id);
 
     @GetMapping("/highlights/MLA/category/{category_id}")
-    public String getItemPositionByCategory(@PathVariable String category_id) throws ResourceNotFoundException;;
+    public String getItemPositionByCategory(@PathVariable String category_id) throws ResourceNotFoundException;
+
+    ;
+
     @GetMapping("/highlights/MLA/item/{item_id}")
     public String getItemPositionByItemId(@PathVariable String item_id);
 
@@ -64,17 +67,14 @@ public interface MeliFeignClient {
     public RefreshTokenDTO refreshToken(@RequestBody RefreshTokenRequestDTO refreshTokenDTO);
 
     @GetMapping("/sites/MLA/listing_prices")
-    public FeeResponseDTO getItemFee(@RequestParam("price") double price, @RequestParam("category_id")String category_id, @RequestParam("listing_type_id")String listing_type_id );
+    public FeeResponseDTO getItemFee(@RequestParam("price") double price, @RequestParam("category_id") String category_id, @RequestParam("listing_type_id") String listing_type_id);
 
     @GetMapping("/items/{itemId}/shipping_options?zip_code=1804")
     OptionsDTO getShippingCostDTO(@PathVariable String itemId);
 
-
-
-
     @GetMapping("/products/{catalog_Product_Id}")
     DescriptionCatalogDTO getCatalogDescription(@PathVariable String catalog_Product_Id);
 
-  @GetMapping("/items/{itemId}/description")
-  DescriptionProductDTO getProductDescription(@PathVariable String itemId);
+    @GetMapping("/items/{itemId}/description")
+    DescriptionProductDTO getProductDescription(@PathVariable String itemId);
 }

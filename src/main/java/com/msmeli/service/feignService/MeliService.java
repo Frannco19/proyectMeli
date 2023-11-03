@@ -178,6 +178,7 @@ public class MeliService {
         SellerDTO responseDTO;
         List<Item> items = new ArrayList<>();
 
+
         do {
             items.clear();
 

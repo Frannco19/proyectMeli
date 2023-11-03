@@ -24,10 +24,10 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-public class UserEntityServiceTest {
+public class UserEntityServiceImplTest {
 
     @InjectMocks
-    private UserEntityService userEntityService;
+    private UserEntityServiceImpl userEntityServiceImpl;
 
     @Mock
     private UserEntityRepository userEntityRepository;
@@ -88,7 +88,7 @@ public class UserEntityServiceTest {
 
         // Llamar al método y verificar el resultado
         try {
-            UserResponseDTO responseDTO = userEntityService.read(1L);
+            UserResponseDTO responseDTO = userEntityServiceImpl.read(1L);
 
             //assertNotNull(responseDTO);
             //assertEquals(1L, responseDTO.getId());
@@ -107,7 +107,7 @@ public class UserEntityServiceTest {
 
         // Llamar al método y verificar el resultado
         try {
-            List<UserResponseDTO> responseDTOs = userEntityService.readAll();
+            List<UserResponseDTO> responseDTOs = userEntityServiceImpl.readAll();
 
             assertNotNull(responseDTOs);
             assertFalse(responseDTOs.isEmpty());
@@ -127,7 +127,7 @@ public class UserEntityServiceTest {
 
         // Llamar al método y verificar el resultado
         try {
-            UserEntity updatedUserEntity = userEntityService.update(userEntity);
+            UserEntity updatedUserEntity = userEntityServiceImpl.update(userEntity);
 
             assertNotNull(updatedUserEntity);
             assertEquals(1L, updatedUserEntity.getId());
@@ -144,7 +144,7 @@ public class UserEntityServiceTest {
         when(userEntityRepository.findById(1L)).thenReturn(Optional.of(userEntity));
 
         // Llamar al método y verificar que no se lance ninguna excepción
-        assertDoesNotThrow(() -> userEntityService.delete(1L));
+        assertDoesNotThrow(() -> userEntityServiceImpl.delete(1L));
     }
 
     @SneakyThrows
@@ -160,7 +160,7 @@ public class UserEntityServiceTest {
 
         // Llamar al método y verificar el resultado
         try {
-            UserResponseDTO responseDTO = userEntityService.modifyUserRoles(1L);
+            UserResponseDTO responseDTO = userEntityServiceImpl.modifyUserRoles(1L);
 
             //assertNotNull(responseDTO);
             assertEquals(1L, responseDTO.getId());
@@ -179,7 +179,7 @@ public class UserEntityServiceTest {
 
         // Llamar al método y verificar el resultado
         try {
-            UserAuthResponseDTO responseDTO = userEntityService.findByUsername("testuser");
+            UserAuthResponseDTO responseDTO = userEntityServiceImpl.findByUsername("testuser");
 
             //assertNotNull(responseDTO);
             //assertEquals("testuser", responseDTO.getUsername());

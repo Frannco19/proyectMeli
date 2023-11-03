@@ -26,4 +26,5 @@ public class UserRegisterRequestDTO {
     @Email
     @NotBlank(message = "Ingrese un email.")
     private String email;
+    private Integer sellerId;
 }

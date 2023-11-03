@@ -115,6 +115,7 @@ public class ItemServiceImpl implements ItemService {
         return itemRepository.save(item);
     }
 
+
     @EventListener(ApplicationReadyEvent.class)
     @Order(8)
     public void createProductsCosts() {
@@ -123,4 +124,33 @@ public class ItemServiceImpl implements ItemService {
             save(costService.createProductsCosts(item, stockService.findLastBySku(item.getSku())));
         }));
     }
+
+    @Override
+    public Page<ItemResponseDTO> searchProducts(String searchType, String searchInput, Pageable pageable) {
+        Page<Item> results = null;
+
+        if ("sku".equals(searchType)) {
+            results = itemRepository.findBySkuContaining(searchInput, pageable);
+        } else if ("id".equals(searchType)) {
+            results = itemRepository.findByIdContaining(searchInput, pageable);
+        }
+
+        // Convierte Page<Item> a Page<ItemResponseDTO> si es necesario
+        // Puedes usar una función de mapeo para convertir Item a ItemResponseDTO
+
+        Page<ItemResponseDTO> itemResponsePage = results.map(item -> {
+            CostResponseDTO costResponseDTO = mapper.map(item.getCost(), CostResponseDTO.class);
+            costResponseDTO.setIIBB(GrossIncome.IIBB.iibPercentage * 100);
+            ItemResponseDTO itemResponseDTO = mapper.map(item, ItemResponseDTO.class);
+            itemResponseDTO.setItem_cost(costResponseDTO);
+            String listingTypeName = listingTypeService.getListingTypeName(item.getListing_type_id());
+            itemResponseDTO.setListing_type_id(listingTypeName);
+            itemResponseDTO.setTotal_stock(stockService.getTotalStockBySku(item.getSku()));
+            // Mapea los atributos de item a itemResponseDTO
+            return itemResponseDTO;
+        });
+
+        return itemResponsePage;
+    }
+
 }
