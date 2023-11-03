@@ -139,7 +139,13 @@ public class ItemServiceImpl implements ItemService {
         // Puedes usar una función de mapeo para convertir Item a ItemResponseDTO
 
         Page<ItemResponseDTO> itemResponsePage = results.map(item -> {
+            CostResponseDTO costResponseDTO = mapper.map(item.getCost(), CostResponseDTO.class);
+            costResponseDTO.setIIBB(GrossIncome.IIBB.iibPercentage * 100);
             ItemResponseDTO itemResponseDTO = mapper.map(item, ItemResponseDTO.class);
+            itemResponseDTO.setItem_cost(costResponseDTO);
+            String listingTypeName = listingTypeService.getListingTypeName(item.getListing_type_id());
+            itemResponseDTO.setListing_type_id(listingTypeName);
+            itemResponseDTO.setTotal_stock(stockService.getTotalStockBySku(item.getSku()));
             // Mapea los atributos de item a itemResponseDTO
             return itemResponseDTO;
         });
