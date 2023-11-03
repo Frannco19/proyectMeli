@@ -116,8 +116,6 @@ public class ItemServiceImpl implements ItemService {
     }
 
 
-    @EventListener(ApplicationReadyEvent.class)
-    @Order(8)
     public void createProductsCosts() {
         List<Item> items = findAll();
         items.parallelStream().forEach((item -> {

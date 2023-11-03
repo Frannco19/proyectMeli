@@ -212,7 +212,7 @@ public class MeliService {
                 } catch (FeignException.NotFound | FeignException.InternalServerError ex) {
                     ex.printStackTrace();
                 } finally {
-                    if(description.isEmpty() || description.matches("^\\s*$")) description = "No posee descripción";
+                    if(description.isEmpty() || description.matches("^\\s*$") || description == null) description = "No posee descripción";
                     item.setDescription(description);
                 }
                 items.add(item);

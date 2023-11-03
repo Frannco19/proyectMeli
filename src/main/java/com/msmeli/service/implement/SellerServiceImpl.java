@@ -40,9 +40,6 @@ public class SellerServiceImpl implements SellerService {
     @Override
     public Seller create(SellerRequestDTO sellerRequestDTO) {
         Seller seller = mapper.map(sellerRequestDTO, Seller.class);
-        List<Supplier> suppliers = new ArrayList<>();
-        suppliers.add(sellerRequestDTO.getSupplier());
-        seller.setSuppliers(suppliers);
         return sellerRepository.save(seller);
     }
 
