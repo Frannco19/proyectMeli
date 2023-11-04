@@ -21,10 +21,15 @@ public class SupplierStockServiceImpl implements SupplierStockService {
         this.mapper = mapper;
     }
 
+    @Override
+    public SupplierStock createOrUpdateSupplierStock(SupplierStock supplierStock) {
+        return supplierStockRepository.save(supplierStock);
+    }
+
+    @Override
     public List<SupplierStock> create(Supplier supplier, List<SupplierStockRequestDTO> stockDTO) {
         List<SupplierStock> supplierStock = stockDTO.stream().map(item -> {
             SupplierStock stock = mapper.map(item, SupplierStock.class);
-            stock.setSupplier(supplier);
             return stock;
         }).toList();
         return supplierStockRepository.saveAll(supplierStock);

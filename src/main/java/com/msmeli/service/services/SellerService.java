@@ -12,10 +12,13 @@ import java.util.Optional;
 
 public interface SellerService {
 
-     Optional<Seller> getSeller(Integer id);
-     Seller create(SellerRequestDTO sellerRequestDTO);
+    Optional<Seller> getSeller(Integer id);
 
-     UserResponseDTO createUser(UserRegisterRequestDTO userRegisterRequestDTO) throws ResourceNotFoundException, AlreadyExistsException;
+    Seller create(SellerRequestDTO sellerRequestDTO);
 
-     List<Seller> findAll();
+    UserResponseDTO createUser(UserRegisterRequestDTO userRegisterRequestDTO) throws ResourceNotFoundException, AlreadyExistsException;
+
+    Seller findById(Integer id) throws ResourceNotFoundException;
+
+    List<Seller> findAll();
 }

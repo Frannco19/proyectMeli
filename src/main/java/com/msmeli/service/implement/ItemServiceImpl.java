@@ -10,6 +10,7 @@ import com.msmeli.repository.ItemRepository;
 import com.msmeli.service.feignService.MeliService;
 import com.msmeli.service.services.*;
 import com.msmeli.util.GrossIncome;
+import org.jetbrains.annotations.NotNull;
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
@@ -67,32 +68,15 @@ public class ItemServiceImpl implements ItemService {
         List<ItemResponseDTO> items = itemPage.getContent()
                 .stream()
                 .parallel()
-                .map(item -> {
-                    CostResponseDTO costResponseDTO = mapper.map(item.getCost(), CostResponseDTO.class);
-                    costResponseDTO.setIIBB(GrossIncome.IIBB.iibPercentage * 100);
-                    ItemResponseDTO itemResponseDTO = mapper.map(item, ItemResponseDTO.class);
-                    itemResponseDTO.setItem_cost(costResponseDTO);
-                    String listingTypeName = listingTypeService.getListingTypeName(item.getListing_type_id());
-                    itemResponseDTO.setListing_type_id(listingTypeName);
-                    itemResponseDTO.setTotal_stock(stockService.getTotalStockBySku(item.getSku()));
-                    return itemResponseDTO;
-                })
+                .map(item -> getItemResponseDTO(item))
                 .toList();
         return new PageImpl<>(items, pageable, itemPage.getTotalElements());
     }
 
     public List<ItemResponseDTO> getItems() {
-        return itemRepository.findAll().stream().map(item -> {
-            CostResponseDTO costResponseDTO = mapper.map(item.getCost(), CostResponseDTO.class);
-            costResponseDTO.setIIBB(GrossIncome.IIBB.iibPercentage * 100);
-            ItemResponseDTO itemResponseDTO = mapper.map(item, ItemResponseDTO.class);
-            itemResponseDTO.setItem_cost(costResponseDTO);
-            String listingTypeName = listingTypeService.getListingTypeName(item.getListing_type_id());
-            itemResponseDTO.setListing_type_id(listingTypeName);
-            itemResponseDTO.setTotal_stock(stockService.getTotalStockBySku(item.getSku()));
-            return itemResponseDTO;
-        }).toList();
+        return itemRepository.findAll().stream().map(item -> getItemResponseDTO(item)).toList();
     }
+
 
     @Override
     public OneProductResponseDTO getOneProduct(String productId) {
@@ -133,22 +117,20 @@ public class ItemServiceImpl implements ItemService {
             results = itemRepository.findByIdContaining(searchInput, pageable);
         }
 
-        // Convierte Page<Item> a Page<ItemResponseDTO> si es necesario
-        // Puedes usar una función de mapeo para convertir Item a ItemResponseDTO
-
-        Page<ItemResponseDTO> itemResponsePage = results.map(item -> {
-            CostResponseDTO costResponseDTO = mapper.map(item.getCost(), CostResponseDTO.class);
-            costResponseDTO.setIIBB(GrossIncome.IIBB.iibPercentage * 100);
-            ItemResponseDTO itemResponseDTO = mapper.map(item, ItemResponseDTO.class);
-            itemResponseDTO.setItem_cost(costResponseDTO);
-            String listingTypeName = listingTypeService.getListingTypeName(item.getListing_type_id());
-            itemResponseDTO.setListing_type_id(listingTypeName);
-            itemResponseDTO.setTotal_stock(stockService.getTotalStockBySku(item.getSku()));
-            // Mapea los atributos de item a itemResponseDTO
-            return itemResponseDTO;
-        });
+        Page<ItemResponseDTO> itemResponsePage = results.map(item -> getItemResponseDTO(item));
 
         return itemResponsePage;
     }
 
+    @NotNull
+    private ItemResponseDTO getItemResponseDTO(Item item) {
+        CostResponseDTO costResponseDTO = mapper.map(item.getCost(), CostResponseDTO.class);
+        costResponseDTO.setIIBB(GrossIncome.IIBB.iibPercentage * 100);
+        ItemResponseDTO itemResponseDTO = mapper.map(item, ItemResponseDTO.class);
+        itemResponseDTO.setItem_cost(costResponseDTO);
+        String listingTypeName = listingTypeService.getListingTypeName(item.getListing_type_id());
+        itemResponseDTO.setListing_type_id(listingTypeName);
+        itemResponseDTO.setTotal_stock(stockService.getTotalStockBySku(item.getSku()));
+        return itemResponseDTO;
+    }
 }

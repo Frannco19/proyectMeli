@@ -49,10 +49,9 @@ public class DataInitializer {
         this.itemService = itemService;
     }
 
-    public void defaultSeller(Supplier supplier) {
+    public void defaultSeller() {
         if (sellerService.findAll().isEmpty()) {
             SellerRequestDTO seller = new SellerRequestDTO();
-            seller.setSupplier(supplier);
             seller.setSellerId(1152777827l);
             seller.setNickname("Moro Tech");
             sellerService.create(seller);
@@ -96,7 +95,8 @@ public class DataInitializer {
     @EventListener(ApplicationReadyEvent.class)
     @Order(5)
     public void fillBd() throws AlreadyExistsException, ResourceNotFoundException, IOException {
-        defaultSeller(defaultSupplier());
+        defaultSeller();
+        defaultSupplier();
         defaultRoles();
         defaultUser();
         defaulStock();

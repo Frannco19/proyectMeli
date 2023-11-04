@@ -22,8 +22,12 @@ public class SupplierServiceImpl implements SupplierService {
         this.supplierStockService = supplierStockService;
     }
 
+    public Supplier findById(Long id) throws ResourceNotFoundException {
+        return supplierRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("No supplier"));
+    }
+
     public List<SupplierStock> uploadSupplierStock(StockBySupplierRequestDTO stockBySupplierRequestDTO) throws ResourceNotFoundException {
-        Supplier supplier = supplierRepository.findById(stockBySupplierRequestDTO.getSupplierId()).orElseThrow(() -> new ResourceNotFoundException("No supplier"));
+        Supplier supplier = findById(stockBySupplierRequestDTO.getSupplierId());
         return supplierStockService.create(supplier, stockBySupplierRequestDTO.getSupplierStock());
     }
 }

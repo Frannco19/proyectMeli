@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface SupplierStockService {
     List<SupplierStock> create(Supplier supplier, List<SupplierStockRequestDTO> stockDTO);
+    SupplierStock createOrUpdateSupplierStock(SupplierStock supplierStock);
 }

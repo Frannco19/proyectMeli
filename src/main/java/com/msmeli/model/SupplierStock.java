@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
 
@@ -19,12 +20,11 @@ public class SupplierStock {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Integer available_quantity;
-    @ManyToOne
-    @JoinColumn(name = "supplier_id", nullable = false)
-    private Supplier supplier;
+    private Integer availableQuantity;
     private double price;
     private String sku;
     @CreationTimestamp
-    private LocalDate register_date;
+    private LocalDate registerDate;
+    @UpdateTimestamp
+    private LocalDate updateDate;
 }

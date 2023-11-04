@@ -53,4 +53,8 @@ public class SellerServiceImpl implements SellerService {
         return sellerRepository.findAll();
     }
 
+    public Seller findById(Integer id) throws ResourceNotFoundException {
+        return sellerRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException(NOT_FOUND));
+    }
+
 }

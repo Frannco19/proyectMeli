@@ -1,6 +1,9 @@
 package com.msmeli.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,7 +15,11 @@ import lombok.Setter;
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SupplierStockRequestDTO {
+    @NotBlank(message = "Ingrese un sku valido")
     private String sku;
+    @NotNull(message = "Ingrese un precio")
+    @Positive(message = "Ingrese un monto positivo")
     private Double price;
-    private int available_quantity;
+    @NotNull(message = "ingrese una cantidad")
+    private Integer availableQuantity;
 }

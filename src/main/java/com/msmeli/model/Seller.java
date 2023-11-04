@@ -23,7 +23,4 @@ public class Seller {
     @JoinColumn(name = "seller_reputation_id", referencedColumnName = "seller_reputation_id")
     @ManyToOne
     private SellerReputation sellerReputationId;
-//    @ManyToMany
-//    @JoinTable(name = "sellers_suppliers", joinColumns = @JoinColumn(name = "seller_id"), inverseJoinColumns = @JoinColumn(name = "supplier_id"))
-//    private List<Supplier> suppliers;
 }
