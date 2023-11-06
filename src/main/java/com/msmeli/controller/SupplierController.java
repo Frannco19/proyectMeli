@@ -32,4 +32,9 @@ public class SupplierController {
     public ResponseEntity<Page<SuppliersSellers>> findAllBySellerId(@RequestParam("sellerId") Long sellerId, @RequestParam(value = "offset", defaultValue = "0") int offset, @RequestParam(value = "pageSize", defaultValue = "50", required = false) int pageSize) throws ResourceNotFoundException {
         return ResponseEntity.status(HttpStatus.FOUND).body(suppliersSellersService.findAllBySellerPaged(sellerId, offset, pageSize));
     }
+
+    @GetMapping("/bySeller/{sellerId}")
+    public  ResponseEntity<List<SuppliersSellers>> findAllBySellerId(@PathVariable Long sellerId) throws ResourceNotFoundException {
+        return ResponseEntity.status(HttpStatus.FOUND).body(suppliersSellersService.findAllBySellerId(sellerId));
+    }
 }

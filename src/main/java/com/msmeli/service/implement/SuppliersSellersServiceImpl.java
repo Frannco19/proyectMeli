@@ -77,6 +77,4 @@ public class SuppliersSellersServiceImpl implements SuppliersSellersService {
             throw new ResourceNotFoundException("No hay mas elementos para mostrar");
         return suppliersSellersPage;
     }
-
-
 }
