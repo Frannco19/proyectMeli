@@ -6,6 +6,7 @@ import com.msmeli.model.SuppliersSellers;
 import com.msmeli.service.services.SupplierService;
 import com.msmeli.service.services.SuppliersSellersService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,8 +28,8 @@ public class SupplierController {
         return ResponseEntity.status(HttpStatus.CREATED).body(suppliersSellersService.create(stockBySupplierRequestDTO));
     }
 
-    @GetMapping("/bySeller/{sellerId}")
-    public ResponseEntity<List<SuppliersSellers>> findAllBySellerId(@PathVariable Long sellerId) throws ResourceNotFoundException {
-        return ResponseEntity.status(HttpStatus.FOUND).body(suppliersSellersService.findAllBySellerId(sellerId));
+    @GetMapping("/bySeller")
+    public ResponseEntity<Page<SuppliersSellers>> findAllBySellerId(@RequestParam("sellerId") Long sellerId, @RequestParam(value = "offset", defaultValue = "0") int offset, @RequestParam(value = "pageSize", defaultValue = "50", required = false) int pageSize) throws ResourceNotFoundException {
+        return ResponseEntity.status(HttpStatus.FOUND).body(suppliersSellersService.findAllBySellerPaged(sellerId, offset, pageSize));
     }
 }

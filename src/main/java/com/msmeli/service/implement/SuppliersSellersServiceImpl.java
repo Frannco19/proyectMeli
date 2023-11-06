@@ -12,6 +12,9 @@ import com.msmeli.service.services.SupplierService;
 import com.msmeli.service.services.SupplierStockService;
 import com.msmeli.service.services.SuppliersSellersService;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -58,9 +61,22 @@ public class SuppliersSellersServiceImpl implements SuppliersSellersService {
         }).toList();
     }
 
+    @Override
     public List<SuppliersSellers> findAllBySellerId(Long id) throws ResourceNotFoundException {
         List<SuppliersSellers> suppliersSellers = suppliersSellersRepository.findAllBySellerId(id);
-        if(suppliersSellers.isEmpty()) throw new ResourceNotFoundException("No hay stock de provedores para este seller");
+        if (suppliersSellers.isEmpty())
+            throw new ResourceNotFoundException("No hay stock de provedores para este seller");
         return suppliersSellers;
     }
+
+    @Override
+    public Page<SuppliersSellers> findAllBySellerPaged(Long id, int offset, int pageSize) throws ResourceNotFoundException {
+        Pageable pageable = PageRequest.of(offset, pageSize);
+        Page<SuppliersSellers> suppliersSellersPage = suppliersSellersRepository.getSuppliersSellersBySellerId(id, pageable);
+        if (suppliersSellersPage.getContent().isEmpty())
+            throw new ResourceNotFoundException("No hay mas elementos para mostrar");
+        return suppliersSellersPage;
+    }
+
+
 }
