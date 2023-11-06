@@ -1,5 +1,6 @@
 package com.msmeli.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -13,6 +14,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 @Schema(description = "Clase de solicitud de registro de usuario.")
 public class UserRegisterRequestDTO {
     @NotBlank(message = "Ingrese un nombre de usuario.")
@@ -26,5 +28,5 @@ public class UserRegisterRequestDTO {
     @Email
     @NotBlank(message = "Ingrese un email.")
     private String email;
-    private Integer sellerId;
+    private Integer seller_id;
 }

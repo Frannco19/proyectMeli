@@ -186,7 +186,7 @@ public class MeliService {
 //
 //            SellerDTO finalResponseDTO = responseDTO;
 //
-//            responseDTO.getResults().parallelStream().forEach(e -> {
+//            responseDTO.getResults().forEach(e -> {
 //
 //                ItemAttributesDTO attributesDTO = meliFeignClient.getItemAtributtes(e.getId());
 //

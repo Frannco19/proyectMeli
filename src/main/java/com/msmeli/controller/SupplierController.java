@@ -3,7 +3,6 @@ package com.msmeli.controller;
 import com.msmeli.dto.request.StockBySupplierRequestDTO;
 import com.msmeli.exception.ResourceNotFoundException;
 import com.msmeli.model.SuppliersSellers;
-import com.msmeli.service.services.SupplierService;
 import com.msmeli.service.services.SuppliersSellersService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;

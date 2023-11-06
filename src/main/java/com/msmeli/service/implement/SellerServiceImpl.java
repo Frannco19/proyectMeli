@@ -6,7 +6,6 @@ import com.msmeli.dto.response.UserResponseDTO;
 import com.msmeli.exception.AlreadyExistsException;
 import com.msmeli.exception.ResourceNotFoundException;
 import com.msmeli.model.Seller;
-import com.msmeli.model.Supplier;
 import com.msmeli.repository.SellerRepository;
 import com.msmeli.service.services.SellerService;
 import com.msmeli.service.services.UserEntityService;
@@ -43,8 +42,9 @@ public class SellerServiceImpl implements SellerService {
         return sellerRepository.save(seller);
     }
 
+    @Override
     public UserResponseDTO createUser(UserRegisterRequestDTO userRegisterRequestDTO) throws ResourceNotFoundException, AlreadyExistsException {
-        Seller seller = sellerRepository.findById(userRegisterRequestDTO.getSellerId()).orElseThrow(() -> new ResourceNotFoundException(NOT_FOUND));
+        Seller seller = sellerRepository.findById(userRegisterRequestDTO.getSeller_id()).orElseThrow(() -> new ResourceNotFoundException(NOT_FOUND));
         return userEntityService.create(userRegisterRequestDTO, seller);
     }
 
@@ -53,6 +53,7 @@ public class SellerServiceImpl implements SellerService {
         return sellerRepository.findAll();
     }
 
+    @Override
     public Seller findById(Integer id) throws ResourceNotFoundException {
         return sellerRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException(NOT_FOUND));
     }
