@@ -1,6 +1,8 @@
 package com.msmeli.controller;
 
+import com.msmeli.dto.StockDTO;
 import com.msmeli.dto.request.StockBySupplierRequestDTO;
+import com.msmeli.dto.response.SupplierStockResponseDTO;
 import com.msmeli.exception.ResourceNotFoundException;
 import com.msmeli.model.SuppliersSellers;
 import com.msmeli.service.services.SuppliersSellersService;
@@ -33,7 +35,12 @@ public class SupplierController {
     }
 
     @GetMapping("/bySeller/{sellerId}")
-    public  ResponseEntity<List<SuppliersSellers>> findAllBySellerId(@PathVariable Long sellerId) throws ResourceNotFoundException {
+    public  ResponseEntity<List<SupplierStockResponseDTO>> findAllBySellerId(@PathVariable Long sellerId) throws ResourceNotFoundException {
         return ResponseEntity.status(HttpStatus.FOUND).body(suppliersSellersService.findAllBySellerId(sellerId));
+    }
+
+    @GetMapping("/bySellerStock/{sellerId}")
+    public ResponseEntity<List<StockDTO>> getStockAndSupplierStock(@PathVariable long sellerId) throws ResourceNotFoundException {
+        return ResponseEntity.status(HttpStatus.FOUND).body(suppliersSellersService.getStockAndSupplierStock(sellerId));
     }
 }

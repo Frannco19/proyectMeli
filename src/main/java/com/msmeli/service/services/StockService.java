@@ -2,6 +2,7 @@ package com.msmeli.service.services;
 
 import com.msmeli.dto.StockDTO;
 import com.msmeli.dto.request.StockRequestDTO;
+import com.msmeli.exception.ResourceNotFoundException;
 import com.msmeli.model.Stock;
 import com.msmeli.model.UserEntity;
 
@@ -12,5 +13,7 @@ public interface StockService {
     void saveUserStock(StockRequestDTO requestDTO);
     Stock findLastBySku(String sku);
     Integer getTotalStockBySku(String sku);
-    List<StockDTO> findAll();
+    List<StockDTO> findAllMapped(Long sellerId);
+
+    List<Stock> findAll(Long sellerId) throws ResourceNotFoundException;
 }

@@ -20,4 +20,7 @@ public interface SuppliersSellersRepository extends JpaRepository<SuppliersSelle
 
     @Query("SELECT ss FROM SuppliersSellers ss WHERE ss.seller.id =?1")
     Page<SuppliersSellers> getSuppliersSellersBySellerId(Long id, Pageable pageable);
+
+    @Query("SELECT ss FROM SuppliersSellers ss WHERE ss.seller.id = ?2 AND ss.supplierStock.sku = ?1")
+    Optional<SuppliersSellers> findBySkuAndSellerId(String sku, Long sellerId);
 }

@@ -1,16 +1,12 @@
 package com.msmeli.service.implement;
 
+import com.msmeli.dto.StockDTO;
 import com.msmeli.dto.request.StockBySupplierRequestDTO;
+import com.msmeli.dto.response.SupplierStockResponseDTO;
 import com.msmeli.exception.ResourceNotFoundException;
-import com.msmeli.model.Seller;
-import com.msmeli.model.Supplier;
-import com.msmeli.model.SupplierStock;
-import com.msmeli.model.SuppliersSellers;
+import com.msmeli.model.*;
 import com.msmeli.repository.SuppliersSellersRepository;
-import com.msmeli.service.services.SellerService;
-import com.msmeli.service.services.SupplierService;
-import com.msmeli.service.services.SupplierStockService;
-import com.msmeli.service.services.SuppliersSellersService;
+import com.msmeli.service.services.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -19,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class SuppliersSellersServiceImpl implements SuppliersSellersService {
@@ -28,13 +25,15 @@ public class SuppliersSellersServiceImpl implements SuppliersSellersService {
     private final SellerService sellerService;
     private final SupplierStockService supplierStockService;
     private final ModelMapper mapper;
+    private final StockService stockService;
 
-    public SuppliersSellersServiceImpl(SuppliersSellersRepository suppliersSellersRepository, SupplierService supplierService, SellerService sellerService, SupplierStockService supplierStockService, ModelMapper mapper) {
+    public SuppliersSellersServiceImpl(SuppliersSellersRepository suppliersSellersRepository, SupplierService supplierService, SellerService sellerService, SupplierStockService supplierStockService, ModelMapper mapper, StockService stockService) {
         this.suppliersSellersRepository = suppliersSellersRepository;
         this.supplierService = supplierService;
         this.sellerService = sellerService;
         this.supplierStockService = supplierStockService;
         this.mapper = mapper;
+        this.stockService = stockService;
     }
 
     @Override
@@ -62,11 +61,15 @@ public class SuppliersSellersServiceImpl implements SuppliersSellersService {
     }
 
     @Override
-    public List<SuppliersSellers> findAllBySellerId(Long id) throws ResourceNotFoundException {
+    public List<SupplierStockResponseDTO> findAllBySellerId(Long id) throws ResourceNotFoundException {
         List<SuppliersSellers> suppliersSellers = suppliersSellersRepository.findAllBySellerId(id);
         if (suppliersSellers.isEmpty())
             throw new ResourceNotFoundException("No hay stock de provedores para este seller");
-        return suppliersSellers;
+        return suppliersSellers.stream().map(stock -> {
+            SupplierStockResponseDTO supplierStock = mapper.map(stock.getSupplierStock(), SupplierStockResponseDTO.class);
+            supplierStock.setNickname(stock.getSupplier().getSupplierName());
+            return supplierStock;
+        }).toList();
     }
 
     @Override
@@ -76,5 +79,19 @@ public class SuppliersSellersServiceImpl implements SuppliersSellersService {
         if (suppliersSellersPage.getContent().isEmpty())
             throw new ResourceNotFoundException("No hay mas elementos para mostrar");
         return suppliersSellersPage;
+    }
+
+    @Override
+    public List<StockDTO> getStockAndSupplierStock(Long id) throws ResourceNotFoundException {
+        List<Stock> sellerStock = stockService.findAll(id);
+        return sellerStock.stream().map((e) -> {
+            StockDTO stockDTO = mapper.map(e, StockDTO.class);
+            Optional<SuppliersSellers> suppliersSellers = suppliersSellersRepository.findBySkuAndSellerId(e.getSku(), id);
+            if (suppliersSellers.isPresent()) {
+                stockDTO.setSupplierContent(mapper.map(suppliersSellers.get().getSupplierStock(), SupplierStockResponseDTO.class));
+                stockDTO.getSupplierContent().setNickname(suppliersSellers.get().getSupplier().getSupplierName());
+            }
+            return stockDTO;
+        }).toList();
     }
 }

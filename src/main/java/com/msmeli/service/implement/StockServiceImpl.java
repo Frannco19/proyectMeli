@@ -1,26 +1,17 @@
 package com.msmeli.service.implement;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.msmeli.dto.StockDTO;
 import com.msmeli.dto.request.StockRequestDTO;
+import com.msmeli.exception.ResourceNotFoundException;
 import com.msmeli.model.Stock;
 import com.msmeli.model.UserEntity;
 import com.msmeli.repository.StockRepository;
 import com.msmeli.repository.UserEntityRepository;
 import com.msmeli.service.services.StockService;
 import jakarta.persistence.EntityNotFoundException;
-import net.minidev.json.JSONObject;
 import org.modelmapper.ModelMapper;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
-import org.springframework.core.annotation.Order;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -64,8 +55,14 @@ public class StockServiceImpl implements StockService {
     }
 
     @Override
-    public List<StockDTO> findAll() {
-        return stockRepository.findAll().stream().map(stock -> modelMapper.map(stock, StockDTO.class)).toList();
+    public List<StockDTO> findAllMapped(Long sellerId) {
+        return stockRepository.findAllBySellerId(sellerId).stream().map(stock -> modelMapper.map(stock, StockDTO.class)).toList();
     }
 
+    @Override
+    public List<Stock> findAll(Long sellerId) throws ResourceNotFoundException {
+        List<Stock> stockList = stockRepository.findAllBySellerId(sellerId);
+        if(stockList.isEmpty()) throw new ResourceNotFoundException("El seller buscado no posee stock");
+        return stockList;
+    }
 }

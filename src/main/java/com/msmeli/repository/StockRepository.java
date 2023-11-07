@@ -14,4 +14,7 @@ public interface StockRepository extends JpaRepository<Stock, Integer> {
 
     @Query("SELECT sum(s.available_quantity) FROM Stock s WHERE s.sku = ?1")
     Integer getTotalBySku(String sku);
+
+    @Query("SELECT s FROM Stock s WHERE s.user_id.seller.id = ?1")
+    List<Stock> findAllBySellerId(Long sellerId);
 }

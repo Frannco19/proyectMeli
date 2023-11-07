@@ -21,7 +21,7 @@ public class StockBySupplierRequestDTO {
     @NotNull(message = "Ingrese un supplier id")
     @Positive(message = "Ingrese un supplier id valido")
     private Long supplierId;
-    @NotEmpty(message = "Ingrese al menos un item en el stock de supplier")
     @Valid
+    @NotEmpty(message = "Ingrese al menos un item en el stock de supplier")
     private List<SupplierStockRequestDTO> content;
 }
