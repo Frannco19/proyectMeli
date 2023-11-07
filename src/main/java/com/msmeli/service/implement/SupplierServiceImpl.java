@@ -28,6 +28,6 @@ public class SupplierServiceImpl implements SupplierService {
 
     public List<SupplierStock> uploadSupplierStock(StockBySupplierRequestDTO stockBySupplierRequestDTO) throws ResourceNotFoundException {
         Supplier supplier = findById(stockBySupplierRequestDTO.getSupplierId());
-        return supplierStockService.create(supplier, stockBySupplierRequestDTO.getSupplierStock());
+        return supplierStockService.create(supplier, stockBySupplierRequestDTO.getContent());
     }
 }

@@ -23,5 +23,5 @@ public class StockBySupplierRequestDTO {
     private Long supplierId;
     @NotEmpty(message = "Ingrese al menos un item en el stock de supplier")
     @Valid
-    private List<SupplierStockRequestDTO> supplierStock;
+    private List<SupplierStockRequestDTO> content;
 }

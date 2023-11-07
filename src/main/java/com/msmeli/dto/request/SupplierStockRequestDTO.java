@@ -18,7 +18,6 @@ public class SupplierStockRequestDTO {
     @NotBlank(message = "Ingrese un sku valido")
     private String sku;
     @NotNull(message = "Ingrese un precio")
-    @Positive(message = "Ingrese un monto positivo")
     private Double price;
     @NotNull(message = "ingrese una cantidad")
     private Integer availableQuantity;

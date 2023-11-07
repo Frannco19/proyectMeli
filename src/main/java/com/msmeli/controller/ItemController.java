@@ -55,10 +55,6 @@ public class ItemController {
         return itemService.searchProducts(searchType, searchInput, pageable);
     }
 
-
-
-
-
     @GetMapping("/seller/list")
     public ResponseEntity<List<ItemResponseDTO>> sellerItemsList(@RequestParam Integer sellerId){
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(itemService.getItems());

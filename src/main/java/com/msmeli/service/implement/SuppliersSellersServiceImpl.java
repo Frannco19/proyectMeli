@@ -41,7 +41,7 @@ public class SuppliersSellersServiceImpl implements SuppliersSellersService {
     public List<SuppliersSellers> create(StockBySupplierRequestDTO stockBySupplierRequestDTO) throws ResourceNotFoundException {
         Supplier supplier = supplierService.findById(stockBySupplierRequestDTO.getSupplierId());
         Seller seller = sellerService.findById(1);
-        return stockBySupplierRequestDTO.getSupplierStock().stream().map(supplierStockDTO -> {
+        return stockBySupplierRequestDTO.getContent().stream().map(supplierStockDTO -> {
             Optional<SuppliersSellers> suppliersSellersFound = suppliersSellersRepository.filterSupplierSeller(supplier.getId(), seller.getId(), supplierStockDTO.getSku());
             SupplierStock supplierStock;
             SuppliersSellers suppliersSellers;
