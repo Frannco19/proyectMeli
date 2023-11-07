@@ -10,6 +10,8 @@ import com.msmeli.service.services.SupplierStockService;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,6 +28,7 @@ public class SupplierStockServiceImpl implements SupplierStockService {
 
     @Override
     public SupplierStock createOrUpdateSupplierStock(SupplierStock supplierStock) {
+        supplierStock.setPrice(Math.round(supplierStock.getPrice() * 100.0) / 100.0);
         return supplierStockRepository.save(supplierStock);
     }
 

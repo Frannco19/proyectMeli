@@ -40,6 +40,7 @@ public class StockServiceImpl implements StockService {
                 .map(e -> {
                     Stock userStock = modelMapper.map(e, Stock.class);
                     userStock.setUser_id(getUserById(requestDTO.getUser_id()));
+                    userStock.setPrice(Math.round(userStock.getPrice() * 100.0) / 100.0);
                     return userStock;
                 }).collect(Collectors.toList()));
     }

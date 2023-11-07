@@ -46,7 +46,6 @@ public class SuppliersSellersServiceImpl implements SuppliersSellersService {
             SuppliersSellers suppliersSellers;
             if (suppliersSellersFound.isPresent()) {
                 supplierStock = suppliersSellersFound.get().getSupplierStock();
-                supplierStock.setPrice(supplierStockDTO.getPrice());
                 supplierStock.setAvailableQuantity(supplierStockDTO.getAvailableQuantity());
                 suppliersSellers = suppliersSellersFound.get();
                 suppliersSellers.setSupplierStock(supplierStockService.createOrUpdateSupplierStock(supplierStock));
