@@ -20,19 +20,9 @@ public class RoleEntityService implements com.msmeli.service.services.RoleEntity
         this.roleRepository = roleRepository;
     }
 
-    @EventListener(ApplicationReadyEvent.class)
-    @Order(5)
-    public void createRoles() {
-        if (roleRepository.findAll().isEmpty()) {
-            for (Role role : Role.values()) {
-                roleRepository.save(RoleEntity.builder().name(role).build());
-            }
-        }
-    }
-
+    @Override
     public RoleEntity findByName(Role rol) throws ResourceNotFoundException {
-        Optional<RoleEntity> role = roleRepository.findByName(rol);
-        if (role.isEmpty()) throw new ResourceNotFoundException("Role not found");
-        return role.get();
+        return roleRepository.findByName(rol)
+                .orElseThrow(() -> new ResourceNotFoundException("Role not found"));
     }
 }

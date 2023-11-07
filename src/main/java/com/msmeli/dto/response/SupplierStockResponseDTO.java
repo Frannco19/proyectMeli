@@ -1,7 +1,6 @@
-package com.msmeli.dto;
+package com.msmeli.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.msmeli.dto.response.SupplierStockResponseDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,11 +13,11 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class StockDTO {
+public class SupplierStockResponseDTO {
     private int id;
     private String sku;
-    private int available_quantity;
+    private Integer availableQuantity;
     private Double price;
-    private LocalDate register_date;
-    private SupplierStockResponseDTO supplierContent;
+    private LocalDate updateDate;
+    private String nickname;
 }

@@ -24,8 +24,8 @@ public class StockController {
         stockService.saveUserStock(requestDTO);
     }
 
-    @GetMapping("/list")
-    public ResponseEntity<List<StockDTO>> findAll() {
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(stockService.findAll());
+    @GetMapping("/list/{sellerId}")
+    public ResponseEntity<List<StockDTO>> findAll(@PathVariable Long sellerId) {
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(stockService.findAllMapped(sellerId));
     }
 }

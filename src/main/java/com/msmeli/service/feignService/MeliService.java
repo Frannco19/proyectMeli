@@ -224,11 +224,6 @@ public class MeliService {
         } while (!responseDTO.getResults().isEmpty());
     }
 
-
-
-
-
-
     public List<CatalogItemResponseDTO> getSellerItemCatalog(String product_catalog_id) {
 
         ItemCatalogDTO responseDTO = meliFeignClient.getProductSearch(product_catalog_id);

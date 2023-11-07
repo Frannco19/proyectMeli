@@ -10,6 +10,7 @@ import com.msmeli.dto.response.UserResponseDTO;
 import com.msmeli.exception.AlreadyExistsException;
 import com.msmeli.exception.ResourceNotFoundException;
 import com.msmeli.model.RoleEntity;
+import com.msmeli.model.Seller;
 import com.msmeli.model.UserEntity;
 import com.msmeli.model.UserEntityRefreshToken;
 import com.msmeli.repository.UserEntityRepository;
@@ -17,16 +18,13 @@ import com.msmeli.service.services.EmailService;
 import com.msmeli.service.services.RoleEntityService;
 import com.msmeli.util.Role;
 import org.modelmapper.ModelMapper;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
-import org.springframework.core.annotation.Order;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
 @Service
-public class UserEntityService implements com.msmeli.service.services.UserEntityService {
+public class UserEntityServiceImpl implements com.msmeli.service.services.UserEntityService {
 
     private final UserEntityRepository userEntityRepository;
     private final PasswordEncoder passwordEncoder;
@@ -38,7 +36,7 @@ public class UserEntityService implements com.msmeli.service.services.UserEntity
     private static final String NOT_FOUND = "Usuario no encontrado.";
 
 
-    public UserEntityService(UserEntityRepository userEntityRepository, PasswordEncoder passwordEncoder, ModelMapper mapper, RoleEntityService roleEntityService, EmailService emailService, UserEntityRefreshTokenService refreshTokenService, JwtService jwtService) {
+    public UserEntityServiceImpl(UserEntityRepository userEntityRepository, PasswordEncoder passwordEncoder, ModelMapper mapper, RoleEntityService roleEntityService, EmailService emailService, UserEntityRefreshTokenService refreshTokenService, JwtService jwtService) {
         this.userEntityRepository = userEntityRepository;
         this.passwordEncoder = passwordEncoder;
         this.mapper = mapper;
@@ -49,7 +47,7 @@ public class UserEntityService implements com.msmeli.service.services.UserEntity
     }
 
     @Override
-    public UserResponseDTO create(UserRegisterRequestDTO userRegisterRequestDTO) throws ResourceNotFoundException, AlreadyExistsException {
+    public UserResponseDTO create(UserRegisterRequestDTO userRegisterRequestDTO, Seller seller) throws ResourceNotFoundException, AlreadyExistsException {
         if (!userRegisterRequestDTO.getPassword().equals(userRegisterRequestDTO.getRePassword()))
             throw new ResourceNotFoundException("Las contraseñas ingresadas no coinciden.");
         if (userEntityRepository.findByUsername(userRegisterRequestDTO.getUsername()).isPresent())
@@ -59,6 +57,7 @@ public class UserEntityService implements com.msmeli.service.services.UserEntity
         List<RoleEntity> roles = new ArrayList<>();
         roles.add(roleEntityService.findByName(Role.USER));
         userEntity.setRoles(roles);
+        userEntity.setSeller(seller);
         UserEntity savedUser = userEntityRepository.save(userEntity);
         refreshTokenService.createRefreshToken(savedUser);
         emailService.sendMail(userEntity.getEmail(), "Bienvenido a G&L App", emailWelcomeBody(userEntity.getUsername()));
@@ -67,9 +66,7 @@ public class UserEntityService implements com.msmeli.service.services.UserEntity
 
     @Override
     public UserResponseDTO read(Long id) throws ResourceNotFoundException {
-        Optional<UserEntity> userSearch = userEntityRepository.findById(id);
-        if (userSearch.isEmpty()) throw new ResourceNotFoundException(NOT_FOUND);
-        return mapper.map(userSearch.get(), UserResponseDTO.class);
+        return userEntityRepository.findById(id).map(user -> mapper.map(user, UserResponseDTO.class)).orElseThrow(() -> new ResourceNotFoundException(NOT_FOUND));
     }
 
     @Override
@@ -78,6 +75,7 @@ public class UserEntityService implements com.msmeli.service.services.UserEntity
         if (usersSearch.isEmpty()) throw new ResourceNotFoundException("No hay usuarios en la base de datos.");
         return usersSearch.stream().map(userEntity -> mapper.map(userEntity, UserResponseDTO.class)).toList();
     }
+
 
     @Override
     public UserEntity update(UserEntity userEntity) throws ResourceNotFoundException {
@@ -95,9 +93,7 @@ public class UserEntityService implements com.msmeli.service.services.UserEntity
 
     @Override
     public UserResponseDTO modifyUserRoles(Long userId) throws ResourceNotFoundException {
-        Optional<UserEntity> user = userEntityRepository.findById(userId);
-        if (user.isEmpty()) throw new ResourceNotFoundException(NOT_FOUND);
-        UserEntity userEntity = user.get();
+        UserEntity userEntity = userEntityRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException(NOT_FOUND));
         RoleEntity admin = roleEntityService.findByName(Role.ADMIN);
         if (userEntity.getRoles().size() == 1) userEntity.getRoles().add(admin);
         else userEntity.getRoles().remove(admin);
@@ -165,12 +161,5 @@ public class UserEntityService implements com.msmeli.service.services.UserEntity
 
     private String emailResetPassword(String username, String newPassword) {
         return "Hola " + username + ",\n \n" + "Restablecimiento de contraseña exitoso." + "\n \n" + "Tu nueva contraseña es :  " + newPassword + "\n \n" + "Saludos, equipo de la 3ra Aceleracion.";
-    }
-
-    @EventListener(ApplicationReadyEvent.class)
-    @Order(6)
-    public void defaultUser() throws AlreadyExistsException, ResourceNotFoundException {
-        if (userEntityRepository.findAll().isEmpty())
-            create(new UserRegisterRequestDTO("user1", "123456", "123456", "mt.soporte.usuario@gmail.com"));
     }
 }

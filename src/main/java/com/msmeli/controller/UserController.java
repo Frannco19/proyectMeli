@@ -8,6 +8,7 @@ import com.msmeli.dto.response.UserAuthResponseDTO;
 import com.msmeli.dto.response.UserResponseDTO;
 import com.msmeli.exception.AlreadyExistsException;
 import com.msmeli.exception.ResourceNotFoundException;
+import com.msmeli.service.services.SellerService;
 import com.msmeli.service.services.UserEntityService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -35,10 +36,12 @@ import java.util.Map;
 public class UserController {
 
     private final UserEntityService userEntityService;
+    private final SellerService sellerService;
     private final AuthenticationManager authenticationManager;
 
-    public UserController(UserEntityService userEntityService, AuthenticationManager authenticationManager) {
+    public UserController(UserEntityService userEntityService, SellerService sellerService, AuthenticationManager authenticationManager) {
         this.userEntityService = userEntityService;
+        this.sellerService = sellerService;
         this.authenticationManager = authenticationManager;
     }
 
@@ -46,7 +49,7 @@ public class UserController {
     @Operation(summary = "Endpoint para crear usuario, se espera UserRegisterRequestDTO.")
     @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "Usuario creado correctamente.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDTO.class))}), @ApiResponse(responseCode = "400", description = "Solicitud erronea.", content = @Content), @ApiResponse(responseCode = "500", description = "Error del servidor.", content = @Content)})
     public ResponseEntity<UserResponseDTO> createUser(@Valid @RequestBody UserRegisterRequestDTO userEntity) throws ResourceNotFoundException, AlreadyExistsException {
-        return ResponseEntity.status(HttpStatus.CREATED).body(userEntityService.create(userEntity));
+        return ResponseEntity.status(HttpStatus.CREATED).body(sellerService.createUser(userEntity));
     }
 
     @GetMapping("/list")
