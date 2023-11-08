@@ -29,12 +29,8 @@ public interface ItemRepository extends JpaRepository<Item, String> {
 
     Page<Item> findByIdContaining(String id, Pageable pageable);
 
-//    @Query("SELECT i FROM Item i WHERE ((?2 = 'id' AND i.id = ?1) OR (?2 = 'sku' AND i.sku = ?1)) AND ((?3 = -1 AND i.catalog_position = ?3) OR (?3 = -2 AND i.catalog_position >= ?3))")
-//    Page<Item> findByFilters(String searchInput, String searchType, int inCatalogue, Pageable pageable);
-
-    @Query("SELECT i FROM Item i WHERE (:searchType = 'id' AND i.id = :searchInput) OR (:searchType = 'sku' AND i.sku = :searchInput)")
-    Page<Item> searchFilters(@Param("searchInput") String searchInput, @Param("searchType") String searchType, Pageable pageable);
-
+    @Query("SELECT i FROM Item i WHERE ((?2 = 'id' AND i.id like ?1) OR (?2 = 'sku' AND i.sku like ?1)) AND ((?3 = -1 AND i.catalog_position = ?3) OR (?3 = -2 AND i.catalog_position >= ?3))")
+    Page<Item> findByFilters(String searchInput, String searchType, int inCatalogue, Pageable pageable);
 
 //    List<Item> findByPublicationNumberContaining(String publicationNumber);
 

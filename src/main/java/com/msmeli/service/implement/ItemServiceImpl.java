@@ -107,17 +107,9 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public Page<ItemResponseDTO> searchProducts(String searchType, String searchInput, int offset, int pageSize, boolean isCatalogue) {
-//        Page<Item> results = null;
         Pageable pageable = PageRequest.of(offset, pageSize); // Crea el objeto Pageable
         int inCatalogue = isCatalogue ? -1 : -2;
-        Page<Item> results = itemRepository.searchFilters(searchInput.toUpperCase(), searchType, pageable);
-
-//        if ("sku".equals(searchType)) {
-//            results = itemRepository.findBySkuContaining(searchInput, pageable);
-//        } else if ("id".equals(searchType)) {
-//            results = itemRepository.findByIdContaining(searchInput, pageable); //MLA
-//        }
-
+        Page<Item> results = itemRepository.findByFilters("%"+searchInput.toUpperCase()+"%", searchType, inCatalogue, pageable);
         Page<ItemResponseDTO> itemResponsePage = results.map(item -> getItemResponseDTO(item));
 
         return itemResponsePage;
