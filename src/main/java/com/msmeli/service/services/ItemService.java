@@ -25,7 +25,7 @@ public interface ItemService {
 
     Item save(Item item);
 
-    Page<ItemResponseDTO> searchProducts(String searchType, String searchInput, Pageable pageable);
+    Page<ItemResponseDTO> searchProducts(String searchType, String searchInput, int offset, int pageSize, boolean isCatalogue);
 
     void createProductsCosts();
 }

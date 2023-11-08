@@ -19,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Locale;
 
 @Service
 public class ItemServiceImpl implements ItemService {
@@ -105,14 +106,17 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public Page<ItemResponseDTO> searchProducts(String searchType, String searchInput, Pageable pageable) {
-        Page<Item> results = null;
+    public Page<ItemResponseDTO> searchProducts(String searchType, String searchInput, int offset, int pageSize, boolean isCatalogue) {
+//        Page<Item> results = null;
+        Pageable pageable = PageRequest.of(offset, pageSize); // Crea el objeto Pageable
+        int inCatalogue = isCatalogue ? -1 : -2;
+        Page<Item> results = itemRepository.searchFilters(searchInput.toUpperCase(), searchType, pageable);
 
-        if ("sku".equals(searchType)) {
-            results = itemRepository.findBySkuContaining(searchInput, pageable);
-        } else if ("id".equals(searchType)) {
-            results = itemRepository.findByIdContaining(searchInput, pageable);
-        }
+//        if ("sku".equals(searchType)) {
+//            results = itemRepository.findBySkuContaining(searchInput, pageable);
+//        } else if ("id".equals(searchType)) {
+//            results = itemRepository.findByIdContaining(searchInput, pageable); //MLA
+//        }
 
         Page<ItemResponseDTO> itemResponsePage = results.map(item -> getItemResponseDTO(item));
 
