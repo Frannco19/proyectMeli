@@ -8,6 +8,7 @@ import com.msmeli.dto.request.description.DescriptionProductDTO;
 import com.msmeli.dto.response.FeeResponseDTO;
 import com.msmeli.dto.response.OptionsDTO;
 import com.msmeli.exception.ResourceNotFoundException;
+import com.msmeli.model.CategoryName;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
@@ -77,4 +78,7 @@ public interface MeliFeignClient {
 
     @GetMapping("/items/{itemId}/description")
     DescriptionProductDTO getProductDescription(@PathVariable String itemId);
+
+    @GetMapping("/sites/MLA/categories")
+    List<CategoryName> getCategoryName();
 }
