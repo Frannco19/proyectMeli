@@ -5,6 +5,7 @@ import com.msmeli.dto.response.BuyBoxWinnerResponseDTO;
 import com.msmeli.dto.response.CatalogItemResponseDTO;
 import com.msmeli.dto.response.ItemResponseDTO;
 import com.msmeli.dto.response.OneProductResponseDTO;
+import com.msmeli.exception.ResourceNotFoundException;
 import com.msmeli.service.feignService.MeliService;
 import com.msmeli.service.services.ItemService;
 import org.springframework.data.domain.Page;
@@ -50,8 +51,8 @@ public class ItemController {
             @RequestParam(value = "searchInput",defaultValue = "mla") String searchInput,
             @RequestParam(value = "isCatalogue", defaultValue = "false") boolean isCatalogue,
             @RequestParam(value = "offset", defaultValue = "0") int offset,
-            @RequestParam(value = "pageSize", defaultValue = "50") int pageSize
-    ) {
+            @RequestParam(value = "pageSize", defaultValue = "5") int pageSize
+    ) throws ResourceNotFoundException {
         return itemService.searchProducts(searchType, searchInput, offset, pageSize, isCatalogue);
     }
 

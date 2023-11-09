@@ -1,15 +1,18 @@
 package com.msmeli.service.implement;
 
+import com.msmeli.dto.response.BuyBoxWinnerResponseDTO;
 import com.msmeli.dto.response.CostResponseDTO;
 import com.msmeli.dto.response.OneProductResponseDTO;
 import com.msmeli.dto.response.ItemResponseDTO;
 import com.msmeli.dto.SellerDTO;
+import com.msmeli.exception.ResourceNotFoundException;
 import com.msmeli.feignClient.MeliFeignClient;
 import com.msmeli.model.Item;
 import com.msmeli.repository.ItemRepository;
 import com.msmeli.service.feignService.MeliService;
 import com.msmeli.service.services.*;
 import com.msmeli.util.GrossIncome;
+import com.msmeli.util.TrafficLight;
 import org.jetbrains.annotations.NotNull;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -38,6 +41,8 @@ public class ItemServiceImpl implements ItemService {
 
     private final CostService costService;
 
+    private static final double MIN_MARGIN = .1;
+
     public ItemServiceImpl(ItemRepository itemRepository, MeliFeignClient meliFeignClient, ListingTypeService listingTypeService, MeliService meliService, ModelMapper mapper, StockServiceImpl stockService, CostService costService) {
         this.itemRepository = itemRepository;
         this.meliFeignClient = meliFeignClient;
@@ -63,11 +68,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private Page<ItemResponseDTO> getItemResponseDTOS(Pageable pageable, Page<Item> itemPage) {
-        List<ItemResponseDTO> items = itemPage.getContent()
-                .stream()
-                .parallel()
-                .map(item -> getItemResponseDTO(item))
-                .toList();
+        List<ItemResponseDTO> items = itemPage.getContent().stream().parallel().map(item -> getItemResponseDTO(item)).toList();
         return new PageImpl<>(items, pageable, itemPage.getTotalElements());
     }
 
@@ -106,10 +107,11 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public Page<ItemResponseDTO> searchProducts(String searchType, String searchInput, int offset, int pageSize, boolean isCatalogue) {
-        Pageable pageable = PageRequest.of(offset, pageSize); // Crea el objeto Pageable
+    public Page<ItemResponseDTO> searchProducts(String searchType, String searchInput, int offset, int pageSize, boolean isCatalogue) throws ResourceNotFoundException {
+        Pageable pageable = PageRequest.of(offset, pageSize);
         int inCatalogue = isCatalogue ? -1 : -2;
-        Page<Item> results = itemRepository.findByFilters("%"+searchInput.toUpperCase()+"%", searchType, inCatalogue, pageable);
+        Page<Item> results = itemRepository.findByFilters("%" + searchInput.toUpperCase() + "%", searchType, inCatalogue, pageable);
+        if (results.getContent().isEmpty()) throw new ResourceNotFoundException("No hay items con esos parametros");
         Page<ItemResponseDTO> itemResponsePage = results.map(item -> getItemResponseDTO(item));
 
         return itemResponsePage;
@@ -124,8 +126,18 @@ public class ItemServiceImpl implements ItemService {
         String listingTypeName = listingTypeService.getListingTypeName(item.getListing_type_id());
         itemResponseDTO.setListing_type_id(listingTypeName);
         itemResponseDTO.setTotal_stock(stockService.getTotalStockBySku(item.getSku()));
+        itemResponseDTO.setTrafficLight(calculateColor(itemResponseDTO));
         return itemResponseDTO;
     }
 
-
+    private TrafficLight calculateColor(ItemResponseDTO item) {
+        BuyBoxWinnerResponseDTO firstPlace = meliService.getBuyBoxWinnerCatalog(item.getCatalog_product_id());
+        double winnerPrice = item.getCatalog_position() >= 0 ? firstPlace.getPrice() : 0.0;
+        double adjustedPrice = (item.getItem_cost().getReplacement_cost() + item.getItem_cost().getShipping()) / (1 - ((item.getItem_cost().getComision_fee() / 100 + 0.045) + MIN_MARGIN));
+        TrafficLight trafficLight = null;
+        if (firstPlace.getSeller_id() == 1152777827) trafficLight = TrafficLight.GREEN;
+        else if (adjustedPrice <= winnerPrice) trafficLight = TrafficLight.YELLOW;
+        else trafficLight = TrafficLight.RED;
+        return trafficLight;
+    }
 }
