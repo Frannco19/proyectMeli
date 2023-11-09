@@ -7,17 +7,12 @@ import com.msmeli.dto.request.UserRegisterRequestDTO;
 import com.msmeli.exception.AlreadyExistsException;
 import com.msmeli.exception.ResourceNotFoundException;
 import com.msmeli.model.RoleEntity;
-import com.msmeli.model.Seller;
 import com.msmeli.model.Supplier;
 import com.msmeli.repository.RoleRepository;
 import com.msmeli.repository.StockRepository;
 import com.msmeli.repository.SupplierRepository;
 import com.msmeli.repository.UserEntityRepository;
-import com.msmeli.service.implement.UserEntityServiceImpl;
-import com.msmeli.service.services.ItemService;
-import com.msmeli.service.services.SellerService;
-import com.msmeli.service.services.StockService;
-import com.msmeli.service.services.UserEntityService;
+import com.msmeli.service.services.*;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
@@ -25,8 +20,6 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 @Component
 public class DataInitializer {
@@ -38,8 +31,9 @@ public class DataInitializer {
     private final UserEntityRepository userEntityRepository;
     private final StockService stockService;
     private final ItemService itemService;
+    private final GeneralCategoryService categoryService;
 
-    public DataInitializer(SellerService sellerService, SupplierRepository supplierRepository, RoleRepository roleRepository, StockRepository stockRepository, UserEntityRepository userEntityRepository, StockService stockService, ItemService itemService) {
+    public DataInitializer(SellerService sellerService, SupplierRepository supplierRepository, RoleRepository roleRepository, StockRepository stockRepository, UserEntityRepository userEntityRepository, StockService stockService, ItemService itemService, GeneralCategoryService categoryService) {
         this.sellerService = sellerService;
         this.supplierRepository = supplierRepository;
         this.roleRepository = roleRepository;
@@ -47,6 +41,7 @@ public class DataInitializer {
         this.userEntityRepository = userEntityRepository;
         this.stockService = stockService;
         this.itemService = itemService;
+        this.categoryService = categoryService;
     }
 
     public void defaultSeller() {
@@ -101,5 +96,6 @@ public class DataInitializer {
         defaultUser();
         defaulStock();
         itemService.createProductsCosts();
+        categoryService.createAll();
     }
 }

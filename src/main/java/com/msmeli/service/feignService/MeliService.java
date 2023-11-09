@@ -8,10 +8,7 @@ import com.jayway.jsonpath.JsonPath;
 import com.msmeli.dto.*;
 import com.msmeli.dto.response.*;
 import com.msmeli.feignClient.MeliFeignClient;
-import com.msmeli.model.Category;
-import com.msmeli.model.Item;
-import com.msmeli.model.ListingType;
-import com.msmeli.model.Seller;
+import com.msmeli.model.*;
 import com.msmeli.repository.*;
 import com.msmeli.service.services.ItemService;
 import feign.FeignException;
@@ -297,4 +294,15 @@ public class MeliService {
         return meliFeignClient.getItemFee(price,category_id,listing_type_id);
     }
 
+    public List<GeneralCategory> findGeneralCategories(){
+        return meliFeignClient.getGeneralCategory();
+    }
+
+    public TopSoldProductCategoryDTO getTopProductsByCategory(String id){
+        return meliFeignClient.getTopProductsByCategory(id);
+    }
+
+    public TopSoldDetailedProductDTO getTopProductDetails(String id){
+        return meliFeignClient.getTopProductDetails(id);
+    }
 }
