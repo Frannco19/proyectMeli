@@ -8,6 +8,7 @@ import com.msmeli.dto.request.description.DescriptionProductDTO;
 import com.msmeli.dto.response.FeeResponseDTO;
 import com.msmeli.dto.response.OptionsDTO;
 import com.msmeli.exception.ResourceNotFoundException;
+import com.msmeli.model.GeneralCategory;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,11 +44,6 @@ public interface MeliFeignClient {
 //    @GetMapping("/highlights/MLA/item/{product_id}")
 //    public String getBestSellerPosition(@PathVariable String product_id);
 
-    @GetMapping("/highlights/MLA/category/{category_id}")
-    public String getItemPositionByCategory(@PathVariable String category_id) throws ResourceNotFoundException;
-
-    ;
-
     @GetMapping("/highlights/MLA/item/{item_id}")
     public String getItemPositionByItemId(@PathVariable String item_id);
 
@@ -77,4 +73,13 @@ public interface MeliFeignClient {
 
     @GetMapping("/items/{itemId}/description")
     DescriptionProductDTO getProductDescription(@PathVariable String itemId);
+
+    @GetMapping("/sites/MLA/categories")
+    List<GeneralCategory> getGeneralCategory();
+
+    @GetMapping("/highlights/MLA/category/{id}")
+    TopSoldProductCategoryDTO getTopProductsByCategory(@PathVariable String id);
+
+    @GetMapping("/products/{productId}")
+    TopSoldDetailedProductDTO getTopProductDetails(@PathVariable String productId);
 }

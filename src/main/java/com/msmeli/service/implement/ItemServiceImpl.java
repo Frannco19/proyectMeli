@@ -112,8 +112,12 @@ public class ItemServiceImpl implements ItemService {
         int inCatalogue = isCatalogue ? -1 : -2;
         Page<Item> results = itemRepository.findByFilters("%" + searchInput.toUpperCase() + "%", searchType, inCatalogue, pageable);
         if (results.getContent().isEmpty()) throw new ResourceNotFoundException("No hay items con esos parametros");
-        Page<ItemResponseDTO> itemResponsePage = results.map(item -> getItemResponseDTO(item));
 
+        Page<ItemResponseDTO> itemResponsePage = results.map(item -> {
+            ItemResponseDTO itemDTO = getItemResponseDTO(item);
+            itemDTO.setTrafficLight(calculateColor(itemDTO));
+            return itemDTO;
+        });
         return itemResponsePage;
     }
 
@@ -126,17 +130,15 @@ public class ItemServiceImpl implements ItemService {
         String listingTypeName = listingTypeService.getListingTypeName(item.getListing_type_id());
         itemResponseDTO.setListing_type_id(listingTypeName);
         itemResponseDTO.setTotal_stock(stockService.getTotalStockBySku(item.getSku()));
-        itemResponseDTO.setTrafficLight(calculateColor(itemResponseDTO));
         return itemResponseDTO;
     }
-
     private TrafficLight calculateColor(ItemResponseDTO item) {
         BuyBoxWinnerResponseDTO firstPlace = null;
         double winnerPrice = 0.0;
         double adjustedPrice = 0.0;
         TrafficLight trafficLight = null;
 
-        if (item.getCatalog_product_id() != null) {
+        if (item.getCatalog_product_id() != null && item.getCatalog_position() != -1) {
             firstPlace = meliService.getBuyBoxWinnerCatalog(item.getCatalog_product_id());
             winnerPrice = item.getCatalog_position() >= 0 ? firstPlace.getPrice() : 0.0;
             adjustedPrice = (item.getItem_cost().getReplacement_cost() + item.getItem_cost().getShipping()) / (1 - ((item.getItem_cost().getComision_fee() / 100 + 0.045) + MIN_MARGIN));
