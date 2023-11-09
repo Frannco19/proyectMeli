@@ -131,13 +131,19 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private TrafficLight calculateColor(ItemResponseDTO item) {
-        BuyBoxWinnerResponseDTO firstPlace = meliService.getBuyBoxWinnerCatalog(item.getCatalog_product_id());
-        double winnerPrice = item.getCatalog_position() >= 0 ? firstPlace.getPrice() : 0.0;
-        double adjustedPrice = (item.getItem_cost().getReplacement_cost() + item.getItem_cost().getShipping()) / (1 - ((item.getItem_cost().getComision_fee() / 100 + 0.045) + MIN_MARGIN));
+        BuyBoxWinnerResponseDTO firstPlace = null;
+        double winnerPrice = 0.0;
+        double adjustedPrice = 0.0;
         TrafficLight trafficLight = null;
-        if (firstPlace.getSeller_id() == 1152777827) trafficLight = TrafficLight.GREEN;
-        else if (adjustedPrice <= winnerPrice) trafficLight = TrafficLight.YELLOW;
-        else trafficLight = TrafficLight.RED;
+
+        if (item.getCatalog_product_id() != null) {
+            firstPlace = meliService.getBuyBoxWinnerCatalog(item.getCatalog_product_id());
+            winnerPrice = item.getCatalog_position() >= 0 ? firstPlace.getPrice() : 0.0;
+            adjustedPrice = (item.getItem_cost().getReplacement_cost() + item.getItem_cost().getShipping()) / (1 - ((item.getItem_cost().getComision_fee() / 100 + 0.045) + MIN_MARGIN));
+            if (firstPlace.getSeller_id() == 1152777827) trafficLight = TrafficLight.GREEN;
+            else if (adjustedPrice <= winnerPrice) trafficLight = TrafficLight.YELLOW;
+            else trafficLight = TrafficLight.RED;
+        }
         return trafficLight;
     }
 }
