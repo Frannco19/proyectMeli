@@ -1,7 +1,6 @@
 package com.msmeli.service.implement;
 
 import com.msmeli.dto.TopSoldDetailedProductDTO;
-import com.msmeli.dto.TopSoldProductCategoryDTO;
 import com.msmeli.exception.ResourceNotFoundException;
 import com.msmeli.model.GeneralCategory;
 import com.msmeli.repository.GeneralCategoryRepository;
@@ -25,8 +24,19 @@ public class GeneralCategoryServiceImpl implements GeneralCategoryService {
 
     @Override
     public void createAll() {
-        if (generalCategoryRepository.findAll().isEmpty())
-            generalCategoryRepository.saveAll(meliService.findGeneralCategories());
+        generalCategoryRepository.saveAll(meliService.findGeneralCategories().stream().map(category -> {
+            int totalSold = 0;
+            double totalCost = .0;
+            for (TopSoldDetailedProductDTO product : getTopProductsByCategory(category.getId())) {
+                totalSold += product.getSold_quantity();
+                if (product.getBuy_box_winner() != null) {
+                    totalCost += product.getBuy_box_winner().getPrice()*product.getSold_quantity();
+                }
+            }
+            category.setTotalSold(totalSold);
+            category.setAverageSoldPrice(Math.round((totalCost / totalSold) * 100.0) / 100.0);
+            return category;
+        }).toList());
     }
 
     @Override
@@ -45,6 +55,5 @@ public class GeneralCategoryServiceImpl implements GeneralCategoryService {
         });
         return detailedProducts;
     }
-
 
 }

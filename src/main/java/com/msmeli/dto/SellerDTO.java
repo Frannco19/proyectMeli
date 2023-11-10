@@ -13,7 +13,6 @@ import java.util.List;
 @Getter
 @Setter
 @JsonIgnoreProperties(ignoreUnknown = true)
-@ToString
 public class SellerDTO {
     private SellerResponseDTO seller;
     private List<ItemResponseDTO> results;

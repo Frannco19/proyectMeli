@@ -2,6 +2,7 @@ package com.msmeli.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.msmeli.util.TrafficLight;
 import lombok.*;
@@ -14,7 +15,6 @@ import java.util.Date;
 @Getter
 @Setter
 @JsonIgnoreProperties(ignoreUnknown = true)
-@ToString
 public class ItemResponseDTO {
 
 //    private String item_id;
@@ -44,4 +44,5 @@ public class ItemResponseDTO {
     private CostResponseDTO item_cost;
     private Integer total_stock;
     private TrafficLight trafficLight;
+    private double winnerPrice;
 }

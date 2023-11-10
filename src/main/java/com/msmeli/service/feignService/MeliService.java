@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -34,7 +35,7 @@ public class MeliService {
     private final SellerReputationRepository sellerReputationRepository;
     private final SellerTransactionRepository sellerTransactionRepository;
 
-        private final ListingTypeRepository listingTypeRepository;
+    private final ListingTypeRepository listingTypeRepository;
 
     private final ObjectMapper objectMapper;
 
@@ -176,49 +177,49 @@ public class MeliService {
         List<Item> items = new ArrayList<>();
 
 
-        do {
-            items.clear();
-
-            responseDTO = meliFeignClient.getSellerByNickname("MORO TECH", offset);
-
-            SellerDTO finalResponseDTO = responseDTO;
-
-            responseDTO.getResults().parallelStream().forEach(e -> {
-
-                ItemAttributesDTO attributesDTO = meliFeignClient.getItemAtributtes(e.getId());
-
-                e.setImage_url(attributesDTO.getPictures().get(0).getUrl());
-                e.setCreated_date_item(attributesDTO.getDate_created());
-                e.setUpdated_date_item(attributesDTO.getLast_updated());
-                e.setStatus(attributesDTO.getStatus());
-
-                e.setSku(getItemSku(attributesDTO));
-
-                Item item = modelMapper.map(e, Item.class);
-                item.setUpdate_date_db(LocalDateTime.now());
-                item.setSellerId(finalResponseDTO.getSeller().getId());
-                item.setBest_seller_position(getBestSellerPosition(e.getId(), e.getCatalog_product_id()));
-                item.setCatalog_position(getCatalogPosition(e.getId(), e.getCatalog_product_id()));
-
-                String description = "";
-                try {
-                    if (item.getCatalog_product_id() == null)
-                        description = meliFeignClient.getProductDescription(item.getId()).getPlain_text();
-                    else
-                        description = meliFeignClient.getCatalogDescription(item.getCatalog_product_id()).getShort_description().getContent();
-                } catch (FeignException.NotFound | FeignException.InternalServerError ignored) {
-//                    ex.printStackTrace();
-                } finally {
-                    if(description.isEmpty() || description.matches("^\\s*$") || description == null) description = "No posee descripción";
-                    item.setDescription(description);
-                }
-                items.add(item);
-            });
-
-            itemRepository.saveAll(items);
-
-            offset = offset + 50;
-        } while (!responseDTO.getResults().isEmpty());
+//        do {
+//            items.clear();
+//
+//            responseDTO = meliFeignClient.getSellerByNickname("MORO TECH", offset);
+//
+//            SellerDTO finalResponseDTO = responseDTO;
+//
+//            responseDTO.getResults().parallelStream().forEach(e -> {
+//
+//                ItemAttributesDTO attributesDTO = meliFeignClient.getItemAtributtes(e.getId());
+//
+//                e.setImage_url(attributesDTO.getPictures().get(0).getUrl());
+//                e.setCreated_date_item(attributesDTO.getDate_created());
+//                e.setUpdated_date_item(attributesDTO.getLast_updated());
+//                e.setStatus(attributesDTO.getStatus());
+//
+//                e.setSku(getItemSku(attributesDTO));
+//
+//                Item item = modelMapper.map(e, Item.class);
+//                item.setUpdate_date_db(LocalDateTime.now());
+//                item.setSellerId(finalResponseDTO.getSeller().getId());
+//                item.setBest_seller_position(getBestSellerPosition(e.getId(), e.getCatalog_product_id()));
+//                item.setCatalog_position(getCatalogPosition(e.getId(), e.getCatalog_product_id()));
+//
+//                String description = "";
+//                try {
+//                    if (item.getCatalog_product_id() == null)
+//                        description = meliFeignClient.getProductDescription(item.getId()).getPlain_text();
+//                    else
+//                        description = meliFeignClient.getCatalogDescription(item.getCatalog_product_id()).getShort_description().getContent();
+//                } catch (FeignException.NotFound | FeignException.InternalServerError ignored) {
+////                    ex.printStackTrace();
+//                } finally {
+//                    if(description.isEmpty() || description.matches("^\\s*$") || description == null) description = "No posee descripción";
+//                    item.setDescription(description);
+//                }
+//                items.add(item);
+//            });
+//
+//            itemRepository.saveAll(items);
+//
+//            offset = offset + 50;
+//        } while (!responseDTO.getResults().isEmpty());
     }
 
     public List<CatalogItemResponseDTO> getSellerItemCatalog(String product_catalog_id) {
@@ -285,24 +286,25 @@ public class MeliService {
         return -1;
     }
 
-    public OptionsDTO getShippingCostDTO(String itemId){
+    public OptionsDTO getShippingCostDTO(String itemId) {
 
         return meliFeignClient.getShippingCostDTO(itemId);
     }
 
-    public FeeResponseDTO getItemFee(double price, String category_id, String listing_type_id){
-        return meliFeignClient.getItemFee(price,category_id,listing_type_id);
+    public FeeResponseDTO getItemFee(double price, String category_id, String listing_type_id) {
+        return meliFeignClient.getItemFee(price, category_id, listing_type_id);
     }
 
-    public List<GeneralCategory> findGeneralCategories(){
-        return meliFeignClient.getGeneralCategory();
+    public List<GeneralCategory> findGeneralCategories() {
+        ArrayList<String> categoriesNotIncluded = new ArrayList<>(Arrays.asList("MLA1540", "MLA1459", "MLA2547", "MLA1743","MLA1430"));
+        return meliFeignClient.getGeneralCategory().stream().filter(category -> !categoriesNotIncluded.contains(category.getId())).toList();
     }
 
-    public TopSoldProductCategoryDTO getTopProductsByCategory(String id){
+    public TopSoldProductCategoryDTO getTopProductsByCategory(String id) {
         return meliFeignClient.getTopProductsByCategory(id);
     }
 
-    public TopSoldDetailedProductDTO getTopProductDetails(String id){
+    public TopSoldDetailedProductDTO getTopProductDetails(String id) {
         return meliFeignClient.getTopProductDetails(id);
     }
 }
