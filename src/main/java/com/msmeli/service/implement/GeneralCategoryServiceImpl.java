@@ -24,7 +24,7 @@ public class GeneralCategoryServiceImpl implements GeneralCategoryService {
 
     @Override
     public void createAll() {
-        generalCategoryRepository.saveAll(meliService.findGeneralCategories().stream().map(category -> {
+        generalCategoryRepository.saveAll(meliService.findGeneralCategories().parallelStream().map(category -> {
             int totalSold = 0;
             double totalCost = .0;
             for (TopSoldDetailedProductDTO product : getTopProductsByCategory(category.getId())) {
@@ -49,7 +49,7 @@ public class GeneralCategoryServiceImpl implements GeneralCategoryService {
     @Override
     public List<TopSoldDetailedProductDTO> getTopProductsByCategory(String id) {
         List<TopSoldDetailedProductDTO> detailedProducts = new ArrayList<>();
-        meliService.getTopProductsByCategory(id).getContent().stream().forEach(product -> {
+        meliService.getTopProductsByCategory(id).getContent().parallelStream().forEach(product -> {
             if (product.getType().equals("PRODUCT"))
                 detailedProducts.add(meliService.getTopProductDetails(product.getId()));
         });
