@@ -22,7 +22,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Locale;
 
 @Service
 public class ItemServiceImpl implements ItemService {
@@ -68,12 +67,12 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private Page<ItemResponseDTO> getItemResponseDTOS(Pageable pageable, Page<Item> itemPage) {
-        List<ItemResponseDTO> items = itemPage.getContent().stream().parallel().map(item -> getItemResponseDTO(item)).toList();
+        List<ItemResponseDTO> items = itemPage.getContent().stream().parallel().map(this::getItemResponseDTO).toList();
         return new PageImpl<>(items, pageable, itemPage.getTotalElements());
     }
 
     public List<ItemResponseDTO> getItems() {
-        return itemRepository.findAll().stream().map(item -> getItemResponseDTO(item)).toList();
+        return itemRepository.findAll().stream().map(this::getItemResponseDTO).toList();
     }
 
 
@@ -101,9 +100,8 @@ public class ItemServiceImpl implements ItemService {
 
     public void createProductsCosts() {
         List<Item> items = findAll();
-        items.parallelStream().forEach((item -> {
-            save(costService.createProductsCosts(item, stockService.findLastBySku(item.getSku())));
-        }));
+        items.parallelStream().forEach((item -> save(costService.createProductsCosts(item, stockService.findLastBySku(item.getSku())))
+        ));
     }
 
     @Override
@@ -112,12 +110,11 @@ public class ItemServiceImpl implements ItemService {
         int inCatalogue = isCatalogue ? -1 : -2;
         Page<Item> results = itemRepository.findByFilters("%" + searchInput.toUpperCase() + "%", searchType, inCatalogue, pageable);
         if (results.getContent().isEmpty()) throw new ResourceNotFoundException("No hay items con esos parametros");
-        Page<ItemResponseDTO> itemResponsePage = results.map(item -> {
+        return results.map(item -> {
             ItemResponseDTO itemDTO = getItemResponseDTO(item);
             itemDTO = calculateColor(itemDTO);
             return itemDTO;
         });
-        return itemResponsePage;
     }
 
     @NotNull

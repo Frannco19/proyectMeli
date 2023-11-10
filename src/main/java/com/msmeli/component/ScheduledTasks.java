@@ -21,7 +21,6 @@ public class ScheduledTasks {
 
     private static final Logger log = LoggerFactory.getLogger(ScheduledTasks.class);
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
-//    private RefreshTokenRequestDTO refreshTokenRequestDTO;
     private final MeliFeignClient meliFeignClient;
     private final ModelMapper mapper;
 

@@ -2,7 +2,6 @@ package com.msmeli.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.msmeli.util.TrafficLight;
 import lombok.*;
@@ -17,7 +16,6 @@ import java.util.Date;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ItemResponseDTO {
 
-//    private String item_id;
     private String id;
     private String title;
     private String catalog_product_id;

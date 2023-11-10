@@ -1,7 +1,6 @@
 package com.msmeli.service.services;
 
 import com.msmeli.dto.TopSoldDetailedProductDTO;
-import com.msmeli.dto.TopSoldProductCategoryDTO;
 import com.msmeli.exception.ResourceNotFoundException;
 import com.msmeli.model.GeneralCategory;
 

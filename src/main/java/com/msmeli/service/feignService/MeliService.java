@@ -10,7 +10,6 @@ import com.msmeli.dto.response.*;
 import com.msmeli.feignClient.MeliFeignClient;
 import com.msmeli.model.*;
 import com.msmeli.repository.*;
-import com.msmeli.service.services.ItemService;
 import feign.FeignException;
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -31,10 +30,6 @@ public class MeliService {
     private final ItemRepository itemRepository;
     private final CategoryRepository categoryRepository;
     private final SellerRepository sellerRepository;
-    private final SellerRatingRepository sellerRatingRepository;
-    private final SellerReputationRepository sellerReputationRepository;
-    private final SellerTransactionRepository sellerTransactionRepository;
-
     private final ListingTypeRepository listingTypeRepository;
 
     private final ObjectMapper objectMapper;
@@ -42,17 +37,11 @@ public class MeliService {
     private final ModelMapper modelMapper;
 
     public MeliService(MeliFeignClient meliFeignClient, ItemRepository itemRepository,
-                       CategoryRepository categoryRepository, SellerRepository sellerRepository,
-                       SellerRatingRepository sellerRatingRepository, SellerReputationRepository sellerReputationRepository,
-                       SellerTransactionRepository sellerTransactionRepository, ObjectMapper objectMapper,
-                       ModelMapper modelMapper, ListingTypeRepository listingTypeRepository, ObjectMapper objectMapper1) {
+                       CategoryRepository categoryRepository, SellerRepository sellerRepository, ListingTypeRepository listingTypeRepository, ObjectMapper objectMapper1) {
         this.meliFeignClient = meliFeignClient;
         this.itemRepository = itemRepository;
         this.categoryRepository = categoryRepository;
         this.sellerRepository = sellerRepository;
-        this.sellerRatingRepository = sellerRatingRepository;
-        this.sellerReputationRepository = sellerReputationRepository;
-        this.sellerTransactionRepository = sellerTransactionRepository;
         this.listingTypeRepository = listingTypeRepository;
         this.objectMapper = objectMapper1;
         this.modelMapper = new ModelMapper();
@@ -177,49 +166,50 @@ public class MeliService {
         List<Item> items = new ArrayList<>();
 
 
-//        do {
-//            items.clear();
-//
-//            responseDTO = meliFeignClient.getSellerByNickname("MORO TECH", offset);
-//
-//            SellerDTO finalResponseDTO = responseDTO;
-//
-//            responseDTO.getResults().parallelStream().forEach(e -> {
-//
-//                ItemAttributesDTO attributesDTO = meliFeignClient.getItemAtributtes(e.getId());
-//
-//                e.setImage_url(attributesDTO.getPictures().get(0).getUrl());
-//                e.setCreated_date_item(attributesDTO.getDate_created());
-//                e.setUpdated_date_item(attributesDTO.getLast_updated());
-//                e.setStatus(attributesDTO.getStatus());
-//
-//                e.setSku(getItemSku(attributesDTO));
-//
-//                Item item = modelMapper.map(e, Item.class);
-//                item.setUpdate_date_db(LocalDateTime.now());
-//                item.setSellerId(finalResponseDTO.getSeller().getId());
-//                item.setBest_seller_position(getBestSellerPosition(e.getId(), e.getCatalog_product_id()));
-//                item.setCatalog_position(getCatalogPosition(e.getId(), e.getCatalog_product_id()));
-//
-//                String description = "";
-//                try {
-//                    if (item.getCatalog_product_id() == null)
-//                        description = meliFeignClient.getProductDescription(item.getId()).getPlain_text();
-//                    else
-//                        description = meliFeignClient.getCatalogDescription(item.getCatalog_product_id()).getShort_description().getContent();
-//                } catch (FeignException.NotFound | FeignException.InternalServerError ignored) {
-////                    ex.printStackTrace();
-//                } finally {
-//                    if(description.isEmpty() || description.matches("^\\s*$") || description == null) description = "No posee descripción";
-//                    item.setDescription(description);
-//                }
-//                items.add(item);
-//            });
-//
-//            itemRepository.saveAll(items);
-//
-//            offset = offset + 50;
-//        } while (!responseDTO.getResults().isEmpty());
+        do {
+            items.clear();
+
+            responseDTO = meliFeignClient.getSellerByNickname("MORO TECH", offset);
+
+            SellerDTO finalResponseDTO = responseDTO;
+
+            responseDTO.getResults().parallelStream().forEach(e -> {
+
+                ItemAttributesDTO attributesDTO = meliFeignClient.getItemAtributtes(e.getId());
+
+                e.setImage_url(attributesDTO.getPictures().get(0).getUrl());
+                e.setCreated_date_item(attributesDTO.getDate_created());
+                e.setUpdated_date_item(attributesDTO.getLast_updated());
+                e.setStatus(attributesDTO.getStatus());
+
+                e.setSku(getItemSku(attributesDTO));
+
+                Item item = modelMapper.map(e, Item.class);
+                item.setUpdate_date_db(LocalDateTime.now());
+                item.setSellerId(finalResponseDTO.getSeller().getId());
+                item.setBest_seller_position(getBestSellerPosition(e.getId(), e.getCatalog_product_id()));
+                item.setCatalog_position(getCatalogPosition(e.getId(), e.getCatalog_product_id()));
+
+                String description = "";
+                try {
+                    if (item.getCatalog_product_id() == null)
+                        description = meliFeignClient.getProductDescription(item.getId()).getPlain_text();
+                    else
+                        description = meliFeignClient.getCatalogDescription(item.getCatalog_product_id()).getShort_description().getContent();
+                } catch (FeignException.NotFound | FeignException.InternalServerError ignored) {
+//                    ex.printStackTrace();
+                } finally {
+                    if (description.isEmpty() || description.matches("^\\s*$") || description == null)
+                        description = "No posee descripción";
+                    item.setDescription(description);
+                }
+                items.add(item);
+            });
+
+            itemRepository.saveAll(items);
+
+            offset = offset + 50;
+        } while (!responseDTO.getResults().isEmpty());
     }
 
     public List<CatalogItemResponseDTO> getSellerItemCatalog(String product_catalog_id) {
@@ -259,9 +249,7 @@ public class MeliService {
 
         BoxWinnerDTO result = meliFeignClient.getProductWinnerSearch(productId);
 
-        BuyBoxWinnerResponseDTO responseDTO = modelMapper.map(result.getBuy_box_winner(), BuyBoxWinnerResponseDTO.class);
-
-        return responseDTO;
+        return modelMapper.map(result.getBuy_box_winner(), BuyBoxWinnerResponseDTO.class);
     }
 
     public int getCatalogPosition(String itemId, String product_catalog_id) {
@@ -296,7 +284,7 @@ public class MeliService {
     }
 
     public List<GeneralCategory> findGeneralCategories() {
-        ArrayList<String> categoriesNotIncluded = new ArrayList<>(Arrays.asList("MLA1540", "MLA1459", "MLA2547", "MLA1743","MLA1430"));
+        ArrayList<String> categoriesNotIncluded = new ArrayList<>(Arrays.asList("MLA1540", "MLA1459", "MLA2547", "MLA1743", "MLA1430"));
         return meliFeignClient.getGeneralCategory().stream().filter(category -> !categoriesNotIncluded.contains(category.getId())).toList();
     }
 

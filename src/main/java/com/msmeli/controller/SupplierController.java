@@ -35,12 +35,17 @@ public class SupplierController {
     }
 
     @GetMapping("/bySeller/{sellerId}")
-    public  ResponseEntity<List<SupplierStockResponseDTO>> findAllBySellerId(@PathVariable Long sellerId) throws ResourceNotFoundException {
+    public ResponseEntity<List<SupplierStockResponseDTO>> findAllBySellerId(@PathVariable Long sellerId) throws ResourceNotFoundException {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(suppliersSellersService.findAllBySellerId(sellerId));
     }
 
     @GetMapping("/bySellerStock/{sellerId}")
     public ResponseEntity<List<StockDTO>> getStockAndSupplierStock(@PathVariable long sellerId) throws ResourceNotFoundException {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(suppliersSellersService.getStockAndSupplierStock(sellerId));
+    }
+
+    @GetMapping("/bySellerStockPaged")
+    public ResponseEntity<Page<StockDTO>> getStockAndSupplierStock(@RequestParam("sellerId") Long sellerId, @RequestParam(value = "offset", defaultValue = "0") int offset, @RequestParam(value = "pageSize", defaultValue = "5") int pageSize) throws ResourceNotFoundException {
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(suppliersSellersService.getStockAndSupplierStock(sellerId, offset, pageSize));
     }
 }

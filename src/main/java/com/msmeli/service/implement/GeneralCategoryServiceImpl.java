@@ -30,7 +30,7 @@ public class GeneralCategoryServiceImpl implements GeneralCategoryService {
             for (TopSoldDetailedProductDTO product : getTopProductsByCategory(category.getId())) {
                 totalSold += product.getSold_quantity();
                 if (product.getBuy_box_winner() != null) {
-                    totalCost += product.getBuy_box_winner().getPrice()*product.getSold_quantity();
+                    totalCost += product.getBuy_box_winner().getPrice() * product.getSold_quantity();
                 }
             }
             category.setTotalSold(totalSold);
