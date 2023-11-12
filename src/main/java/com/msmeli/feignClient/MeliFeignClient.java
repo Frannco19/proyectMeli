@@ -7,7 +7,6 @@ import com.msmeli.dto.request.description.DescriptionCatalogDTO;
 import com.msmeli.dto.request.description.DescriptionProductDTO;
 import com.msmeli.dto.response.FeeResponseDTO;
 import com.msmeli.dto.response.OptionsDTO;
-import com.msmeli.exception.ResourceNotFoundException;
 import com.msmeli.model.GeneralCategory;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;

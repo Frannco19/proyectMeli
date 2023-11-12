@@ -10,7 +10,6 @@ import java.util.Date;
 @AllArgsConstructor
 @Getter
 @Setter
-@ToString
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CatalogItemResponseDTO {
 

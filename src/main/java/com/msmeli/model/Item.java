@@ -12,7 +12,6 @@ import java.util.Date;
 @AllArgsConstructor
 @Getter
 @Setter
-@ToString
 @Table(name = "item", catalog = "msmeli")
 public class Item {
     @Id

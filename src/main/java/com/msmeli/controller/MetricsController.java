@@ -1,7 +1,6 @@
 package com.msmeli.controller;
 
 import com.msmeli.dto.TopSoldDetailedProductDTO;
-import com.msmeli.dto.TopSoldProductCategoryDTO;
 import com.msmeli.exception.ResourceNotFoundException;
 import com.msmeli.model.GeneralCategory;
 import com.msmeli.service.services.GeneralCategoryService;
@@ -33,7 +32,7 @@ public class MetricsController {
     }
 
     @GetMapping("/topSold/{id}")
-    public ResponseEntity<List<TopSoldDetailedProductDTO>> getTopProductsByCategory(@PathVariable String id) throws ResourceNotFoundException {
+    public ResponseEntity<List<TopSoldDetailedProductDTO>> getTopProductsByCategory(@PathVariable String id) {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(categoryService.getTopProductsByCategory(id));
     }
 }

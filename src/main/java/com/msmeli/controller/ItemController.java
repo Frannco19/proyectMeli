@@ -9,8 +9,6 @@ import com.msmeli.exception.ResourceNotFoundException;
 import com.msmeli.service.feignService.MeliService;
 import com.msmeli.service.services.ItemService;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

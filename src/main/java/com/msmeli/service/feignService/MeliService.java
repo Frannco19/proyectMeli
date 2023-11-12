@@ -10,7 +10,6 @@ import com.msmeli.dto.response.*;
 import com.msmeli.feignClient.MeliFeignClient;
 import com.msmeli.model.*;
 import com.msmeli.repository.*;
-import com.msmeli.service.services.ItemService;
 import feign.FeignException;
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -20,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -30,28 +30,18 @@ public class MeliService {
     private final ItemRepository itemRepository;
     private final CategoryRepository categoryRepository;
     private final SellerRepository sellerRepository;
-    private final SellerRatingRepository sellerRatingRepository;
-    private final SellerReputationRepository sellerReputationRepository;
-    private final SellerTransactionRepository sellerTransactionRepository;
-
-        private final ListingTypeRepository listingTypeRepository;
+    private final ListingTypeRepository listingTypeRepository;
 
     private final ObjectMapper objectMapper;
 
     private final ModelMapper modelMapper;
 
     public MeliService(MeliFeignClient meliFeignClient, ItemRepository itemRepository,
-                       CategoryRepository categoryRepository, SellerRepository sellerRepository,
-                       SellerRatingRepository sellerRatingRepository, SellerReputationRepository sellerReputationRepository,
-                       SellerTransactionRepository sellerTransactionRepository, ObjectMapper objectMapper,
-                       ModelMapper modelMapper, ListingTypeRepository listingTypeRepository, ObjectMapper objectMapper1) {
+                       CategoryRepository categoryRepository, SellerRepository sellerRepository, ListingTypeRepository listingTypeRepository, ObjectMapper objectMapper1) {
         this.meliFeignClient = meliFeignClient;
         this.itemRepository = itemRepository;
         this.categoryRepository = categoryRepository;
         this.sellerRepository = sellerRepository;
-        this.sellerRatingRepository = sellerRatingRepository;
-        this.sellerReputationRepository = sellerReputationRepository;
-        this.sellerTransactionRepository = sellerTransactionRepository;
         this.listingTypeRepository = listingTypeRepository;
         this.objectMapper = objectMapper1;
         this.modelMapper = new ModelMapper();
@@ -209,7 +199,8 @@ public class MeliService {
                 } catch (FeignException.NotFound | FeignException.InternalServerError ignored) {
 //                    ex.printStackTrace();
                 } finally {
-                    if(description.isEmpty() || description.matches("^\\s*$") || description == null) description = "No posee descripción";
+                    if (description.isEmpty() || description.matches("^\\s*$") || description == null)
+                        description = "No posee descripción";
                     item.setDescription(description);
                 }
                 items.add(item);
@@ -258,9 +249,7 @@ public class MeliService {
 
         BoxWinnerDTO result = meliFeignClient.getProductWinnerSearch(productId);
 
-        BuyBoxWinnerResponseDTO responseDTO = modelMapper.map(result.getBuy_box_winner(), BuyBoxWinnerResponseDTO.class);
-
-        return responseDTO;
+        return modelMapper.map(result.getBuy_box_winner(), BuyBoxWinnerResponseDTO.class);
     }
 
     public int getCatalogPosition(String itemId, String product_catalog_id) {
@@ -285,24 +274,25 @@ public class MeliService {
         return -1;
     }
 
-    public OptionsDTO getShippingCostDTO(String itemId){
+    public OptionsDTO getShippingCostDTO(String itemId) {
 
         return meliFeignClient.getShippingCostDTO(itemId);
     }
 
-    public FeeResponseDTO getItemFee(double price, String category_id, String listing_type_id){
-        return meliFeignClient.getItemFee(price,category_id,listing_type_id);
+    public FeeResponseDTO getItemFee(double price, String category_id, String listing_type_id) {
+        return meliFeignClient.getItemFee(price, category_id, listing_type_id);
     }
 
-    public List<GeneralCategory> findGeneralCategories(){
-        return meliFeignClient.getGeneralCategory();
+    public List<GeneralCategory> findGeneralCategories() {
+        ArrayList<String> categoriesNotIncluded = new ArrayList<>(Arrays.asList("MLA1540", "MLA1459", "MLA2547", "MLA1743", "MLA1430"));
+        return meliFeignClient.getGeneralCategory().stream().filter(category -> !categoriesNotIncluded.contains(category.getId())).toList();
     }
 
-    public TopSoldProductCategoryDTO getTopProductsByCategory(String id){
+    public TopSoldProductCategoryDTO getTopProductsByCategory(String id) {
         return meliFeignClient.getTopProductsByCategory(id);
     }
 
-    public TopSoldDetailedProductDTO getTopProductDetails(String id){
+    public TopSoldDetailedProductDTO getTopProductDetails(String id) {
         return meliFeignClient.getTopProductDetails(id);
     }
 }

@@ -10,7 +10,6 @@ import lombok.*;
 @AllArgsConstructor
 @Getter
 @Setter
-@ToString
 @Table(name = "listing_type", catalog = "msmeli")
 public class ListingType {
 

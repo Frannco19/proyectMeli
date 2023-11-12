@@ -22,7 +22,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Locale;
 
 @Service
 public class ItemServiceImpl implements ItemService {
@@ -68,12 +67,12 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private Page<ItemResponseDTO> getItemResponseDTOS(Pageable pageable, Page<Item> itemPage) {
-        List<ItemResponseDTO> items = itemPage.getContent().stream().parallel().map(item -> getItemResponseDTO(item)).toList();
+        List<ItemResponseDTO> items = itemPage.getContent().stream().parallel().map(this::getItemResponseDTO).toList();
         return new PageImpl<>(items, pageable, itemPage.getTotalElements());
     }
 
     public List<ItemResponseDTO> getItems() {
-        return itemRepository.findAll().stream().map(item -> getItemResponseDTO(item)).toList();
+        return itemRepository.findAll().stream().map(this::getItemResponseDTO).toList();
     }
 
 
@@ -101,9 +100,8 @@ public class ItemServiceImpl implements ItemService {
 
     public void createProductsCosts() {
         List<Item> items = findAll();
-        items.parallelStream().forEach((item -> {
-            save(costService.createProductsCosts(item, stockService.findLastBySku(item.getSku())));
-        }));
+        items.parallelStream().forEach((item -> save(costService.createProductsCosts(item, stockService.findLastBySku(item.getSku())))
+        ));
     }
 
     @Override
@@ -112,13 +110,11 @@ public class ItemServiceImpl implements ItemService {
         int inCatalogue = isCatalogue ? -1 : -2;
         Page<Item> results = itemRepository.findByFilters("%" + searchInput.toUpperCase() + "%", searchType, inCatalogue, pageable);
         if (results.getContent().isEmpty()) throw new ResourceNotFoundException("No hay items con esos parametros");
-
-        Page<ItemResponseDTO> itemResponsePage = results.map(item -> {
+        return results.map(item -> {
             ItemResponseDTO itemDTO = getItemResponseDTO(item);
-            itemDTO.setTrafficLight(calculateColor(itemDTO));
+            itemDTO = calculateColor(itemDTO);
             return itemDTO;
         });
-        return itemResponsePage;
     }
 
     @NotNull
@@ -132,12 +128,13 @@ public class ItemServiceImpl implements ItemService {
         itemResponseDTO.setTotal_stock(stockService.getTotalStockBySku(item.getSku()));
         return itemResponseDTO;
     }
-    private TrafficLight calculateColor(ItemResponseDTO item) {
+
+    private ItemResponseDTO calculateColor(ItemResponseDTO item) {
         BuyBoxWinnerResponseDTO firstPlace = null;
         double winnerPrice = 0.0;
         double adjustedPrice = 0.0;
         TrafficLight trafficLight = null;
-
+        item.setCatalog_position(meliService.getCatalogPosition(item.getId(), item.getCatalog_product_id()));
         if (item.getCatalog_product_id() != null && item.getCatalog_position() != -1) {
             firstPlace = meliService.getBuyBoxWinnerCatalog(item.getCatalog_product_id());
             winnerPrice = item.getCatalog_position() >= 0 ? firstPlace.getPrice() : 0.0;
@@ -145,7 +142,9 @@ public class ItemServiceImpl implements ItemService {
             if (firstPlace.getSeller_id() == 1152777827) trafficLight = TrafficLight.GREEN;
             else if (adjustedPrice <= winnerPrice) trafficLight = TrafficLight.YELLOW;
             else trafficLight = TrafficLight.RED;
+            item.setTrafficLight(trafficLight);
+            item.setWinnerPrice(winnerPrice);
         }
-        return trafficLight;
+        return item;
     }
 }
