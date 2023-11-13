@@ -23,7 +23,7 @@ public interface ItemService {
 
     Item save(Item item);
 
-    Page<ItemResponseDTO> searchProducts(String searchType, String searchInput, int offset, int pageSize, boolean isCatalogue) throws ResourceNotFoundException;
+    Page<ItemResponseDTO> searchProducts(String searchType, String searchInput, int offset, int pageSize, boolean isCatalogue,String isActive) throws ResourceNotFoundException;
 
     void createProductsCosts();
 }

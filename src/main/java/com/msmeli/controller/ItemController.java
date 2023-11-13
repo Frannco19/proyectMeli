@@ -49,9 +49,10 @@ public class ItemController {
             @RequestParam(value = "searchInput",defaultValue = "mla") String searchInput,
             @RequestParam(value = "isCatalogue", defaultValue = "false") boolean isCatalogue,
             @RequestParam(value = "offset", defaultValue = "0") int offset,
-            @RequestParam(value = "pageSize", defaultValue = "5") int pageSize
+            @RequestParam(value = "pageSize", defaultValue = "5") int pageSize,
+            @RequestParam(value = "isActive", defaultValue = "active") String isActive
     ) throws ResourceNotFoundException {
-        return itemService.searchProducts(searchType, searchInput, offset, pageSize, isCatalogue);
+        return itemService.searchProducts(searchType, searchInput, offset, pageSize, isCatalogue, isActive);
     }
 
     @GetMapping("/seller/list")
