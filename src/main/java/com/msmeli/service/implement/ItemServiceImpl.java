@@ -76,7 +76,7 @@ public class ItemServiceImpl implements ItemService {
         return itemRepository.findAll().stream().map(this::getItemResponseDTO).toList();
     }
 
-    public Page<ItemResponseDTO> getItemsAndCost(Integer id, int offset, int pageSize) {
+    public List<ItemResponseDTO> getItemsAndCost(Integer id, int offset, int pageSize) {
         Pageable pageable = PageRequest.of(offset, pageSize);
         Page<Item> itemCost = itemRepository.findAllBySellerId(id, pageable);
         return itemRepository.findAll().stream().map(this::getItemResponseDTO).toList();
