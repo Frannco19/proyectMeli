@@ -76,10 +76,12 @@ public class ItemServiceImpl implements ItemService {
         return itemRepository.findAll().stream().map(this::getItemResponseDTO).toList();
     }
 
-    public List<ItemResponseDTO> getItemsAndCost(Integer id, int offset, int pageSize) {
+    @Override
+    public Page<ItemResponseDTO> getItemsAndCostPaged(Integer id, int offset, int pageSize) throws ResourceNotFoundException {
         Pageable pageable = PageRequest.of(offset, pageSize);
         Page<Item> itemCost = itemRepository.findAllBySellerId(id, pageable);
-        return itemRepository.findAll().stream().map(this::getItemResponseDTO).toList();
+        if (itemCost.getContent().isEmpty()) throw new ResourceNotFoundException("No hay items con esos parametros");
+        return new PageImpl<>(itemCost.stream().map(this::getItemResponseDTO).toList(), pageable, itemCost.getTotalElements());
     }
 
     @Override
