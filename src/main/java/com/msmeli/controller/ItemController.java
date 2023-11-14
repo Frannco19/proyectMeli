@@ -79,7 +79,7 @@ public class ItemController {
     }
 
     @GetMapping("/winner/{product_catalog_id}")
-    public BuyBoxWinnerResponseDTO getBuyBoxWinner(@PathVariable String product_catalog_id) throws JsonProcessingException {
+    public BuyBoxWinnerResponseDTO getBuyBoxWinner(@PathVariable String product_catalog_id) throws JsonProcessingException, ResourceNotFoundException {
         return meliService.getBuyBoxWinner(product_catalog_id);
     }
 

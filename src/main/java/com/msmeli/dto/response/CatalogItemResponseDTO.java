@@ -25,6 +25,4 @@ public class CatalogItemResponseDTO {
     private Date created_date_item;
     @JsonFormat(pattern = "dd-MM-yyyy")
     private Date updated_date_item;
-
-
 }

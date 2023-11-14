@@ -7,6 +7,7 @@ import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.msmeli.dto.*;
 import com.msmeli.dto.response.*;
+import com.msmeli.exception.ResourceNotFoundException;
 import com.msmeli.feignClient.MeliFeignClient;
 import com.msmeli.model.*;
 import com.msmeli.repository.*;
@@ -96,6 +97,9 @@ public class MeliService {
 
     }
 
+    public ListingType getListingTypeNameFromBd(String listingTypeId) throws ResourceNotFoundException {
+        return listingTypeRepository.findById(listingTypeId).orElseThrow(()-> new ResourceNotFoundException("No hay un Listing Type con ese id"));
+    }
 
     public Integer getPositionMethod(DocumentContext positionByItemId) {
         return positionByItemId.read("$.position");
@@ -218,7 +222,9 @@ public class MeliService {
         }).toList();
     }
 
-    public BuyBoxWinnerResponseDTO getBuyBoxWinner(String productId) {
+
+
+    public BuyBoxWinnerResponseDTO getBuyBoxWinner(String productId) throws ResourceNotFoundException {
 
         BoxWinnerDTO result = meliFeignClient.getProductWinnerSearch(productId);
         SellerDTO seller = meliFeignClient.getSellerBySellerId(result.getBuy_box_winner().getSeller_id());
@@ -226,7 +232,7 @@ public class MeliService {
         BuyBoxWinnerResponseDTO responseDTO = modelMapper.map(result.getBuy_box_winner(), BuyBoxWinnerResponseDTO.class);
 
         responseDTO.setSeller_nickname(seller.getSeller().getNickname());
-        responseDTO.setListing_type_id(getListingTypeName(responseDTO.getListing_type_id()));
+        responseDTO.setListing_type_id(getListingTypeNameFromBd(responseDTO.getListing_type_id()).getName());
 
         return responseDTO;
     }
