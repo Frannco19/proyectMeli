@@ -71,10 +71,18 @@ public class ItemServiceImpl implements ItemService {
         return new PageImpl<>(items, pageable, itemPage.getTotalElements());
     }
 
+    @Override
     public List<ItemResponseDTO> getItems() {
         return itemRepository.findAll().stream().map(this::getItemResponseDTO).toList();
     }
 
+    @Override
+    public Page<ItemResponseDTO> getItemsAndCostPaged(Integer id, int offset, int pageSize) throws ResourceNotFoundException {
+        Pageable pageable = PageRequest.of(offset, pageSize);
+        Page<Item> itemCost = itemRepository.findAllBySellerId(id, pageable);
+        if (itemCost.getContent().isEmpty()) throw new ResourceNotFoundException("No hay items con esos parametros");
+        return new PageImpl<>(itemCost.stream().map(this::getItemResponseDTO).toList(), pageable, itemCost.getTotalElements());
+    }
 
     @Override
     public OneProductResponseDTO getOneProduct(String productId) {
@@ -105,10 +113,10 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public Page<ItemResponseDTO> searchProducts(String searchType, String searchInput, int offset, int pageSize, boolean isCatalogue) throws ResourceNotFoundException {
+    public Page<ItemResponseDTO> searchProducts(String searchType, String searchInput, int offset, int pageSize, boolean isCatalogue, String isActive) throws ResourceNotFoundException {
         Pageable pageable = PageRequest.of(offset, pageSize);
         int inCatalogue = isCatalogue ? -1 : -2;
-        Page<Item> results = itemRepository.findByFilters("%" + searchInput.toUpperCase() + "%", searchType, inCatalogue, pageable);
+        Page<Item> results = itemRepository.findByFilters("%" + searchInput.toUpperCase() + "%", searchType, inCatalogue, isActive, pageable);
         if (results.getContent().isEmpty()) throw new ResourceNotFoundException("No hay items con esos parametros");
         return results.map(item -> {
             ItemResponseDTO itemDTO = getItemResponseDTO(item);

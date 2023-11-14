@@ -28,7 +28,6 @@ public class ItemController {
     private final MeliService meliService;
 
 
-
     public ItemController(ItemService itemService, MeliService meliService) {
         this.itemService = itemService;
         this.meliService = meliService;
@@ -37,39 +36,40 @@ public class ItemController {
     @GetMapping("/seller/items")
     public Page<ItemResponseDTO> sellerItems(
             @RequestParam("sellerId") Integer sellerId,
-            @RequestParam(value = "offset",defaultValue = "0") int offset,
+            @RequestParam(value = "offset", defaultValue = "0") int offset,
             @RequestParam(value = "pageSize", defaultValue = "50", required = false) int pageSize
-    ){
-        return itemService.getSellerItems(sellerId,offset,pageSize);
+    ) {
+        return itemService.getSellerItems(sellerId, offset, pageSize);
     }
 
     @GetMapping("/search")
     public Page<ItemResponseDTO> searchItems(
             @RequestParam(value = "searchType", defaultValue = "id") String searchType,
-            @RequestParam(value = "searchInput",defaultValue = "mla") String searchInput,
+            @RequestParam(value = "searchInput", defaultValue = "mla") String searchInput,
             @RequestParam(value = "isCatalogue", defaultValue = "false") boolean isCatalogue,
             @RequestParam(value = "offset", defaultValue = "0") int offset,
-            @RequestParam(value = "pageSize", defaultValue = "5") int pageSize
+            @RequestParam(value = "pageSize", defaultValue = "5") int pageSize,
+            @RequestParam(value = "isActive", defaultValue = "null") String isActive
     ) throws ResourceNotFoundException {
-        return itemService.searchProducts(searchType, searchInput, offset, pageSize, isCatalogue);
+        return itemService.searchProducts(searchType, searchInput, offset, pageSize, isCatalogue, isActive);
     }
 
     @GetMapping("/seller/list")
-    public ResponseEntity<List<ItemResponseDTO>> sellerItemsList(@RequestParam Integer sellerId){
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(itemService.getItems());
+    public ResponseEntity<Page<ItemResponseDTO>> sellerItemsList(@RequestParam(value = "sellerId", defaultValue = "1152777827") Integer sellerId, @RequestParam(value = "offset", defaultValue = "0") int offset, @RequestParam(value = "pageSize", defaultValue = "5") int pageSize) throws ResourceNotFoundException {
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(itemService.getItemsAndCostPaged(sellerId, offset, pageSize));
     }
 
     @GetMapping("/seller/catalogItems")
     public Page<ItemResponseDTO> sellerCatalogItems(
             @RequestParam("sellerId") Integer sellerId,
-            @RequestParam(value = "offset",defaultValue = "0") int offset,
+            @RequestParam(value = "offset", defaultValue = "0") int offset,
             @RequestParam(value = "pageSize", defaultValue = "50", required = false) int pageSize
-    ){
-        return itemService.getCatalogItems(sellerId,offset,pageSize);
+    ) {
+        return itemService.getCatalogItems(sellerId, offset, pageSize);
     }
 
     @GetMapping("/catalog/{product_catalog_id}")
-    public List<CatalogItemResponseDTO> getSellerItemCatalog (@PathVariable String product_catalog_id) throws ParseException {
+    public List<CatalogItemResponseDTO> getSellerItemCatalog(@PathVariable String product_catalog_id) throws ParseException {
         return meliService.getSellerItemCatalog(product_catalog_id);
     }
 
