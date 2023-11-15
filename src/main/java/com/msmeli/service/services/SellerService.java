@@ -20,5 +20,7 @@ public interface SellerService {
 
     Seller findById(Integer id) throws ResourceNotFoundException;
 
+    Seller findBySellerId(Long sellerId) throws ResourceNotFoundException;
+
     List<Seller> findAll();
 }

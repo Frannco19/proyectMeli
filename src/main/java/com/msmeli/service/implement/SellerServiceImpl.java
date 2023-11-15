@@ -57,4 +57,8 @@ public class SellerServiceImpl implements SellerService {
         return sellerRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException(NOT_FOUND));
     }
 
+    @Override
+    public Seller findBySellerId(Long sellerId) throws ResourceNotFoundException {
+        return sellerRepository.findBySellerId(sellerId).orElseThrow(()->new ResourceNotFoundException("No hay sellers con ese id."));
+    }
 }

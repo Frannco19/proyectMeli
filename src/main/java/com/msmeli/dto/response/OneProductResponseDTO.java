@@ -14,34 +14,18 @@ import java.util.Date;
 public class OneProductResponseDTO {
 
     private String title;
-
     private String catalog_product_id;
-
     private Double price;
-
     private int sold_quantity;
-
     private int available_quantity;
-
     private String listing_type_id;
-
     private int catalog_position;
-
-    @Column(name = "best_seller_position")
     private int bestSellerPosition;
-
     private String seller_nickname;
-
     private String category_id;
-
     private Date created_date_item;
-
     private Date updated_date_item;
-
     private String status_condition;
-
     private String image_url;
-
     private String sku;
-
 }

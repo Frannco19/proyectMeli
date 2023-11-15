@@ -1,6 +1,7 @@
 package com.msmeli.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.msmeli.dto.ItemCatalogDTO;
 import com.msmeli.dto.response.BuyBoxWinnerResponseDTO;
 import com.msmeli.dto.response.CatalogItemResponseDTO;
 import com.msmeli.dto.response.ItemResponseDTO;
@@ -69,12 +70,12 @@ public class ItemController {
     }
 
     @GetMapping("/catalog/{product_catalog_id}")
-    public List<CatalogItemResponseDTO> getSellerItemCatalog(@PathVariable String product_catalog_id) throws ParseException {
-        return meliService.getSellerItemCatalog(product_catalog_id);
+    public ItemCatalogDTO getSellerItemCatalog(@PathVariable String product_catalog_id,@RequestParam(defaultValue = "5") int limit,@RequestParam(defaultValue = "0") int page) throws ParseException {
+        return meliService.getSellerItemCatalog(product_catalog_id,limit,  page);
     }
 
     @GetMapping("/seller/catalog/{product_catalog_id}")
-    public OneProductResponseDTO getOneCatalogProduct(@PathVariable String product_catalog_id) throws JsonProcessingException {
+    public OneProductResponseDTO getOneCatalogProduct(@PathVariable String product_catalog_id) throws JsonProcessingException, ResourceNotFoundException {
         return itemService.getOneProduct(product_catalog_id);
     }
 
@@ -82,6 +83,5 @@ public class ItemController {
     public BuyBoxWinnerResponseDTO getBuyBoxWinner(@PathVariable String product_catalog_id) throws JsonProcessingException, ResourceNotFoundException {
         return meliService.getBuyBoxWinner(product_catalog_id);
     }
-
 
 }

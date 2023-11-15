@@ -8,6 +8,7 @@ import com.msmeli.dto.SellerDTO;
 import com.msmeli.exception.ResourceNotFoundException;
 import com.msmeli.feignClient.MeliFeignClient;
 import com.msmeli.model.Item;
+import com.msmeli.model.Seller;
 import com.msmeli.repository.ItemRepository;
 import com.msmeli.service.feignService.MeliService;
 import com.msmeli.service.services.*;
@@ -27,22 +28,16 @@ import java.util.List;
 public class ItemServiceImpl implements ItemService {
 
     private final ItemRepository itemRepository;
-
     private final MeliFeignClient meliFeignClient;
-
     private final ListingTypeService listingTypeService;
-
     private final MeliService meliService;
-
     private final ModelMapper mapper;
-
     private final StockService stockService;
-
     private final CostService costService;
-
     private static final double MIN_MARGIN = .1;
+    private final SellerService sellerService;
 
-    public ItemServiceImpl(ItemRepository itemRepository, MeliFeignClient meliFeignClient, ListingTypeService listingTypeService, MeliService meliService, ModelMapper mapper, StockServiceImpl stockService, CostService costService) {
+    public ItemServiceImpl(ItemRepository itemRepository, MeliFeignClient meliFeignClient, ListingTypeService listingTypeService, MeliService meliService, ModelMapper mapper, StockServiceImpl stockService, CostService costService, SellerService sellerService) {
         this.itemRepository = itemRepository;
         this.meliFeignClient = meliFeignClient;
         this.listingTypeService = listingTypeService;
@@ -50,6 +45,7 @@ public class ItemServiceImpl implements ItemService {
         this.mapper = mapper;
         this.stockService = stockService;
         this.costService = costService;
+        this.sellerService = sellerService;
     }
 
     @Override
@@ -85,12 +81,13 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public OneProductResponseDTO getOneProduct(String productId) {
+    public OneProductResponseDTO getOneProduct(String productId) throws ResourceNotFoundException {
         Item item = itemRepository.findByProductId(productId);
-        SellerDTO seller = meliFeignClient.getSellerBySellerId(item.getSellerId());
+        Seller seller = sellerService.findBySellerId(Long.valueOf(item.getSellerId()));
+
         OneProductResponseDTO responseDTO = mapper.map(item, OneProductResponseDTO.class);
-        responseDTO.setSeller_nickname(seller.getSeller().getNickname());
-        responseDTO.setBestSellerPosition(meliService.getBestSellerPosition(item.getId(), productId));
+        responseDTO.setSeller_nickname(seller.getNickname());
+
         responseDTO.setCatalog_position(meliService.getCatalogPosition(item.getId(), productId));
         return responseDTO;
     }

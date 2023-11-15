@@ -11,11 +11,11 @@ import java.util.List;
 
 public interface ItemService {
 
-    public Page<ItemResponseDTO> getSellerItems(Integer sellerId, int offset, int pageSize);
+    Page<ItemResponseDTO> getSellerItems(Integer sellerId, int offset, int pageSize);
 
-    public OneProductResponseDTO getOneProduct(String productId) throws JsonProcessingException;
+    OneProductResponseDTO getOneProduct(String productId) throws ResourceNotFoundException;
 
-    public Page<ItemResponseDTO> getCatalogItems(Integer sellerId, int offset, int pageSize);
+    Page<ItemResponseDTO> getCatalogItems(Integer sellerId, int offset, int pageSize);
 
     List<ItemResponseDTO> getItems();
 
