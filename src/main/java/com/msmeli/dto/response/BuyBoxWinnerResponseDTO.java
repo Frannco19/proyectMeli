@@ -18,6 +18,7 @@ public class BuyBoxWinnerResponseDTO {
     private Integer sold_quantity;
     private Integer available_quantity;
     private String listing_type_id;
+    private Double original_price;
     private ShippingDTO shipping;
 
 }
