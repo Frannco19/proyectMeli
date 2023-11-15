@@ -29,6 +29,7 @@ public interface ItemRepository extends JpaRepository<Item, String> {
 
     Page<Item> findByIdContaining(String id, Pageable pageable);
 
-//    List<Item> findByPublicationNumberContaining(String publicationNumber);
-
+    @Query("SELECT i FROM Item i WHERE ((?2 = 'id' AND i.id like ?1) OR (?2 = 'sku' AND i.sku like ?1)) AND ((?3 = -1 AND i.catalog_position != ?3) OR (?3 = -2 AND i.catalog_position >= ?3)) AND ((?4 = 'null' AND i.status != ?4) OR i.status = ?4)")
+    Page<Item> findByFilters(String searchInput, String searchType, int inCatalogue, String isActive, Pageable pageable);
+    Page<Item> findAllBySellerId(Integer sellerId, Pageable pageable);
 }

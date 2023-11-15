@@ -10,6 +10,8 @@ import com.msmeli.repository.UserEntityRepository;
 import com.msmeli.service.services.StockService;
 import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,7 +24,7 @@ public class StockServiceImpl implements StockService {
     private final UserEntityRepository userEntityRepository;
     private final ModelMapper modelMapper;
 
-    public StockServiceImpl(StockRepository stockRepository, UserEntityRepository userEntityRepository, ModelMapper modelMapper) {
+    public StockServiceImpl(StockRepository stockRepository, UserEntityRepository userEntityRepository) {
         this.stockRepository = stockRepository;
         this.userEntityRepository = userEntityRepository;
         this.modelMapper = new ModelMapper();
@@ -64,6 +66,13 @@ public class StockServiceImpl implements StockService {
     public List<Stock> findAll(Long sellerId) throws ResourceNotFoundException {
         List<Stock> stockList = stockRepository.findAllBySellerId(sellerId);
         if(stockList.isEmpty()) throw new ResourceNotFoundException("El seller buscado no posee stock");
+        return stockList;
+    }
+
+
+    public Page<Stock> findAllPaged(Long sellerId, Pageable pageable) throws ResourceNotFoundException {
+        Page<Stock> stockList = stockRepository.findAllBySellerId(sellerId,pageable);
+        if(stockList.getContent().isEmpty()) throw new ResourceNotFoundException("El seller buscado no posee stock");
         return stockList;
     }
 }

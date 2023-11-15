@@ -1,15 +1,18 @@
 package com.msmeli.service.implement;
 
+import com.msmeli.dto.response.BuyBoxWinnerResponseDTO;
 import com.msmeli.dto.response.CostResponseDTO;
 import com.msmeli.dto.response.OneProductResponseDTO;
 import com.msmeli.dto.response.ItemResponseDTO;
 import com.msmeli.dto.SellerDTO;
+import com.msmeli.exception.ResourceNotFoundException;
 import com.msmeli.feignClient.MeliFeignClient;
 import com.msmeli.model.Item;
 import com.msmeli.repository.ItemRepository;
 import com.msmeli.service.feignService.MeliService;
 import com.msmeli.service.services.*;
 import com.msmeli.util.GrossIncome;
+import com.msmeli.util.TrafficLight;
 import org.jetbrains.annotations.NotNull;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -37,6 +40,8 @@ public class ItemServiceImpl implements ItemService {
 
     private final CostService costService;
 
+    private static final double MIN_MARGIN = .1;
+
     public ItemServiceImpl(ItemRepository itemRepository, MeliFeignClient meliFeignClient, ListingTypeService listingTypeService, MeliService meliService, ModelMapper mapper, StockServiceImpl stockService, CostService costService) {
         this.itemRepository = itemRepository;
         this.meliFeignClient = meliFeignClient;
@@ -62,18 +67,22 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private Page<ItemResponseDTO> getItemResponseDTOS(Pageable pageable, Page<Item> itemPage) {
-        List<ItemResponseDTO> items = itemPage.getContent()
-                .stream()
-                .parallel()
-                .map(item -> getItemResponseDTO(item))
-                .toList();
+        List<ItemResponseDTO> items = itemPage.getContent().stream().parallel().map(this::getItemResponseDTO).toList();
         return new PageImpl<>(items, pageable, itemPage.getTotalElements());
     }
 
+    @Override
     public List<ItemResponseDTO> getItems() {
-        return itemRepository.findAll().stream().map(item -> getItemResponseDTO(item)).toList();
+        return itemRepository.findAll().stream().map(this::getItemResponseDTO).toList();
     }
 
+    @Override
+    public Page<ItemResponseDTO> getItemsAndCostPaged(Integer id, int offset, int pageSize) throws ResourceNotFoundException {
+        Pageable pageable = PageRequest.of(offset, pageSize);
+        Page<Item> itemCost = itemRepository.findAllBySellerId(id, pageable);
+        if (itemCost.getContent().isEmpty()) throw new ResourceNotFoundException("No hay items con esos parametros");
+        return new PageImpl<>(itemCost.stream().map(this::getItemResponseDTO).toList(), pageable, itemCost.getTotalElements());
+    }
 
     @Override
     public OneProductResponseDTO getOneProduct(String productId) {
@@ -99,24 +108,21 @@ public class ItemServiceImpl implements ItemService {
 
     public void createProductsCosts() {
         List<Item> items = findAll();
-        items.parallelStream().forEach((item -> {
-            save(costService.createProductsCosts(item, stockService.findLastBySku(item.getSku())));
-        }));
+        items.parallelStream().forEach((item -> save(costService.createProductsCosts(item, stockService.findLastBySku(item.getSku())))
+        ));
     }
 
     @Override
-    public Page<ItemResponseDTO> searchProducts(String searchType, String searchInput, Pageable pageable) {
-        Page<Item> results = null;
-
-        if ("sku".equals(searchType)) {
-            results = itemRepository.findBySkuContaining(searchInput, pageable);
-        } else if ("id".equals(searchType)) {
-            results = itemRepository.findByIdContaining(searchInput, pageable);
-        }
-
-        Page<ItemResponseDTO> itemResponsePage = results.map(item -> getItemResponseDTO(item));
-
-        return itemResponsePage;
+    public Page<ItemResponseDTO> searchProducts(String searchType, String searchInput, int offset, int pageSize, boolean isCatalogue, String isActive) throws ResourceNotFoundException {
+        Pageable pageable = PageRequest.of(offset, pageSize);
+        int inCatalogue = isCatalogue ? -1 : -2;
+        Page<Item> results = itemRepository.findByFilters("%" + searchInput.toUpperCase() + "%", searchType, inCatalogue, isActive, pageable);
+        if (results.getContent().isEmpty()) throw new ResourceNotFoundException("No hay items con esos parametros");
+        return results.map(item -> {
+            ItemResponseDTO itemDTO = getItemResponseDTO(item);
+            itemDTO = calculateColor(itemDTO);
+            return itemDTO;
+        });
     }
 
     @NotNull
@@ -131,5 +137,22 @@ public class ItemServiceImpl implements ItemService {
         return itemResponseDTO;
     }
 
-
+    private ItemResponseDTO calculateColor(ItemResponseDTO item) {
+        BuyBoxWinnerResponseDTO firstPlace = null;
+        double winnerPrice = 0.0;
+        double adjustedPrice = 0.0;
+        TrafficLight trafficLight = null;
+        item.setCatalog_position(meliService.getCatalogPosition(item.getId(), item.getCatalog_product_id()));
+        if (item.getCatalog_product_id() != null && item.getCatalog_position() != -1) {
+            firstPlace = meliService.getBuyBoxWinnerCatalog(item.getCatalog_product_id());
+            winnerPrice = item.getCatalog_position() >= 0 ? firstPlace.getPrice() : 0.0;
+            adjustedPrice = (item.getItem_cost().getReplacement_cost() + item.getItem_cost().getShipping()) / (1 - ((item.getItem_cost().getComision_fee() / 100 + 0.045) + MIN_MARGIN));
+            if (firstPlace.getSeller_id() == 1152777827) trafficLight = TrafficLight.GREEN;
+            else if (adjustedPrice <= winnerPrice) trafficLight = TrafficLight.YELLOW;
+            else trafficLight = TrafficLight.RED;
+            item.setTrafficLight(trafficLight);
+            item.setWinnerPrice(winnerPrice);
+        }
+        return item;
+    }
 }

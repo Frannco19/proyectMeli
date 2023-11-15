@@ -1,8 +1,6 @@
 package com.msmeli.service.implement;
 
 import com.msmeli.dto.request.SupplierStockRequestDTO;
-import com.msmeli.dto.response.SupplierStockResponseDTO;
-import com.msmeli.exception.ResourceNotFoundException;
 import com.msmeli.model.Supplier;
 import com.msmeli.model.SupplierStock;
 import com.msmeli.repository.SupplierStockRepository;
@@ -10,10 +8,7 @@ import com.msmeli.service.services.SupplierStockService;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class SupplierStockServiceImpl implements SupplierStockService {
@@ -34,10 +29,7 @@ public class SupplierStockServiceImpl implements SupplierStockService {
 
     @Override
     public List<SupplierStock> create(Supplier supplier, List<SupplierStockRequestDTO> stockDTO) {
-        List<SupplierStock> supplierStock = stockDTO.stream().map(item -> {
-            SupplierStock stock = mapper.map(item, SupplierStock.class);
-            return stock;
-        }).toList();
+        List<SupplierStock> supplierStock = stockDTO.stream().map(item -> mapper.map(item, SupplierStock.class)).toList();
         return supplierStockRepository.saveAll(supplierStock);
     }
 }

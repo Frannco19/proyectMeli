@@ -9,13 +9,13 @@ import com.msmeli.repository.SuppliersSellersRepository;
 import com.msmeli.service.services.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class SuppliersSellersServiceImpl implements SuppliersSellersService {
@@ -83,7 +83,7 @@ public class SuppliersSellersServiceImpl implements SuppliersSellersService {
     @Override
     public List<StockDTO> getStockAndSupplierStock(Long id) throws ResourceNotFoundException {
         List<Stock> sellerStock = stockService.findAll(id);
-        return sellerStock.stream().map((e) -> {
+        return sellerStock.stream().map(e -> {
             StockDTO stockDTO = mapper.map(e, StockDTO.class);
             Optional<SuppliersSellers> suppliersSellers = suppliersSellersRepository.findBySkuAndSellerId(e.getSku(), id);
             if (suppliersSellers.isPresent()) {
@@ -92,5 +92,25 @@ public class SuppliersSellersServiceImpl implements SuppliersSellersService {
             }
             return stockDTO;
         }).toList();
+    }
+
+
+    public Page<StockDTO> getStockAndSupplierStock(Long id, int offset, int pageSize) throws ResourceNotFoundException {
+        Pageable pageable = PageRequest.of(offset, pageSize);
+        Page<Stock> sellerStock = stockService.findAllPaged(id, pageable);
+        return pageDTO(pageable, sellerStock, id);
+    }
+
+    private Page<StockDTO> pageDTO(Pageable pageable, Page<Stock> stockPage, Long sellerId) {
+        List<StockDTO> stock = stockPage.stream().map(e -> {
+            StockDTO stockDTO = mapper.map(e, StockDTO.class);
+            Optional<SuppliersSellers> suppliersSellers = suppliersSellersRepository.findBySkuAndSellerId(e.getSku(), sellerId);
+            if (suppliersSellers.isPresent()) {
+                stockDTO.setSupplierContent(mapper.map(suppliersSellers.get().getSupplierStock(), SupplierStockResponseDTO.class));
+                stockDTO.getSupplierContent().setNickname(suppliersSellers.get().getSupplier().getSupplierName());
+            }
+            return stockDTO;
+        }).toList();
+        return new PageImpl<>(stock, pageable, stockPage.getTotalElements());
     }
 }

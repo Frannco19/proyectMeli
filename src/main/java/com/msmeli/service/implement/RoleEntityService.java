@@ -4,12 +4,7 @@ import com.msmeli.exception.ResourceNotFoundException;
 import com.msmeli.model.RoleEntity;
 import com.msmeli.repository.RoleRepository;
 import com.msmeli.util.Role;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 public class RoleEntityService implements com.msmeli.service.services.RoleEntityService {

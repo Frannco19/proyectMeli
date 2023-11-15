@@ -7,14 +7,15 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Supplier {
+@Getter
+@Setter
+public class GeneralCategory {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private String supplierName;
+    private String id;
+    private String name;
+    private Integer totalSold;
+    private Double averageSoldPrice;
 }

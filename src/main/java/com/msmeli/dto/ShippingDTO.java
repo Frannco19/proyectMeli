@@ -7,10 +7,10 @@ import lombok.*;
 @AllArgsConstructor
 @Getter
 @Setter
-@ToString
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ShippingDTO {
 
+    private String mode;
     private boolean free_shipping;
 
     private String logistic_type;
