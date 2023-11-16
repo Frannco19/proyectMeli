@@ -99,6 +99,6 @@ public class DataInitializer {
         defaultUser();
         defaulStock();
         itemService.createProductsCosts();
-//        categoryService.createAll();
+        categoryService.createAll();
     }
 }
