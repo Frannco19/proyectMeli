@@ -6,11 +6,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.msmeli.dto.*;
-import com.msmeli.dto.response.*;
+import com.msmeli.dto.response.BuyBoxWinnerResponseDTO;
+import com.msmeli.dto.response.CatalogItemResponseDTO;
+import com.msmeli.dto.response.FeeResponseDTO;
+import com.msmeli.dto.response.OptionsDTO;
 import com.msmeli.exception.ResourceNotFoundException;
 import com.msmeli.feignClient.MeliFeignClient;
 import com.msmeli.model.*;
-import com.msmeli.repository.*;
+import com.msmeli.repository.CategoryRepository;
+import com.msmeli.repository.ItemRepository;
+import com.msmeli.repository.ListingTypeRepository;
+import com.msmeli.repository.SellerRepository;
 import feign.FeignException;
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -22,8 +28,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Service

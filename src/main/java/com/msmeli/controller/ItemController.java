@@ -3,7 +3,6 @@ package com.msmeli.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.msmeli.dto.ItemCatalogDTO;
 import com.msmeli.dto.response.BuyBoxWinnerResponseDTO;
-import com.msmeli.dto.response.CatalogItemResponseDTO;
 import com.msmeli.dto.response.ItemResponseDTO;
 import com.msmeli.dto.response.OneProductResponseDTO;
 import com.msmeli.exception.ResourceNotFoundException;
@@ -15,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
-import java.util.List;
 
 @RestController
 //@CrossOrigin(origins = "http://201.216.243.146:10080")
