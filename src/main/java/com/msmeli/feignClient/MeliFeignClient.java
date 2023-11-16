@@ -20,6 +20,8 @@ public interface MeliFeignClient {
 
     @GetMapping("/products/{productId}/items")
     public ItemCatalogDTO getProductSearch(@PathVariable String productId);
+    @GetMapping("/products/{productId}/items")
+    public ItemCatalogDTO getProductSearch(@PathVariable String productId,@RequestParam int limit,@RequestParam int offset);
 
     @GetMapping("/products/{productId}")
     public BoxWinnerDTO getProductWinnerSearch(@PathVariable String productId);
