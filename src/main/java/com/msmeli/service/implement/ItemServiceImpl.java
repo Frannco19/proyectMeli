@@ -2,9 +2,8 @@ package com.msmeli.service.implement;
 
 import com.msmeli.dto.response.BuyBoxWinnerResponseDTO;
 import com.msmeli.dto.response.CostResponseDTO;
-import com.msmeli.dto.response.OneProductResponseDTO;
 import com.msmeli.dto.response.ItemResponseDTO;
-import com.msmeli.dto.SellerDTO;
+import com.msmeli.dto.response.OneProductResponseDTO;
 import com.msmeli.exception.ResourceNotFoundException;
 import com.msmeli.feignClient.MeliFeignClient;
 import com.msmeli.model.Item;
