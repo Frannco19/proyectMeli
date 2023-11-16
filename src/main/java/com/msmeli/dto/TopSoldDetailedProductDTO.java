@@ -17,7 +17,7 @@ import java.util.List;
 public class TopSoldDetailedProductDTO {
 
     private String id;
-    private String permanlink;
+    private String permalink;
     private int sold_quantity;
     private String name;
     private BuyBoxWinnerResponseDTO buy_box_winner;
