@@ -32,20 +32,29 @@ public class TokenServiceImpl implements TokenService {
     @EventListener(ApplicationReadyEvent.class)
     @Order(1)
     public void saveToken() {
-        Token token = new Token();
 
-        token.setRefresh_token(meliRefreshToken);
 
-        //TODO CAMBIAR EN CASO DE EMERGENCIA
+        //TODO CAMBIAR LOGICA DE USAR EL SAVE TOKEN AGREGANDO USER
 
-        if (tokenRepository.findAll().isEmpty() || !getAccessToken("ADMIN").matches(meliAccessToken)) token.setAccess_token(meliAccessToken);
-        else token.setAccess_token(getAccessToken("ADMIN"));
+        if (tokenRepository.findAll().isEmpty() || !getAccessToken("ADMIN").matches(meliAccessToken)) {
+            Token token = new Token();
+            token.setAccess_token(meliAccessToken);
+            token.setRefresh_token(meliRefreshToken);
+            token.setUsername(meliUsernameToken);
+            tokenRepository.save(token);
+        }
+        else {
+            Token token = tokenRepository.findByUsername("ADMIN");
+            token.setAccess_token(getAccessToken("ADMIN"));
+            token.setRefresh_token(getRefreshToken("ADMIN"));
+            tokenRepository.save(token);
+        }
 //        token.setAccess_token(meliAccessToken);
 //        token.setAccess_token(getAccessToken("ADMIN"));
 
-        token.setUsername(meliUsernameToken);
 
-        tokenRepository.save(token);
+
+
     }
 
     @Override
