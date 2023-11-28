@@ -13,7 +13,9 @@ import java.util.List;
 @NoArgsConstructor
 @Table(name = "sellers")
 public class SellerRefactor extends UserEntity {
-    private String meliId;
+    private String meliID;
+    private String refreshToken;
+    private String tokenMl;
     @OneToMany(mappedBy = "sellerRefactor", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Employee> employees;
 }
