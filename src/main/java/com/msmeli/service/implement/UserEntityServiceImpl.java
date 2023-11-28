@@ -54,21 +54,18 @@ public class UserEntityServiceImpl implements com.msmeli.service.services.UserEn
     }
 
     @Override
-    public UserResponseDTO create(UserRegisterRequestDTO userRegisterRequestDTO, SellerRefactor seller) throws ResourceNotFoundException, AlreadyExistsException {
+    public UserResponseDTO createSeller(UserRegisterRequestDTO userRegisterRequestDTO) throws ResourceNotFoundException, AlreadyExistsException {
         if (!userRegisterRequestDTO.getPassword().equals(userRegisterRequestDTO.getRePassword()))
             throw new ResourceNotFoundException("Las contraseñas ingresadas no coinciden.");
         if (userEntityRepository.findByUsername(userRegisterRequestDTO.getUsername()).isPresent())
             throw new AlreadyExistsException("El nombre de usuario ya existe.");
-        UserEntity userEntity = mapper.map(userRegisterRequestDTO, UserEntity.class);
-        userEntity.setPassword(passwordEncoder.encode(userRegisterRequestDTO.getPassword()));
+        SellerRefactor newSeller = mapper.map(userRegisterRequestDTO,SellerRefactor.class);
+        newSeller.setPassword(passwordEncoder.encode(userRegisterRequestDTO.getPassword()));
         List<RoleEntity> roles = new ArrayList<>();
         roles.add(roleEntityService.findByName(Role.SELLER));
-        userEntity.setRoles(roles);
-        SellerRefactor newSeller = mapper.map(userEntity, SellerRefactor.class);
-        //UserEntity savedUser = userEntityRepository.save(userEntity);
+        newSeller.setRoles(roles);
         sellerRefactorRepository.save(newSeller);
-
-        emailService.sendMail(userEntity.getEmail(), "Bienvenido a G&L App", emailWelcomeBody(userEntity.getUsername()));
+        emailService.sendMail(newSeller.getEmail(),"Bienvenido a G&L App", emailWelcomeBody(newSeller.getUsername()));
         return mapper.map(newSeller, UserResponseDTO.class);
     }
 

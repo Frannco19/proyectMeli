@@ -69,7 +69,7 @@ public class DataInitializer {
 
    /* public void defaultUser() throws AlreadyExistsException, ResourceNotFoundException {
         if (userEntityRepository.findAll().isEmpty()) {
-            sellerService.createUser(new UserRegisterRequestDTO("user1", "123456", "123456", "mt.soporte.usuario@gmail.com", 1));
+            sellerService.createSeller(new UserRegisterRequestDTO("user1", "123456", "123456", "mt.soporte.usuario@gmail.com", 1));
         }
     }*/
 

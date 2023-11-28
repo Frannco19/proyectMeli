@@ -44,10 +44,10 @@ public class SellerServiceImpl implements SellerService {
     }
 
     @Override
-    public UserResponseDTO createUser(UserRegisterRequestDTO userRegisterRequestDTO) throws ResourceNotFoundException, AlreadyExistsException {
+    public UserResponseDTO createSeller(UserRegisterRequestDTO userRegisterRequestDTO) throws ResourceNotFoundException, AlreadyExistsException {
         //Seller seller = sellerRepository.findById(userRegisterRequestDTO.getSeller_id()).orElseThrow(() -> new ResourceNotFoundException(NOT_FOUND));
         SellerRefactor seller = new SellerRefactor();
-        return userEntityService.create(userRegisterRequestDTO, seller);
+        return userEntityService.createSeller(userRegisterRequestDTO);
     }
 
     @Override

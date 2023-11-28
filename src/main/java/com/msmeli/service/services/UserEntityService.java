@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface UserEntityService {
-    UserResponseDTO create(UserRegisterRequestDTO userRegisterRequestDTO, SellerRefactor seller) throws ResourceNotFoundException, AlreadyExistsException;
+    UserResponseDTO createSeller(UserRegisterRequestDTO userRegisterRequestDTO) throws ResourceNotFoundException, AlreadyExistsException;
     UserResponseDTO createEmployee(EmployeeRegisterRequestDTO employeeRegisterRequestDTO, String token) throws ResourceNotFoundException, AlreadyExistsException;
     UserResponseDTO read(Long id) throws ResourceNotFoundException;
 
