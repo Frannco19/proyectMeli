@@ -76,17 +76,18 @@ public class UserEntityServiceImpl implements com.msmeli.service.services.UserEn
             throw new ResourceNotFoundException("Las contraseñas ingresadas no coinciden.");
         if (userEntityRepository.findByUsername(employeeRegisterDTO.getUsername()).isPresent())
             throw new AlreadyExistsException("El nombre de usuario ya existe.");
-        UserEntity userEntity = mapper.map(employeeRegisterDTO, UserEntity.class);
-        userEntity.setPassword(passwordEncoder.encode(employeeRegisterDTO.getPassword()));
+        Employee newEmployee = mapper.map(employeeRegisterDTO, Employee.class);
+        newEmployee.setPassword(passwordEncoder.encode(employeeRegisterDTO.getPassword()));
         List<RoleEntity> roles = new ArrayList<>();
         roles.add(roleEntityService.findByName(Role.EMPLOYEE));
-        userEntity.setRoles(roles);
-        Employee employee = mapper.map(employeeRegisterDTO, Employee.class);
-        Optional<SellerRefactor> sellerBd = sellerRefactorRepository.findById(jwtService.extractId(token));
-        employee.setSellerRefactor(sellerBd.get());
-        employee.setPassword(passwordEncoder.encode(employeeRegisterDTO.getPassword()));
-        employeeRepository.save(employee);
-        return mapper.map(employee,UserResponseDTO.class);
+        newEmployee.setRoles(roles);
+        SellerRefactor seller = sellerRefactorRepository.findById(jwtService.extractId(token))
+                .orElseThrow(() -> new NoSuchElementException("No se encontró el seller en la base de datos"));
+
+        newEmployee.setSellerRefactor(seller);
+        newEmployee.setPassword(passwordEncoder.encode(employeeRegisterDTO.getPassword()));
+        employeeRepository.save(newEmployee);
+        return mapper.map(newEmployee,UserResponseDTO.class);
     }
 
     @Override
