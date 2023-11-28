@@ -43,7 +43,7 @@ public class ScheduledTasks {
         this.tokenService = tokenService;
     }
 
-    @Scheduled(fixedRate = 3600000)
+    /*@Scheduled(fixedRate = 3600000)
     @Order(2)
     public void refreshToken(){
         RefreshTokenRequestDTO refreshTokenRequestDTO = new RefreshTokenRequestDTO();
@@ -62,6 +62,6 @@ public class ScheduledTasks {
         log.info("TOKEN refreshToken: {}", refreshToken.getAccess_token());
         log.info("TOKEN : {}", token);
 
-    }
+    }*/
 
 }

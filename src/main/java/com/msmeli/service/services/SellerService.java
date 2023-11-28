@@ -1,5 +1,6 @@
 package com.msmeli.service.services;
 
+import com.msmeli.dto.request.EmployeeRegisterRequestDTO;
 import com.msmeli.dto.request.SellerRequestDTO;
 import com.msmeli.dto.request.UserRegisterRequestDTO;
 import com.msmeli.dto.response.UserResponseDTO;
@@ -18,6 +19,7 @@ public interface SellerService {
 
     UserResponseDTO createUser(UserRegisterRequestDTO userRegisterRequestDTO) throws ResourceNotFoundException, AlreadyExistsException;
 
+    UserResponseDTO createEmployee(EmployeeRegisterRequestDTO EmployeeRegister, String token) throws ResourceNotFoundException, AlreadyExistsException;
     Seller findById(Integer id) throws ResourceNotFoundException;
 
     Seller findBySellerId(Long sellerId) throws ResourceNotFoundException;

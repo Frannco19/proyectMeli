@@ -23,13 +23,18 @@ public class JwtService {
     @Value("${jwt.time.expiration}")
     private long expirationTime;
 
-    public String generateToken(String username) {
+    public String generateToken(String username, Long id) {
         Map<String, Object> claims = new HashMap<>();
-        return createToken(claims, username);
+        return createToken(claims, username, id);
     }
 
-    private String createToken(Map<String, Object> claims, String username) {
-        return Jwts.builder().setClaims(claims).setSubject(username).setIssuedAt(new Date(System.currentTimeMillis())).setExpiration(new Date(System.currentTimeMillis() + expirationTime)).signWith(getSignKey(), SignatureAlgorithm.HS256).compact();
+    private String createToken(Map<String, Object> claims, String username, Long id) {
+        return Jwts.builder()
+                .setClaims(claims).setSubject(username+ "|" + id)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
+                .signWith(getSignKey(), SignatureAlgorithm.HS256)
+                .compact();
     }
 
     private Key getSignKey() {
@@ -39,6 +44,22 @@ public class JwtService {
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
+    }
+    public  Long extractId(String jwtToken) {
+        Long id = null;
+        Claims claims = extractAllClaims(jwtToken);
+
+        String subject = claims.getSubject();
+        if (subject != null) {
+            String[] parts = subject.split("\\|"); // Reemplaza el carácter "|" con el que uses en la construcción del subject
+            String userId = parts[1];
+
+
+            id = Long.valueOf(userId);
+        } else {
+            System.out.println("No se encontró el campo 'subject' en el token.");
+        }
+        return id;
     }
 
     public Date extractExpiration(String token) {
