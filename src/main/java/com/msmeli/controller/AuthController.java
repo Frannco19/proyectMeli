@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -70,8 +71,8 @@ public class AuthController {
             @ApiResponse(responseCode = "201", description = "Usuario creado correctamente.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDTO.class))}),
             @ApiResponse(responseCode = "400", description = "Solicitud erronea.", content = @Content),
             @ApiResponse(responseCode = "500", description = "Error del servidor.", content = @Content)})
-    public ResponseEntity<UserResponseDTO>registerEmployee(@Valid @RequestBody EmployeeRegisterRequestDTO employeeRegisterDTO , @RequestHeader("Authorization") String token )throws ResourceNotFoundException, AlreadyExistsException {
-        return ResponseEntity.status(HttpStatus.CREATED).body(sellerService.createEmployee(employeeRegisterDTO,token));
+    public ResponseEntity<UserResponseDTO>registerEmployee(@Valid @RequestBody EmployeeRegisterRequestDTO employeeRegisterDTO , HttpServletRequest request) throws ResourceNotFoundException, AlreadyExistsException {
+        return ResponseEntity.status(HttpStatus.CREATED).body(sellerService.createEmployee(employeeRegisterDTO,request.getHeader("Authorization")));
     }
 
 

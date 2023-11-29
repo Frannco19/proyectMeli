@@ -1,10 +1,12 @@
 package com.msmeli.configuration.security.service;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import com.msmeli.component.ScheduledTasks;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -18,6 +20,7 @@ import java.util.function.Function;
 @Component
 public class JwtService {
 
+    private static final Logger log = LoggerFactory.getLogger(JwtService.class);
     @Value("${jwt.secret.key}")
     private String secretKey;
     @Value("${jwt.time.expiration}")
@@ -42,11 +45,26 @@ public class JwtService {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String extractUsername(String token) {
-        return extractClaim(token, Claims::getSubject);
+    public String extractUsername(String token) throws MalformedJwtException, SignatureException, ExpiredJwtException, UnsupportedJwtException {
+        String username = null;
+        Claims claims = extractAllClaims(token);
+
+        String subject = claims.getSubject();
+        if (subject != null) {
+            String[] parts = subject.split("\\|");
+            username = parts[0];
+        } else {
+            log.error("No se encontró el campo 'subject' en el token.");
+        }
+        return username;
     }
     public  Long extractId(String jwtToken) {
         Long id = null;
+
+        if (jwtToken != null && jwtToken.startsWith("Bearer ")) {
+            jwtToken = jwtToken.substring(7); // Elimina el prefijo "Bearer "
+        }
+
         Claims claims = extractAllClaims(jwtToken);
 
         String subject = claims.getSubject();
