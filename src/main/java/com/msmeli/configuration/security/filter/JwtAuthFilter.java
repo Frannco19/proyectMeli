@@ -2,10 +2,12 @@ package com.msmeli.configuration.security.filter;
 
 import com.msmeli.configuration.security.service.JwtService;
 import com.msmeli.configuration.security.service.UserEntityUserDetailsService;
+import com.msmeli.exception.AppExceptionHandler;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.ProblemDetail;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,11 +24,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final UserEntityUserDetailsService userEntityUserDetailsService;
     private final HandlerExceptionResolver handlerExceptionResolver;
+    private final AppExceptionHandler appExceptionHandler;
 
-    public JwtAuthFilter(JwtService jwtService, UserEntityUserDetailsService userEntityUserDetailsService, HandlerExceptionResolver handlerExceptionResolver) {
+    public JwtAuthFilter(JwtService jwtService, UserEntityUserDetailsService userEntityUserDetailsService, HandlerExceptionResolver handlerExceptionResolver, AppExceptionHandler appExceptionHandler) {
         this.jwtService = jwtService;
         this.userEntityUserDetailsService = userEntityUserDetailsService;
         this.handlerExceptionResolver = handlerExceptionResolver;
+        this.appExceptionHandler = appExceptionHandler;
     }
 
     @Override
@@ -49,7 +53,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             }
             filterChain.doFilter(request, response);
         } catch (Exception ex) {
-            handlerExceptionResolver.resolveException(request, response, null, ex);
+            ProblemDetail problemDetail = appExceptionHandler.handleSecurityException(ex);
+            response.setStatus(problemDetail.getStatus());
+            response.setContentType("application/problem+json");
+            response.getWriter().write(problemDetail.toString());
+            response.getWriter().flush();
+            response.getWriter().close();
         }
     }
 }

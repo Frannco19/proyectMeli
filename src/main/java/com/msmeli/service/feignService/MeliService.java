@@ -138,7 +138,7 @@ public class MeliService {
         return null;
     }
 
-    @EventListener(ApplicationReadyEvent.class)
+    /*@EventListener(ApplicationReadyEvent.class)
     @Order(3)
     public void saveListingTypes() {
 
@@ -151,9 +151,9 @@ public class MeliService {
         });
 
         listingTypeRepository.saveAll(listingTypes);
-    }
+    }*/
 
-    @EventListener(ApplicationReadyEvent.class)
+    /*@EventListener(ApplicationReadyEvent.class)
     @Order(4)
     public void saveSellerItems() {
         int offset = 0;
@@ -205,7 +205,7 @@ public class MeliService {
 
             offset = offset + 50;
         } while (!responseDTO.getResults().isEmpty());
-    }
+    }*/
 
     public ItemCatalogDTO getSellerItemCatalog(String product_catalog_id, int limit, int page) {
         /*el paginado de la api de meli funciona por offset(a partir de que elemento) y no por pagina.*/

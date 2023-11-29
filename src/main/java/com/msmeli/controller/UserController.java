@@ -49,7 +49,7 @@ public class UserController {
     @Operation(summary = "Endpoint para crear usuario, se espera UserRegisterRequestDTO.")
     @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "Usuario creado correctamente.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDTO.class))}), @ApiResponse(responseCode = "400", description = "Solicitud erronea.", content = @Content), @ApiResponse(responseCode = "500", description = "Error del servidor.", content = @Content)})
     public ResponseEntity<UserResponseDTO> createUser(@Valid @RequestBody UserRegisterRequestDTO userEntity) throws ResourceNotFoundException, AlreadyExistsException {
-        return ResponseEntity.status(HttpStatus.CREATED).body(sellerService.createUser(userEntity));
+        return ResponseEntity.status(HttpStatus.CREATED).body(sellerService.createSeller(userEntity));
     }
 
     @GetMapping("/list")

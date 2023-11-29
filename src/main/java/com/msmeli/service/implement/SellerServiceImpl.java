@@ -1,11 +1,13 @@
 package com.msmeli.service.implement;
 
+import com.msmeli.dto.request.EmployeeRegisterRequestDTO;
 import com.msmeli.dto.request.SellerRequestDTO;
 import com.msmeli.dto.request.UserRegisterRequestDTO;
 import com.msmeli.dto.response.UserResponseDTO;
 import com.msmeli.exception.AlreadyExistsException;
 import com.msmeli.exception.ResourceNotFoundException;
 import com.msmeli.model.Seller;
+import com.msmeli.model.SellerRefactor;
 import com.msmeli.repository.SellerRepository;
 import com.msmeli.service.services.SellerService;
 import com.msmeli.service.services.UserEntityService;
@@ -42,9 +44,15 @@ public class SellerServiceImpl implements SellerService {
     }
 
     @Override
-    public UserResponseDTO createUser(UserRegisterRequestDTO userRegisterRequestDTO) throws ResourceNotFoundException, AlreadyExistsException {
-        Seller seller = sellerRepository.findById(userRegisterRequestDTO.getSeller_id()).orElseThrow(() -> new ResourceNotFoundException(NOT_FOUND));
-        return userEntityService.create(userRegisterRequestDTO, seller);
+    public UserResponseDTO createSeller(UserRegisterRequestDTO userRegisterRequestDTO) throws ResourceNotFoundException, AlreadyExistsException {
+        //Seller seller = sellerRepository.findById(userRegisterRequestDTO.getSeller_id()).orElseThrow(() -> new ResourceNotFoundException(NOT_FOUND));
+        SellerRefactor seller = new SellerRefactor();
+        return userEntityService.createSeller(userRegisterRequestDTO);
+    }
+
+    @Override
+    public UserResponseDTO createEmployee(EmployeeRegisterRequestDTO employeeRegisterDTO, String token) throws ResourceNotFoundException, AlreadyExistsException {
+        return userEntityService.createEmployee(employeeRegisterDTO,token);
     }
 
     @Override

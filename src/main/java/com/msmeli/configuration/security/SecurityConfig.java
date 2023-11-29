@@ -67,7 +67,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.csrf().disable()
                 .authorizeHttpRequests()
-                .requestMatchers("/meli/user/**", "/item/**", "/v3/api-docs/**", "/swagger-ui/**", "/v2/api-docs/**", "/swagger-resources/**","/stock/**","/meli/supplier/**","/metrics/**").permitAll()
+                .requestMatchers("/meli/user/**", "/item/**", "/v3/api-docs/**", "/swagger-ui/**", "/v2/api-docs/**", "/swagger-resources/**","/stock/**","/meli/supplier/**","/metrics/**","/auth/**").permitAll()
                 .and()
                 .authorizeHttpRequests().anyRequest().authenticated()
                 .and()
