@@ -1,5 +1,6 @@
 package com.msmeli.service.implement;
 
+import com.msmeli.configuration.security.entity.UserEntityUserDetails;
 import com.msmeli.configuration.security.service.JwtService;
 import com.msmeli.configuration.security.service.UserEntityRefreshTokenService;
 import com.msmeli.dto.request.EmployeeRegisterRequestDTO;
@@ -18,6 +19,8 @@ import com.msmeli.service.services.EmailService;
 import com.msmeli.service.services.RoleEntityService;
 import com.msmeli.util.Role;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -70,18 +73,21 @@ public class UserEntityServiceImpl implements com.msmeli.service.services.UserEn
     }
 
     @Override
-    public UserResponseDTO createEmployee(EmployeeRegisterRequestDTO employeeRegisterDTO, String token) throws AlreadyExistsException, ResourceNotFoundException {
+    public UserResponseDTO createEmployee(EmployeeRegisterRequestDTO employeeRegisterDTO) throws AlreadyExistsException, ResourceNotFoundException {
 
         if (!employeeRegisterDTO.getPassword().equals(employeeRegisterDTO.getRePassword()))
             throw new ResourceNotFoundException("Las contraseñas ingresadas no coinciden.");
         if (userEntityRepository.findByUsername(employeeRegisterDTO.getUsername()).isPresent())
             throw new AlreadyExistsException("El nombre de usuario ya existe.");
+
+        Long id = getAuthenticatedUserId();
+
         Employee newEmployee = mapper.map(employeeRegisterDTO, Employee.class);
         newEmployee.setPassword(passwordEncoder.encode(employeeRegisterDTO.getPassword()));
         List<RoleEntity> roles = new ArrayList<>();
         roles.add(roleEntityService.findByName(Role.EMPLOYEE));
         newEmployee.setRoles(roles);
-        SellerRefactor seller = sellerRefactorRepository.findById(jwtService.extractId(token))
+        SellerRefactor seller = sellerRefactorRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("No se encontró el seller en la base de datos"));
 
         newEmployee.setSellerRefactor(seller);
@@ -187,5 +193,16 @@ public class UserEntityServiceImpl implements com.msmeli.service.services.UserEn
 
     private String emailResetPassword(String username, String newPassword) {
         return "Hola " + username + ",\n \n" + "Restablecimiento de contraseña exitoso." + "\n \n" + "Tu nueva contraseña es :  " + newPassword + "\n \n" + "Saludos, equipo de la 3ra Aceleracion.";
+    }
+
+    private Long getAuthenticatedUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication != null && authentication.getPrincipal() instanceof UserEntityUserDetails) {
+            UserEntityUserDetails userDetails = (UserEntityUserDetails) authentication.getPrincipal();
+            return userDetails.getId();
+        } else {
+            return null;
+        }
     }
 }

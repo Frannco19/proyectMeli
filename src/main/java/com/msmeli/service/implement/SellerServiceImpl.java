@@ -51,8 +51,8 @@ public class SellerServiceImpl implements SellerService {
     }
 
     @Override
-    public UserResponseDTO createEmployee(EmployeeRegisterRequestDTO employeeRegisterDTO, String token) throws ResourceNotFoundException, AlreadyExistsException {
-        return userEntityService.createEmployee(employeeRegisterDTO,token);
+    public UserResponseDTO createEmployee(EmployeeRegisterRequestDTO employeeRegisterDTO) throws ResourceNotFoundException, AlreadyExistsException {
+        return userEntityService.createEmployee(employeeRegisterDTO);
     }
 
     @Override

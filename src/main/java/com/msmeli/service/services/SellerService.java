@@ -19,7 +19,7 @@ public interface SellerService {
 
     UserResponseDTO createSeller(UserRegisterRequestDTO userRegisterRequestDTO) throws ResourceNotFoundException, AlreadyExistsException;
 
-    UserResponseDTO createEmployee(EmployeeRegisterRequestDTO EmployeeRegister, String token) throws ResourceNotFoundException, AlreadyExistsException;
+    UserResponseDTO createEmployee(EmployeeRegisterRequestDTO EmployeeRegister) throws ResourceNotFoundException, AlreadyExistsException;
     Seller findById(Integer id) throws ResourceNotFoundException;
 
     Seller findBySellerId(Long sellerId) throws ResourceNotFoundException;

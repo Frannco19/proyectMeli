@@ -32,7 +32,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         this.handlerExceptionResolver = handlerExceptionResolver;
         this.appExceptionHandler = appExceptionHandler;
     }
-
+//TODO FALTA RESPOSE CUANDO NO SE ENVIA TOKEN DEVUELVE 403
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String authHeader = request.getHeader("Authorization");
@@ -46,12 +46,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = userEntityUserDetailsService.loadUserByUsername(username);
                 if (jwtService.validateToken(token, userDetails)) {
-                    UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                    UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, token, userDetails.getAuthorities());
                     authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authenticationToken);
                 }
             }
-            filterChain.doFilter(request, response);
+
         } catch (Exception ex) {
             ProblemDetail problemDetail = appExceptionHandler.handleSecurityException(ex);
             response.setStatus(problemDetail.getStatus());
@@ -59,6 +59,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             response.getWriter().write(problemDetail.toString());
             response.getWriter().flush();
             response.getWriter().close();
+            return;
         }
+        filterChain.doFilter(request, response);
     }
 }
