@@ -3,10 +3,12 @@ package com.msmeli.feignClient;
 import com.msmeli.configuration.feign.FeignClientConfiguration;
 import com.msmeli.dto.*;
 import com.msmeli.dto.request.RefreshTokenRequestDTO;
+import com.msmeli.dto.request.TokenRequestDTO;
 import com.msmeli.dto.request.description.DescriptionCatalogDTO;
 import com.msmeli.dto.request.description.DescriptionProductDTO;
 import com.msmeli.dto.response.FeeResponseDTO;
 import com.msmeli.dto.response.OptionsDTO;
+import com.msmeli.dto.response.TokenResposeDTO;
 import com.msmeli.model.GeneralCategory;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
@@ -60,8 +62,8 @@ public interface MeliFeignClient {
     @GetMapping("/products/{productId}")
     public String getBuyBoxWinner(@PathVariable String productId);
 
-    @PostMapping("/oauth/token")
-    public RefreshTokenDTO refreshToken(@RequestBody RefreshTokenRequestDTO refreshTokenDTO);
+    /*@PostMapping("/oauth/token")
+    public RefreshTokenDTO refreshToken(@RequestBody RefreshTokenRequestDTO refreshTokenDTO);*/
 
     @GetMapping("/sites/MLA/listing_prices")
     public FeeResponseDTO getItemFee(@RequestParam("price") double price, @RequestParam("category_id") String category_id, @RequestParam("listing_type_id") String listing_type_id);
@@ -83,4 +85,7 @@ public interface MeliFeignClient {
 
     @GetMapping("/products/{productId}")
     TopSoldDetailedProductDTO getTopProductDetails(@PathVariable String productId);
+
+    @PostMapping("/oauth/token")
+    TokenResposeDTO tokenForTG(@RequestBody TokenRequestDTO tokenRequestDTO);
 }
