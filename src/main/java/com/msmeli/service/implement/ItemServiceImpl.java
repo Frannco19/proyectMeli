@@ -1,5 +1,8 @@
 package com.msmeli.service.implement;
 
+import com.msmeli.configuration.security.entity.UserEntityUserDetails;
+import com.msmeli.dto.feign.ItemFeignDTO;
+import com.msmeli.dto.feign.ItemIdsResponseDTO;
 import com.msmeli.dto.response.BuyBoxWinnerResponseDTO;
 import com.msmeli.dto.response.CostResponseDTO;
 import com.msmeli.dto.response.ItemResponseDTO;
@@ -8,7 +11,9 @@ import com.msmeli.exception.ResourceNotFoundException;
 import com.msmeli.feignClient.MeliFeignClient;
 import com.msmeli.model.Item;
 import com.msmeli.model.Seller;
+import com.msmeli.model.SellerRefactor;
 import com.msmeli.repository.ItemRepository;
+import com.msmeli.repository.SellerRefactorRepository;
 import com.msmeli.service.feignService.MeliService;
 import com.msmeli.service.services.*;
 import com.msmeli.util.GrossIncome;
@@ -19,8 +24,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -35,8 +43,8 @@ public class ItemServiceImpl implements ItemService {
     private final CostService costService;
     private static final double MIN_MARGIN = .1;
     private final SellerService sellerService;
-
-    public ItemServiceImpl(ItemRepository itemRepository, MeliFeignClient meliFeignClient, ListingTypeService listingTypeService, MeliService meliService, ModelMapper mapper, StockServiceImpl stockService, CostService costService, SellerService sellerService) {
+    private final SellerRefactorRepository sellerRefactorRepository;
+    public ItemServiceImpl(ItemRepository itemRepository, MeliFeignClient meliFeignClient, ListingTypeService listingTypeService, MeliService meliService, ModelMapper mapper, StockServiceImpl stockService, CostService costService, SellerService sellerService, SellerRefactorRepository sellerRefactorRepository) {
         this.itemRepository = itemRepository;
         this.meliFeignClient = meliFeignClient;
         this.listingTypeService = listingTypeService;
@@ -45,6 +53,7 @@ public class ItemServiceImpl implements ItemService {
         this.stockService = stockService;
         this.costService = costService;
         this.sellerService = sellerService;
+        this.sellerRefactorRepository = sellerRefactorRepository;
     }
 
     @Override
@@ -77,6 +86,62 @@ public class ItemServiceImpl implements ItemService {
         Page<Item> itemCost = itemRepository.findAllBySellerId(id, pageable);
         if (itemCost.getContent().isEmpty()) throw new ResourceNotFoundException("No hay items con esos parametros");
         return new PageImpl<>(itemCost.stream().map(this::getItemResponseDTO).toList(), pageable, itemCost.getTotalElements());
+    }
+
+    /**
+     * "método de conveniencia o método de envoltura"
+     * Realiza la operación compleja de Cargar en la base de datos los item de un Seller
+     * al llamar a los siguientes métodos:
+     * getItemId()
+     * setItemAtributtes()
+     * @throws ResourceNotFoundException (Tratar mejor los errores)
+     */
+    @Override
+    public void saveAllItemForSeller() throws ResourceNotFoundException {
+        Long idSeller = getAuthenticatedUserId();
+        SellerRefactor seller = sellerService.findById(idSeller);
+        List<String> idsItems = getItemId(seller);
+        setItemAtributtes(idsItems,seller);
+    }
+
+    /**
+     * Este metodo se encarga de cargar todos los atributos de un item consultando a la api de mercadolibre recorriendo un
+     * ArrayList de ids de item
+     * @param idsItems ids de Item de un selle
+     * @param seller Entidad "Seller" con la que se establece la relacion en la BD
+     */
+    private void setItemAtributtes(List<String>idsItems,SellerRefactor seller) {
+        ItemFeignDTO itemRespose = null;
+        List<Item>itemList = new ArrayList<>();
+        for (String id : idsItems){
+            itemRespose = meliFeignClient.getItemAtributtesRe(id);
+            Item item = mapper.map(itemRespose, Item.class);
+            item.setSellerRefactor(seller);
+            itemList.add(item);
+        }
+        seller.setItems(itemList);
+        sellerRefactorRepository.save(seller);
+    }
+
+    /**
+     * Este metodo se encarga de consultar a la api de mercadolibre  traer todos los Ids de los items de un seller
+     * @param seller entidad con las credenciasles necesarias para la consulta a la api de mercadolibre
+     * @return idsItems ArrayList con los Ids de todos los items del seller
+     */
+    private List<String> getItemId(SellerRefactor seller) {
+       int offset = 0;
+       int limit = 100;
+       ItemIdsResponseDTO resultado = null;
+       List<String>idsItems = new ArrayList<>();
+       do {
+
+               resultado = meliFeignClient.getAllIDsForSeller(seller.getMeliID(),"Bearer " + seller.getTokenMl());
+               idsItems.addAll(resultado.getResults());
+               offset += limit;
+       }while (offset < resultado.getPaging().getLimit() );
+
+       return idsItems;
+
     }
 
     @Override
@@ -150,5 +215,16 @@ public class ItemServiceImpl implements ItemService {
             item.setWinnerPrice(winnerPrice);
         }
         return item;
+    }
+
+    private Long getAuthenticatedUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication != null && authentication.getPrincipal() instanceof UserEntityUserDetails) {
+            UserEntityUserDetails userDetails = (UserEntityUserDetails) authentication.getPrincipal();
+            return userDetails.getId();
+        } else {
+            return null;
+        }
     }
 }

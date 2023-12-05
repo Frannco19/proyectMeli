@@ -2,6 +2,8 @@ package com.msmeli.feignClient;
 
 import com.msmeli.configuration.feign.FeignClientConfiguration;
 import com.msmeli.dto.*;
+import com.msmeli.dto.feign.ItemFeignDTO;
+import com.msmeli.dto.feign.ItemIdsResponseDTO;
 import com.msmeli.dto.request.RefreshTokenRequestDTO;
 import com.msmeli.dto.request.TokenRequestDTO;
 import com.msmeli.dto.request.description.DescriptionCatalogDTO;
@@ -42,6 +44,8 @@ public interface MeliFeignClient {
 
     @GetMapping("/items/{item_id}")
     public ItemAttributesDTO getItemAtributtes(@PathVariable String item_id);
+    @GetMapping("/items/{item_id}")
+    public ItemFeignDTO getItemAtributtesRe(@PathVariable String item_id);
 
 //    //Puede funcionar mas a futuro
 //    @GetMapping("/highlights/MLA/item/{product_id}")
@@ -88,4 +92,10 @@ public interface MeliFeignClient {
 
     @PostMapping("/oauth/token")
     TokenResposeDTO tokenForTG(@RequestBody TokenRequestDTO tokenRequestDTO);
+
+    @GetMapping("/users/{userId}/items/search")
+    ItemIdsResponseDTO getAllIDsForSeller(
+            @PathVariable("userId") int userId,
+            @RequestHeader("Authorization") String authorization
+    );
 }

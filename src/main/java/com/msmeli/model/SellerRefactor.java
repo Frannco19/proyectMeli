@@ -18,4 +18,6 @@ public class SellerRefactor extends UserEntity {
     private String tokenMl;
     @OneToMany(mappedBy = "sellerRefactor", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Employee> employees;
+    @OneToMany(mappedBy = "sellerRefactor", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Item> Items;
 }

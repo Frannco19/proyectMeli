@@ -27,4 +27,6 @@ public interface ItemService {
     void createProductsCosts();
 
     Page<ItemResponseDTO> getItemsAndCostPaged(Integer id, int offset, int pageSize) throws ResourceNotFoundException;
+
+    void saveAllItemForSeller() throws ResourceNotFoundException;
 }
