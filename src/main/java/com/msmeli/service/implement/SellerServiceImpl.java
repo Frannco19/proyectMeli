@@ -36,7 +36,7 @@ public class SellerServiceImpl implements SellerService {
     private static final String NOT_FOUND = "Seller no encontrado.";
 
 
-    public SellerServiceImpl(SellerRepository sellerRepository, UserEntityService userEntityService, ModelMapper mapper) {
+    public SellerServiceImpl(SellerRepository sellerRepository, SellerRefactorRepository sellerRefactorRepository, MeliFeignClient meliFeignClient, UserEntityService userEntityService, ModelMapper mapper) {
         this.sellerRepository = sellerRepository;
         this.sellerRefactorRepository = sellerRefactorRepository;
         this.meliFeignClient = meliFeignClient;
