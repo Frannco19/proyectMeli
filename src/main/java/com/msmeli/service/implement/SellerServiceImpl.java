@@ -36,7 +36,7 @@ public class SellerServiceImpl implements SellerService {
     private static final String NOT_FOUND = "Seller no encontrado.";
 
 
-    public SellerServiceImpl(SellerRepository sellerRepository, SellerRefactorRepository sellerRefactorRepository, MeliFeignClient meliFeignClient, UserEntityService userEntityService, ModelMapper mapper) {
+    public SellerServiceImpl(SellerRepository sellerRepository, UserEntityService userEntityService, ModelMapper mapper) {
         this.sellerRepository = sellerRepository;
         this.sellerRefactorRepository = sellerRefactorRepository;
         this.meliFeignClient = meliFeignClient;
@@ -100,6 +100,13 @@ public class SellerServiceImpl implements SellerService {
 
 
     }
+
+    @Override
+    public SellerRefactor findById(Long id) throws ResourceNotFoundException {
+        return sellerRefactorRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException(NOT_FOUND));
+    }
+
+
 
     @Override
     public Seller findById(Integer id) throws ResourceNotFoundException {

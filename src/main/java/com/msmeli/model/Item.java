@@ -57,4 +57,7 @@ public class Item {
 
     @OneToOne
     private Cost cost;
+    @ManyToOne
+    @JoinColumn(name = "sellerRefactor_id")
+    private SellerRefactor sellerRefactor;
 }

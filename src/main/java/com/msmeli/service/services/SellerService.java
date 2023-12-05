@@ -9,6 +9,7 @@ import com.msmeli.dto.response.UserResponseDTO;
 import com.msmeli.exception.AlreadyExistsException;
 import com.msmeli.exception.ResourceNotFoundException;
 import com.msmeli.model.Seller;
+import com.msmeli.model.SellerRefactor;
 
 import java.util.List;
 import java.util.Optional;
@@ -29,4 +30,8 @@ public interface SellerService {
     List<Seller> findAll();
 
     TokenResposeDTO saveToken(String TG);
+
+    SellerRefactor findById(Long id) throws ResourceNotFoundException;
+
+
 }
