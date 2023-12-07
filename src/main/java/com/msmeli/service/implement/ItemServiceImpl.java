@@ -1,6 +1,7 @@
 package com.msmeli.service.implement;
 
 import com.msmeli.configuration.security.entity.UserEntityUserDetails;
+import com.msmeli.dto.ItemAttributesDTO;
 import com.msmeli.dto.feign.ItemFeignDTO;
 import com.msmeli.dto.feign.ItemIdsResponseDTO;
 import com.msmeli.dto.response.BuyBoxWinnerResponseDTO;
@@ -28,6 +29,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import javax.xml.transform.SourceLocator;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -111,14 +113,13 @@ public class ItemServiceImpl implements ItemService {
      * @param seller Entidad "Seller" con la que se establece la relacion en la BD
      */
     private void setItemAtributtes(List<String>idsItems,SellerRefactor seller) {
-        ItemFeignDTO itemRespose = null;
         List<Item>itemList = new ArrayList<>();
         for (String id : idsItems){
-            itemRespose = meliFeignClient.getItemAtributtesRe(id);
-            Item item = mapper.map(itemRespose, Item.class);
-            item.setSellerRefactor(seller);
-            itemList.add(item);
-        }
+                ItemFeignDTO itemRespose = meliFeignClient.getItemAtributtesRe(id,"Bearer " + seller.getTokenMl());
+                Item item = mapper.map(itemRespose, Item.class);
+                item.setSellerRefactor(seller);
+                itemList.add(item);
+            }
         seller.setItems(itemList);
         sellerRefactorRepository.save(seller);
     }
