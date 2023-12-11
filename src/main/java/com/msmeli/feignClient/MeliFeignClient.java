@@ -45,7 +45,7 @@ public interface MeliFeignClient {
     @GetMapping("/items/{item_id}")
     public ItemAttributesDTO getItemAtributtes(@PathVariable String item_id);
     @GetMapping("/items/{item_id}")
-    public ItemFeignDTO getItemAtributtesRe(@PathVariable String item_id);
+    public ItemFeignDTO getItemAtributtesRe(@PathVariable String item_id,@RequestHeader("Authorization") String authorization);
 
 //    //Puede funcionar mas a futuro
 //    @GetMapping("/highlights/MLA/item/{product_id}")
