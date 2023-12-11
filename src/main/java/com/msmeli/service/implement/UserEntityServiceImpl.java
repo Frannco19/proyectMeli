@@ -183,6 +183,27 @@ public class UserEntityServiceImpl implements com.msmeli.service.services.UserEn
         return userAuthResponseDTO;
     }
 
+    /**
+     * Metodo que se encarga de devolver el id del Seller que pidio el recurso
+     * se encrga de comprobar si es un instanci de selleo o employee para poder conseguir el id
+     * @return Long id recuperado del usuaria que solicita el recurso
+     */
+    @Override
+    public Long getAuthenticatedUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication != null && authentication.getPrincipal() instanceof UserEntityUserDetails) {
+            UserEntityUserDetails userDetails = (UserEntityUserDetails) authentication.getPrincipal();
+            UserEntity userEntity = userDetails.getUserEntity();
+            if (userEntity instanceof Employee){
+                return ((Employee) userEntity).getSellerRefactor().getId();
+            } else if (userEntity instanceof SellerRefactor){
+                return userEntity.getId();
+            }
+        }
+        return null;
+    }
+
     private String emailWelcomeBody(String username) {
         return "Hola " + username + ",\n \n" + "Para iniciar sesión click aqui : https://ml.gylgroup.com/auth/login/" + "\n \n" + "Saludos, equipo de la 3ra Aceleracion.";
     }
@@ -195,14 +216,5 @@ public class UserEntityServiceImpl implements com.msmeli.service.services.UserEn
         return "Hola " + username + ",\n \n" + "Restablecimiento de contraseña exitoso." + "\n \n" + "Tu nueva contraseña es :  " + newPassword + "\n \n" + "Saludos, equipo de la 3ra Aceleracion.";
     }
 
-    private Long getAuthenticatedUserId() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if (authentication != null && authentication.getPrincipal() instanceof UserEntityUserDetails) {
-            UserEntityUserDetails userDetails = (UserEntityUserDetails) authentication.getPrincipal();
-            return userDetails.getId();
-        } else {
-            return null;
-        }
-    }
 }
