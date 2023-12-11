@@ -17,6 +17,7 @@ import com.msmeli.repository.SellerRepository;
 import com.msmeli.service.services.SellerService;
 import com.msmeli.service.services.UserEntityService;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -34,6 +35,16 @@ public class SellerServiceImpl implements SellerService {
     private final UserEntityService userEntityService;
     private ModelMapper mapper;
     private static final String NOT_FOUND = "Seller no encontrado.";
+    @Value("${meli.grantType}")
+    private String meliGrantType;
+    @Value("${meli.clientId}")
+    private String meliClientId;
+    @Value("${meli.clientSecret}")
+    private String meliClientSecret;
+    @Value("${meli.refresh.token}")
+    private String meliRefreshToken;
+    @Value("${meli.redirect.uri}")
+    private String meliRedirectUri;
 
 
     public SellerServiceImpl(SellerRepository sellerRepository, SellerRefactorRepository sellerRefactorRepository, MeliFeignClient meliFeignClient, UserEntityService userEntityService, ModelMapper mapper) {
@@ -73,10 +84,10 @@ public class SellerServiceImpl implements SellerService {
     }
 
     /**
-     * Este metodo se enecarga de guardar por primera vez el token(mercadoLibre) dentro de la
-     * entidad seller que haya solicitido el endpoint
-     * @param TG
-     * @return
+     * Guarda por primera vez el token de MercadoLibre dentro de la entidad Seller que ha solicitado el endpoint.
+     * @param TG Token generado por MercadoLibre que se utilizará para obtener el token de acceso.
+     * @return tokenResposeDTO que contiene la respuesta del proceso de guardado del token.
+     * @throws NoSuchElementException Si no se encuentra al Seller en la base de datos.
      */
     @Override
     public TokenResposeDTO saveToken(String TG) {
@@ -85,9 +96,9 @@ public class SellerServiceImpl implements SellerService {
                 .orElseThrow(() -> new NoSuchElementException("No se encontró el seller en la base de datos"));
         TokenRequestDTO tokenRequestDTO = new TokenRequestDTO().builder()
                 .code(TG)
-                .client_secret("FkXpw1hbXHzxUhflOBcE9EOVGkeYTXp7")
-                .client_id("1798757980849345")
-                .redirect_uri("https://ml.gylgroup.com/")
+                .client_secret(meliClientSecret)
+                .client_id(meliClientId)
+                .redirect_uri(meliRedirectUri)
                 .code_verifier("123")
                 .grant_type("authorization_code").build();
         TokenResposeDTO tokenResposeDTO = meliFeignClient.tokenForTG(tokenRequestDTO);
@@ -105,8 +116,6 @@ public class SellerServiceImpl implements SellerService {
     public SellerRefactor findById(Long id) throws ResourceNotFoundException {
         return sellerRefactorRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException(NOT_FOUND));
     }
-
-
 
     @Override
     public Seller findById(Integer id) throws ResourceNotFoundException {
