@@ -24,6 +24,10 @@ public class ModelMapperConfig {
         return modelMapper;
     }
 
+    /**
+     * metodo que crea un configuracion de mapeado involucrando a ItemFeignDTO y Item
+     * @return PropertyMap Objeto usado en ModelMapper
+     */
     private PropertyMap<ItemFeignDTO, Item> dtoItemToItem() {
         return new PropertyMap<ItemFeignDTO, Item>() {
             @Override
@@ -54,6 +58,12 @@ public class ModelMapperConfig {
         };
     }
 
+    /**
+     * Metodo o configuracion creado expecificamente para poder converti la <List<AttributesDTO> en
+     * un objeto unico buscado por el id
+     * @param targetId Id para busccar en el ArrayList de atributtes
+     * @return Converter<List<AttributesDTO> objeto usado en ModelMapper
+     */
     private Converter<List<AttributesDTO>, String> createAttributesConverter(String targetId) {
         return new Converter<List<AttributesDTO>, String>() {
             @Override
