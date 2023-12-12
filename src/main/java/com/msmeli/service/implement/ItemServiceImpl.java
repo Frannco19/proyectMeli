@@ -9,9 +9,7 @@ import com.msmeli.dto.response.ItemResponseDTO;
 import com.msmeli.dto.response.OneProductResponseDTO;
 import com.msmeli.exception.ResourceNotFoundException;
 import com.msmeli.feignClient.MeliFeignClient;
-import com.msmeli.model.Item;
-import com.msmeli.model.Seller;
-import com.msmeli.model.SellerRefactor;
+import com.msmeli.model.*;
 import com.msmeli.repository.ItemRepository;
 import com.msmeli.repository.SellerRefactorRepository;
 import com.msmeli.service.feignService.MeliService;
@@ -43,8 +41,9 @@ public class ItemServiceImpl implements ItemService {
     private final CostService costService;
     private static final double MIN_MARGIN = .1;
     private final SellerService sellerService;
+    private final UserEntityService userEntityService;
     private final SellerRefactorRepository sellerRefactorRepository;
-    public ItemServiceImpl(ItemRepository itemRepository, MeliFeignClient meliFeignClient, ListingTypeService listingTypeService, MeliService meliService, ModelMapper mapper, StockServiceImpl stockService, CostService costService, SellerService sellerService, SellerRefactorRepository sellerRefactorRepository) {
+    public ItemServiceImpl(ItemRepository itemRepository, MeliFeignClient meliFeignClient, ListingTypeService listingTypeService, MeliService meliService, ModelMapper mapper, StockServiceImpl stockService, CostService costService, SellerService sellerService, UserEntityService userEntityService, SellerRefactorRepository sellerRefactorRepository) {
         this.itemRepository = itemRepository;
         this.meliFeignClient = meliFeignClient;
         this.listingTypeService = listingTypeService;
@@ -53,6 +52,7 @@ public class ItemServiceImpl implements ItemService {
         this.stockService = stockService;
         this.costService = costService;
         this.sellerService = sellerService;
+        this.userEntityService = userEntityService;
         this.sellerRefactorRepository = sellerRefactorRepository;
     }
 
@@ -98,7 +98,7 @@ public class ItemServiceImpl implements ItemService {
      */
     @Override
     public void saveAllItemForSeller() throws ResourceNotFoundException {
-        Long idSeller = getAuthenticatedUserId();
+        Long idSeller = userEntityService.getAuthenticatedUserId();
         SellerRefactor seller = sellerService.findById(idSeller);
         List<String> idsItems = getItemId(seller);
         setItemAtributtes(idsItems,seller);
@@ -188,7 +188,7 @@ public class ItemServiceImpl implements ItemService {
      */
     @Override
     public Page<ItemResponseDTO> searchProducts(String searchType, String searchInput, int offset, int pageSize, boolean isCatalogue, String isActive) throws ResourceNotFoundException {
-        Long idSeller = getAuthenticatedUserId();
+        Long idSeller = userEntityService.getAuthenticatedUserId();
         SellerRefactor seller = sellerService.findById(idSeller);
         Pageable pageable = PageRequest.of(offset, pageSize);
         int inCatalogue = isCatalogue ? -1 : -2;
@@ -246,14 +246,4 @@ public class ItemServiceImpl implements ItemService {
         return itemResponseDTO;
     }
 
-    private Long getAuthenticatedUserId() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication != null && authentication.getPrincipal() instanceof UserEntityUserDetails) {
-            UserEntityUserDetails userDetails = (UserEntityUserDetails) authentication.getPrincipal();
-            return userDetails.getId();
-        } else {
-            return null;
-        }
-    }
 }
