@@ -10,6 +10,7 @@ import lombok.*;
 @Setter
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AttributesDTO {
+    private String id;
     private String name;
     private String value_name;
 }

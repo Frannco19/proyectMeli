@@ -14,8 +14,10 @@ public class UserEntityUserDetails implements UserDetails {
     private final String username;
     private final String password;
     private final List<GrantedAuthority> authorities;
+    private final UserEntity userEntity;
 
     public UserEntityUserDetails(UserEntity userEntity) {
+        this.userEntity = userEntity;
         id = userEntity.getId();
         username = userEntity.getUsername();
         password = userEntity.getPassword();
@@ -57,4 +59,7 @@ public class UserEntityUserDetails implements UserDetails {
         return true;
     }
     public Long getId() {return id;}
+    public UserEntity getUserEntity() {
+        return userEntity;
+    }
 }

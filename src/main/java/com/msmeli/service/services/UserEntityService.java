@@ -39,4 +39,5 @@ public interface UserEntityService {
     UserAuthResponseDTO userRefreshToken(UserRefreshTokenRequestDTO refreshTokenRequestDTO) throws ResourceNotFoundException;
 
     UserAuthResponseDTO userAuthenticateAndGetToken(String username) throws ResourceNotFoundException;
+    Long getAuthenticatedUserId();
 }
