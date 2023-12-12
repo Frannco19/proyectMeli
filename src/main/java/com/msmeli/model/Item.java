@@ -54,7 +54,12 @@ public class Item {
     private String image_url;
 
     private String sku;
+    private String marca;
+    private String gtin;
 
     @OneToOne
     private Cost cost;
+    @ManyToOne
+    @JoinColumn(name = "sellerRefactor_id")
+    private SellerRefactor sellerRefactor;
 }

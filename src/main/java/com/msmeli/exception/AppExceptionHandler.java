@@ -1,6 +1,8 @@
 package com.msmeli.exception;
 
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.io.IOException;
 import io.jsonwebtoken.security.SignatureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -62,6 +64,10 @@ public class AppExceptionHandler {
         if (ex instanceof ExpiredJwtException) {
             errorDetail = ProblemDetail.forStatusAndDetail(HttpStatusCode.valueOf(403), ex.getMessage());
             errorDetail.setProperty(ACCESS_DENIED, "JWT token alredy expired!");
+        }
+        if (ex instanceof MalformedJwtException){
+            errorDetail = ProblemDetail.forStatusAndDetail(HttpStatusCode.valueOf(400), ex.getMessage());
+            errorDetail.setProperty(ACCESS_DENIED, "Malformed JWT");
         }
         return errorDetail;
     }

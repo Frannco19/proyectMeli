@@ -2,11 +2,15 @@ package com.msmeli.feignClient;
 
 import com.msmeli.configuration.feign.FeignClientConfiguration;
 import com.msmeli.dto.*;
+import com.msmeli.dto.feign.ItemFeignDTO;
+import com.msmeli.dto.feign.ItemIdsResponseDTO;
 import com.msmeli.dto.request.RefreshTokenRequestDTO;
+import com.msmeli.dto.request.TokenRequestDTO;
 import com.msmeli.dto.request.description.DescriptionCatalogDTO;
 import com.msmeli.dto.request.description.DescriptionProductDTO;
 import com.msmeli.dto.response.FeeResponseDTO;
 import com.msmeli.dto.response.OptionsDTO;
+import com.msmeli.dto.response.TokenResposeDTO;
 import com.msmeli.model.GeneralCategory;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +24,8 @@ public interface MeliFeignClient {
 
     @GetMapping("/products/{productId}/items")
     public ItemCatalogDTO getProductSearch(@PathVariable String productId);
+    @GetMapping("/products/{productId}/items")
+    public ItemCatalogDTO getProductSearch(@PathVariable String productId,@RequestParam int limit,@RequestParam int offset);
 
     @GetMapping("/products/{productId}")
     public BoxWinnerDTO getProductWinnerSearch(@PathVariable String productId);
@@ -38,6 +44,8 @@ public interface MeliFeignClient {
 
     @GetMapping("/items/{item_id}")
     public ItemAttributesDTO getItemAtributtes(@PathVariable String item_id);
+    @GetMapping("/items/{item_id}")
+    public ItemFeignDTO getItemAtributtesRe(@PathVariable String item_id,@RequestHeader("Authorization") String authorization);
 
 //    //Puede funcionar mas a futuro
 //    @GetMapping("/highlights/MLA/item/{product_id}")
@@ -58,8 +66,8 @@ public interface MeliFeignClient {
     @GetMapping("/products/{productId}")
     public String getBuyBoxWinner(@PathVariable String productId);
 
-    @PostMapping("/oauth/token")
-    public RefreshTokenDTO refreshToken(@RequestBody RefreshTokenRequestDTO refreshTokenDTO);
+    /*@PostMapping("/oauth/token")
+    public RefreshTokenDTO refreshToken(@RequestBody RefreshTokenRequestDTO refreshTokenDTO);*/
 
     @GetMapping("/sites/MLA/listing_prices")
     public FeeResponseDTO getItemFee(@RequestParam("price") double price, @RequestParam("category_id") String category_id, @RequestParam("listing_type_id") String listing_type_id);
@@ -82,5 +90,15 @@ public interface MeliFeignClient {
 
     @GetMapping("/products/{productId}")
     TopSoldDetailedProductDTO getTopProductDetails(@PathVariable String productId);
+
+
+    @PostMapping("/oauth/token")
+    TokenResposeDTO tokenForTG(@RequestBody TokenRequestDTO tokenRequestDTO);
+
+    @GetMapping("/users/{userId}/items/search")
+    ItemIdsResponseDTO getAllIDsForSeller(
+            @PathVariable("userId") int userId,
+            @RequestHeader("Authorization") String authorization
+    );
 
 }

@@ -13,9 +13,9 @@ public class FeignClientConfiguration {
     }
 
 
-    @Bean
+    /*@Bean
     public RequestInterceptor bearerTokenInterceptor() {
         return template -> template.header("Authorization", String.format("Bearer %s", tokenService.getAccessToken("ADMIN")));
     }
-
+*/
 }

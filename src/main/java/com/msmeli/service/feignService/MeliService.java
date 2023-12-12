@@ -6,10 +6,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.msmeli.dto.*;
-import com.msmeli.dto.response.*;
+import com.msmeli.dto.response.BuyBoxWinnerResponseDTO;
+import com.msmeli.dto.response.CatalogItemResponseDTO;
+import com.msmeli.dto.response.FeeResponseDTO;
+import com.msmeli.dto.response.OptionsDTO;
+import com.msmeli.exception.ResourceNotFoundException;
 import com.msmeli.feignClient.MeliFeignClient;
 import com.msmeli.model.*;
-import com.msmeli.repository.*;
+import com.msmeli.repository.CategoryRepository;
+import com.msmeli.repository.ItemRepository;
+import com.msmeli.repository.ListingTypeRepository;
+import com.msmeli.repository.SellerRepository;
 import feign.FeignException;
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -96,6 +103,9 @@ public class MeliService {
 
     }
 
+    public ListingType getListingTypeNameFromBd(String listingTypeId) throws ResourceNotFoundException {
+        return listingTypeRepository.findById(listingTypeId).orElseThrow(() -> new ResourceNotFoundException("No hay un Listing Type con ese id"));
+    }
 
     public Integer getPositionMethod(DocumentContext positionByItemId) {
         return positionByItemId.read("$.position");
@@ -128,7 +138,7 @@ public class MeliService {
         return null;
     }
 
-    @EventListener(ApplicationReadyEvent.class)
+    /*@EventListener(ApplicationReadyEvent.class)
     @Order(3)
     public void saveListingTypes() {
 
@@ -141,10 +151,9 @@ public class MeliService {
         });
 
         listingTypeRepository.saveAll(listingTypes);
+    }*/
 
-    }
-
-    @EventListener(ApplicationReadyEvent.class)
+    /*@EventListener(ApplicationReadyEvent.class)
     @Order(4)
     public void saveSellerItems() {
         int offset = 0;
@@ -197,29 +206,36 @@ public class MeliService {
 
             offset = offset + 50;
         } while (!responseDTO.getResults().isEmpty());
+    }*/
+
+    public ItemCatalogDTO getSellerItemCatalog(String product_catalog_id, int limit, int page) {
+        /*el paginado de la api de meli funciona por offset(a partir de que elemento) y no por pagina.*/
+        int pageN = page * limit;
+        ItemCatalogDTO resultDTO = meliFeignClient.getProductSearch(product_catalog_id, limit, pageN);
+        int position = pageN + 1;
+
+        List<CatalogItemResponseDTO> processedResults = resultDTO.getResults()
+                .parallelStream()
+                .map(e -> {
+
+                    ItemAttributesDTO attributesDTO = meliFeignClient.getItemAtributtes(e.getItem_id());
+                    SellerDTO sellerDTO = meliFeignClient.getSellerBySellerId(e.getSeller_id());
+
+                    e.setCreated_date_item(attributesDTO.getDate_created());
+                    e.setUpdated_date_item(attributesDTO.getLast_updated());
+                    e.setSeller_nickname(sellerDTO.getSeller().getNickname());
+
+                    e.setCatalogPosition(resultDTO.getResults().indexOf(e) + position);
+                    return e;
+                }).toList();
+
+        ItemCatalogDTO responseDTO = new ItemCatalogDTO();
+        responseDTO.setPaging(resultDTO.getPaging());
+        responseDTO.setResults(processedResults);
+        return responseDTO;
     }
 
-    public List<CatalogItemResponseDTO> getSellerItemCatalog(String product_catalog_id) {
-
-        ItemCatalogDTO responseDTO = meliFeignClient.getProductSearch(product_catalog_id);
-
-        return responseDTO.getResults().parallelStream().peek(e -> {
-
-            int position = responseDTO.getResults().indexOf(e);
-
-            ItemAttributesDTO attributesDTO = meliFeignClient.getItemAtributtes(e.getItem_id());
-            SellerDTO sellerDTO = meliFeignClient.getSellerBySellerId(e.getSeller_id());
-
-            e.setCreated_date_item(attributesDTO.getDate_created());
-            e.setUpdated_date_item(attributesDTO.getLast_updated());
-            e.setSeller_nickname(sellerDTO.getSeller().getNickname());
-
-            e.setCatalogPosition(position + 1);
-
-        }).toList();
-    }
-
-    public BuyBoxWinnerResponseDTO getBuyBoxWinner(String productId) {
+    public BuyBoxWinnerResponseDTO getBuyBoxWinner(String productId) throws ResourceNotFoundException {
 
         BoxWinnerDTO result = meliFeignClient.getProductWinnerSearch(productId);
         SellerDTO seller = meliFeignClient.getSellerBySellerId(result.getBuy_box_winner().getSeller_id());
@@ -227,8 +243,7 @@ public class MeliService {
         BuyBoxWinnerResponseDTO responseDTO = modelMapper.map(result.getBuy_box_winner(), BuyBoxWinnerResponseDTO.class);
 
         responseDTO.setSeller_nickname(seller.getSeller().getNickname());
-        responseDTO.setListing_type_id(getListingTypeName(responseDTO.getListing_type_id()));
-
+        responseDTO.setListing_type_id(getListingTypeNameFromBd(responseDTO.getListing_type_id()).getName());
         return responseDTO;
     }
 

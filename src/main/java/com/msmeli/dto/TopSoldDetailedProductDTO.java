@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -15,8 +17,10 @@ import lombok.Setter;
 public class TopSoldDetailedProductDTO {
 
     private String id;
-    private String status;
+    private String permalink;
     private int sold_quantity;
     private String name;
     private BuyBoxWinnerResponseDTO buy_box_winner;
+    private List<PicturesDTO> pictures;
+    private List<AttributesDTO> attributes;
 }

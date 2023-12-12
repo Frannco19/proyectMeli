@@ -12,7 +12,10 @@ import com.msmeli.repository.RoleRepository;
 import com.msmeli.repository.StockRepository;
 import com.msmeli.repository.SupplierRepository;
 import com.msmeli.repository.UserEntityRepository;
-import com.msmeli.service.services.*;
+import com.msmeli.service.services.GeneralCategoryService;
+import com.msmeli.service.services.ItemService;
+import com.msmeli.service.services.SellerService;
+import com.msmeli.service.services.StockService;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
@@ -64,11 +67,11 @@ public class DataInitializer {
     }
 
 
-    public void defaultUser() throws AlreadyExistsException, ResourceNotFoundException {
+   /* public void defaultUser() throws AlreadyExistsException, ResourceNotFoundException {
         if (userEntityRepository.findAll().isEmpty()) {
-            sellerService.createUser(new UserRegisterRequestDTO("user1", "123456", "123456", "mt.soporte.usuario@gmail.com", 1));
+            sellerService.createSeller(new UserRegisterRequestDTO("user1", "123456", "123456", "mt.soporte.usuario@gmail.com", 1));
         }
-    }
+    }*/
 
     public void defaultRoles() {
         if (roleRepository.findAll().isEmpty()) {
@@ -90,12 +93,11 @@ public class DataInitializer {
     @EventListener(ApplicationReadyEvent.class)
     @Order(5)
     public void fillBd() throws AlreadyExistsException, ResourceNotFoundException, IOException {
-        defaultSeller();
-        defaultSupplier();
+
+
         defaultRoles();
-        defaultUser();
-        defaulStock();
-        itemService.createProductsCosts();
-        categoryService.createAll();
+
+
+
     }
 }

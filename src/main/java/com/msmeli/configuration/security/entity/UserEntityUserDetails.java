@@ -10,11 +10,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class UserEntityUserDetails implements UserDetails {
+    private final Long id;
     private final String username;
     private final String password;
     private final List<GrantedAuthority> authorities;
+    private final UserEntity userEntity;
 
     public UserEntityUserDetails(UserEntity userEntity) {
+        this.userEntity = userEntity;
+        id = userEntity.getId();
         username = userEntity.getUsername();
         password = userEntity.getPassword();
         authorities = userEntity.getRoles().stream().map(roleEntity -> new SimpleGrantedAuthority(roleEntity.getName().name())).collect(Collectors.toList());
@@ -53,5 +57,9 @@ public class UserEntityUserDetails implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+    public Long getId() {return id;}
+    public UserEntity getUserEntity() {
+        return userEntity;
     }
 }
