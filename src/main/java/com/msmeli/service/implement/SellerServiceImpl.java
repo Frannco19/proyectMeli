@@ -112,6 +112,54 @@ public class SellerServiceImpl implements SellerService {
 
     }
 
+    /**
+     * Actualiza el Token de MercadoLibre dentro de la entidad Seller.
+     *
+     * @param TG Token generado por MercadoLibre que se utilizará para obtener el nuevo token de acceso.
+     * @return tokenResposeDTO que contiene la respuesta del proceso de actualización del token.
+     * @throws NoSuchElementException Si no se encuentra al Seller en la base de datos.
+     */
+    @Override
+    public TokenResposeDTO updateToken(String TG) {
+        Long id = getAuthenticatedUserId();
+        SellerRefactor seller = sellerRefactorRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("No se encontró el seller en la base de datos"));
+        TokenRequestDTO tokenRequestDTO = new TokenRequestDTO().builder()
+                .code(TG)
+                .client_secret(meliClientSecret)
+                .client_id(meliClientId)
+                .redirect_uri(meliRedirectUri)
+                .code_verifier("123")
+                .grant_type(meliGrantType).build();
+        TokenResposeDTO tokenResposeDTO = meliFeignClient.tokenForTG(tokenRequestDTO);
+
+        // Actualizar el token y otros detalles si es necesario
+        seller.setTokenMl(tokenResposeDTO.getAccess_token());
+        seller.setRefreshToken(tokenResposeDTO.getRefresh_token());
+        seller.setMeliID(tokenResposeDTO.getUser_id());
+        sellerRefactorRepository.save(seller);
+
+        return tokenResposeDTO;
+    }
+
+    /**
+     * Actualiza el Access Token de MercadoLibre dentro de la entidad Seller.
+     *
+     * @param newAccessToken Nuevo Access Token a ser almacenado.
+     * @throws NoSuchElementException Si no se encuentra al Seller en la base de datos.
+     */
+    @Override
+    public void updateAccessToken(String newAccessToken) {
+        Long id = getAuthenticatedUserId();
+        SellerRefactor seller = sellerRefactorRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("No se encontró el seller en la base de datos"));
+
+        // Actualizar el access token si es necesario
+        seller.setTokenMl(newAccessToken);
+        sellerRefactorRepository.save(seller);
+    }
+
+
     @Override
     public SellerRefactor findById(Long id) throws ResourceNotFoundException {
         return sellerRefactorRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException(NOT_FOUND));
