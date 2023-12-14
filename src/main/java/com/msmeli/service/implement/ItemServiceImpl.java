@@ -199,7 +199,8 @@ public class ItemServiceImpl implements ItemService {
         if (results.getContent().isEmpty()) throw new ResourceNotFoundException("No hay items con esos parametros");
         return results.map(item -> {
             ItemResponseDTO itemDTO = getItemResponseDTO(item);
-            itemDTO = calculateColor(itemDTO);
+            //TODO No se puede tratar si no tenemos costos y product-ID
+           // itemDTO = calculateColor(itemDTO);
             return itemDTO;
         });
     }
