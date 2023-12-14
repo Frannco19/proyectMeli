@@ -185,6 +185,7 @@ public class MeliService {
                 item.setBest_seller_position(getBestSellerPosition(e.getId(), e.getCatalog_product_id()));
                 item.setCatalog_position(getCatalogPosition(e.getId(), e.getCatalog_product_id()));
 
+
                 String description = "";
                 try {
                     if (item.getCatalog_product_id() == null)
@@ -280,6 +281,7 @@ public class MeliService {
         return meliFeignClient.getItemFee(price, category_id, listing_type_id);
     }
 
+
     public List<GeneralCategory> findGeneralCategories() {
         ArrayList<String> categoriesNotIncluded = new ArrayList<>(Arrays.asList("MLA1540", "MLA1459", "MLA2547", "MLA1743", "MLA1430"));
         return meliFeignClient.getGeneralCategory().stream().filter(category -> !categoriesNotIncluded.contains(category.getId())).toList();
@@ -292,4 +294,5 @@ public class MeliService {
     public TopSoldDetailedProductDTO getTopProductDetails(String id) {
         return meliFeignClient.getTopProductDetails(id);
     }
+
 }
