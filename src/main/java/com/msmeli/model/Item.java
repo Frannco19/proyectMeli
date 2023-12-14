@@ -41,13 +41,10 @@ public class Item {
     private String status;
 
     @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime update_date_db;
-
-    @Temporal(TemporalType.TIMESTAMP)
     private Date created_date_item;
 
     @Temporal(TemporalType.TIMESTAMP)
-    private Date updated_date_item;
+    private LocalDateTime updated_date_item;
 
     private String status_condition;
 
