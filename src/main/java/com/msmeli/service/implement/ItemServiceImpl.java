@@ -26,7 +26,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -115,6 +117,7 @@ public class ItemServiceImpl implements ItemService {
         for (String id : idsItems){
                 ItemFeignDTO itemRespose = meliFeignClient.getItemAtributtesRe(id,"Bearer " + seller.getTokenMl());
                 Item item = mapper.map(itemRespose, Item.class);
+                item.setUpdated_date_item(LocalDateTime.now());
                 item.setSellerRefactor(seller);
                 itemList.add(item);
             }
