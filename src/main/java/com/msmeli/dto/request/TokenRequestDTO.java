@@ -14,4 +14,5 @@ public class TokenRequestDTO {
     private String code;
     private String redirect_uri;
     private String code_verifier;
+    private String refresh_token;
 }
