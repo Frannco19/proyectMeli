@@ -65,11 +65,12 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http.csrf().disable()
-                .authorizeHttpRequests()
-                .requestMatchers("/meli/user/**", "/item/**", "/v3/api-docs/**", "/swagger-ui/**", "/v2/api-docs/**", "/swagger-resources/**","/stock/**","/meli/supplier/**","/metrics/**").permitAll()
+        return http.cors()
                 .and()
-                .authorizeHttpRequests().anyRequest().authenticated()
+                .csrf().disable()
+                .authorizeHttpRequests()
+                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**","/auth/register-seller","/auth/login").permitAll()
+                .anyRequest().authenticated()
                 .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)

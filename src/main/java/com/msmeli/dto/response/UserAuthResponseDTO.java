@@ -1,7 +1,10 @@
 package com.msmeli.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.msmeli.model.RoleEntity;
 import lombok.*;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -15,4 +18,5 @@ public class UserAuthResponseDTO {
     private String email;
     private String token;
     private String refreshToken;
+    private List<RoleEntity> roles;
 }

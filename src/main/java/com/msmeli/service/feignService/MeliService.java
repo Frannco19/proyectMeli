@@ -138,7 +138,7 @@ public class MeliService {
         return null;
     }
 
-    @EventListener(ApplicationReadyEvent.class)
+    /*@EventListener(ApplicationReadyEvent.class)
     @Order(3)
     public void saveListingTypes() {
 
@@ -151,9 +151,9 @@ public class MeliService {
         });
 
         listingTypeRepository.saveAll(listingTypes);
-    }
+    }*/
 
-    @EventListener(ApplicationReadyEvent.class)
+    /*@EventListener(ApplicationReadyEvent.class)
     @Order(4)
     public void saveSellerItems() {
         int offset = 0;
@@ -185,6 +185,7 @@ public class MeliService {
                 item.setBest_seller_position(getBestSellerPosition(e.getId(), e.getCatalog_product_id()));
                 item.setCatalog_position(getCatalogPosition(e.getId(), e.getCatalog_product_id()));
 
+
                 String description = "";
                 try {
                     if (item.getCatalog_product_id() == null)
@@ -204,8 +205,13 @@ public class MeliService {
             itemRepository.saveAll(items);
 
             offset = offset + 50;
+<<<<<<< HEAD
       //  } while (!responseDTO.getResults().isEmpty());
     }
+=======
+        } while (!responseDTO.getResults().isEmpty());
+    }*/
+>>>>>>> 6d591c02e0c4311e844a9f708d6be9ada6cbab21
 
     public ItemCatalogDTO getSellerItemCatalog(String product_catalog_id, int limit, int page) {
         /*el paginado de la api de meli funciona por offset(a partir de que elemento) y no por pagina.*/
@@ -280,6 +286,7 @@ public class MeliService {
         return meliFeignClient.getItemFee(price, category_id, listing_type_id);
     }
 
+
     public List<GeneralCategory> findGeneralCategories() {
         ArrayList<String> categoriesNotIncluded = new ArrayList<>(Arrays.asList("MLA1540", "MLA1459", "MLA2547", "MLA1743", "MLA1430"));
         return meliFeignClient.getGeneralCategory().stream().filter(category -> !categoriesNotIncluded.contains(category.getId())).toList();
@@ -292,4 +299,5 @@ public class MeliService {
     public TopSoldDetailedProductDTO getTopProductDetails(String id) {
         return meliFeignClient.getTopProductDetails(id);
     }
+
 }
