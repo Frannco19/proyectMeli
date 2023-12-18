@@ -33,6 +33,10 @@ public interface SellerService {
 
     TokenResposeDTO saveToken(String TG);
 
+    TokenResposeDTO updateToken(String TG);
+
+    void updateAccessToken(String newAccessToken);
+
     SellerRefactor findById(Long id) throws ResourceNotFoundException;
 
     List<Employee> getEmployeesBySellerId(Long sellerId);

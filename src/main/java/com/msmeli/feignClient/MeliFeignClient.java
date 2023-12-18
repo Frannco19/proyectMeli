@@ -82,6 +82,7 @@ public interface MeliFeignClient {
     DescriptionProductDTO getProductDescription(@PathVariable String itemId);
 
     @GetMapping("/sites/MLA/categories")
+
     List<GeneralCategory> getGeneralCategory();
 
     @GetMapping("/highlights/MLA/category/{id}")
@@ -89,6 +90,7 @@ public interface MeliFeignClient {
 
     @GetMapping("/products/{productId}")
     TopSoldDetailedProductDTO getTopProductDetails(@PathVariable String productId);
+
 
     @PostMapping("/oauth/token")
     TokenResposeDTO tokenForTG(@RequestBody TokenRequestDTO tokenRequestDTO);
@@ -98,4 +100,5 @@ public interface MeliFeignClient {
             @PathVariable("userId") int userId,
             @RequestHeader("Authorization") String authorization
     );
+
 }

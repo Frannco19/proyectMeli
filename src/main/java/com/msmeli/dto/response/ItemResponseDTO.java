@@ -35,6 +35,7 @@ public class ItemResponseDTO {
     private String status_condition;
     private String image_url;
     private String sku;
+    private String gtin;
     @JsonFormat(pattern = "dd-MM-yyyy")
     private Date created_date_item;
     @JsonFormat(pattern = "dd-MM-yyyy")
