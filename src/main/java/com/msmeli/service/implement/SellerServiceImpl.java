@@ -217,4 +217,5 @@ public class SellerServiceImpl implements SellerService {
     public List<Employee> getAllEmployees() {
         return employeeRepository.findAll();
     }
+
 }
