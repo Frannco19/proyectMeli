@@ -45,4 +45,5 @@ public interface SellerService {
     Map<String, Object> getEmployeesInfoBySellerId(Long sellerId);
 
     List<Employee> getAllEmployees();
+
 }
