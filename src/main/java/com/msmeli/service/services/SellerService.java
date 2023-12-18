@@ -8,10 +8,12 @@ import com.msmeli.dto.response.TokenResposeDTO;
 import com.msmeli.dto.response.UserResponseDTO;
 import com.msmeli.exception.AlreadyExistsException;
 import com.msmeli.exception.ResourceNotFoundException;
+import com.msmeli.model.Employee;
 import com.msmeli.model.Seller;
 import com.msmeli.model.SellerRefactor;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface SellerService {
@@ -33,6 +35,10 @@ public interface SellerService {
 
     SellerRefactor findById(Long id) throws ResourceNotFoundException;
 
+    List<Employee> getEmployeesBySellerId(Long sellerId);
 
 
+    Map<String, Object> getEmployeesInfoBySellerId(Long sellerId);
+
+    List<Employee> getAllEmployees();
 }

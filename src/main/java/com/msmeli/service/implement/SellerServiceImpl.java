@@ -10,8 +10,10 @@ import com.msmeli.dto.response.UserResponseDTO;
 import com.msmeli.exception.AlreadyExistsException;
 import com.msmeli.exception.ResourceNotFoundException;
 import com.msmeli.feignClient.MeliFeignClient;
+import com.msmeli.model.Employee;
 import com.msmeli.model.Seller;
 import com.msmeli.model.SellerRefactor;
+import com.msmeli.repository.EmployeeRepository;
 import com.msmeli.repository.SellerRefactorRepository;
 import com.msmeli.repository.SellerRepository;
 import com.msmeli.service.services.SellerService;
@@ -22,9 +24,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class SellerServiceImpl implements SellerService {
@@ -33,6 +33,8 @@ public class SellerServiceImpl implements SellerService {
     private final SellerRefactorRepository sellerRefactorRepository;
     private final MeliFeignClient meliFeignClient;
     private final UserEntityService userEntityService;
+    private final EmployeeRepository employeeRepository;
+
     private ModelMapper mapper;
     private static final String NOT_FOUND = "Seller no encontrado.";
     @Value("${meli.grantType}")
@@ -47,11 +49,12 @@ public class SellerServiceImpl implements SellerService {
     private String meliRedirectUri;
 
 
-    public SellerServiceImpl(SellerRepository sellerRepository, SellerRefactorRepository sellerRefactorRepository, MeliFeignClient meliFeignClient, UserEntityService userEntityService, ModelMapper mapper) {
+    public SellerServiceImpl(SellerRepository sellerRepository, SellerRefactorRepository sellerRefactorRepository, MeliFeignClient meliFeignClient, UserEntityService userEntityService, EmployeeRepository employeeRepository, ModelMapper mapper) {
         this.sellerRepository = sellerRepository;
         this.sellerRefactorRepository = sellerRefactorRepository;
         this.meliFeignClient = meliFeignClient;
         this.userEntityService = userEntityService;
+        this.employeeRepository = employeeRepository;
         this.mapper = mapper;
     }
 
@@ -136,5 +139,34 @@ public class SellerServiceImpl implements SellerService {
         } else {
             return null;
         }
+    }
+
+    @Override
+    public List<Employee> getEmployeesBySellerId(Long sellerId) {
+        SellerRefactor seller = null;
+        try {
+            seller = sellerRefactorRepository.findById(sellerId)
+                    .orElseThrow(() -> new ResourceNotFoundException("No se encontró el vendedor en la base de datos"));
+        } catch (ResourceNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        return seller.getEmployees();
+    }
+
+    @Override
+    public Map<String, Object> getEmployeesInfoBySellerId(Long sellerId) {
+        List<Employee> employees = getEmployeesBySellerId(sellerId);
+        int totalEmployees = employees.size();
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("employees", employees);
+        result.put("totalEmployees", totalEmployees);
+
+        return result;
+    }
+
+    @Override
+    public List<Employee> getAllEmployees() {
+        return employeeRepository.findAll();
     }
 }

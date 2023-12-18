@@ -2,12 +2,14 @@ package com.msmeli.controller;
 
 
 import com.msmeli.exception.ResourceNotFoundException;
+import com.msmeli.model.Employee;
 import com.msmeli.service.services.ItemService;
 import com.msmeli.service.services.SellerService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/seller")
@@ -30,5 +32,17 @@ public class SellerController {
     public void prueba() throws ResourceNotFoundException {
         itemService.saveAllItemForSeller();
 
+    }
+
+    @GetMapping("/employeesInfo/{sellerId}")
+    public ResponseEntity<Map<String, Object>> getEmployeesInfoBySellerId(@PathVariable Long sellerId) {
+        Map<String, Object> employeesInfo = sellerService.getEmployeesInfoBySellerId(sellerId);
+        return ResponseEntity.ok(employeesInfo);
+    }
+
+    @GetMapping("/employees/all")
+    public ResponseEntity<List<Employee>> getAllEmployees() {
+        List<Employee> employees = sellerService.getAllEmployees();
+        return ResponseEntity.ok(employees);
     }
 }
