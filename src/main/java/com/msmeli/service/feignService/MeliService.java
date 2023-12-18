@@ -205,13 +205,9 @@ public class MeliService {
             itemRepository.saveAll(items);
 
             offset = offset + 50;
-<<<<<<< HEAD
-      //  } while (!responseDTO.getResults().isEmpty());
-    }
-=======
         } while (!responseDTO.getResults().isEmpty());
     }*/
->>>>>>> 6d591c02e0c4311e844a9f708d6be9ada6cbab21
+
 
     public ItemCatalogDTO getSellerItemCatalog(String product_catalog_id, int limit, int page) {
         /*el paginado de la api de meli funciona por offset(a partir de que elemento) y no por pagina.*/
