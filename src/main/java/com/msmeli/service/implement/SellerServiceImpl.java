@@ -115,6 +115,24 @@ public class SellerServiceImpl implements SellerService {
 
     }
 
+    public TokenResposeDTO refreshToken() {
+        Long id = getAuthenticatedUserId();
+        SellerRefactor seller = sellerRefactorRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("No se encontró el seller en la base de datos"));
+
+        TokenRequestDTO tokenRequestDTO = new TokenRequestDTO().builder()
+                .refresh_token(seller.getRefreshToken())
+                .client_id(meliClientId)
+                .client_secret(meliClientSecret)
+                .redirect_uri(meliRedirectUri)
+                .grant_type("refresh_token")
+                .build();
+
+        return meliFeignClient.refreshToken(tokenRequestDTO);
+    }
+
+
+
     /**
      * Actualiza el Token de MercadoLibre dentro de la entidad Seller.
      *
