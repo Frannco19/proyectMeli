@@ -100,5 +100,6 @@ public interface MeliFeignClient {
             @PathVariable("userId") int userId,
             @RequestHeader("Authorization") String authorization
     );
-
+    @PostMapping("/oauth/token")
+    TokenResposeDTO refreshToken(TokenRequestDTO tokenRequestDTO);
 }
