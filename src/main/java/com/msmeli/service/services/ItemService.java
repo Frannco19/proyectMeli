@@ -2,6 +2,7 @@ package com.msmeli.service.services;
 
 import com.msmeli.dto.response.ItemResponseDTO;
 import com.msmeli.dto.response.OneProductResponseDTO;
+import com.msmeli.exception.AppException;
 import com.msmeli.exception.ResourceNotFoundException;
 import com.msmeli.model.Item;
 import org.springframework.data.domain.Page;
@@ -22,7 +23,7 @@ public interface ItemService {
 
     Item save(Item item);
 
-    Page<ItemResponseDTO> searchProducts(String searchType, String searchInput, int offset, int pageSize, boolean isCatalogue, String isActive) throws ResourceNotFoundException;
+    Page<ItemResponseDTO> searchProducts(String searchType, String searchInput, int offset, int pageSize, boolean isCatalogue, String isActive) throws ResourceNotFoundException, AppException;
 
     void createProductsCosts();
 
