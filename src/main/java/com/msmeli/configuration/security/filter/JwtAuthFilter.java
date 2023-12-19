@@ -37,10 +37,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String token = null;
         String username = null;
         try {
-            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            validateAuthHeader(authHeader);
                 token = authHeader.substring(7);
                 username = jwtService.extractUsername(token);
-            }
+
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = userEntityUserDetailsService.loadUserByUsername(username);
                 if (jwtService.validateToken(token, userDetails)) {
@@ -54,5 +54,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    private void validateAuthHeader(String authHeader){
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            throw new SecurityException("El encabezado de autenticación es nulo o no tiene el formato esperado","JWT TOKEN",000);
+        }
     }
 }
