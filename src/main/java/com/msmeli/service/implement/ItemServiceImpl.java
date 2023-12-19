@@ -7,6 +7,7 @@ import com.msmeli.dto.response.BuyBoxWinnerResponseDTO;
 import com.msmeli.dto.response.CostResponseDTO;
 import com.msmeli.dto.response.ItemResponseDTO;
 import com.msmeli.dto.response.OneProductResponseDTO;
+import com.msmeli.exception.AppException;
 import com.msmeli.exception.ResourceNotFoundException;
 import com.msmeli.feignClient.MeliFeignClient;
 import com.msmeli.model.*;
@@ -190,16 +191,17 @@ public class ItemServiceImpl implements ItemService {
      * @throws ResourceNotFoundException
      */
     @Override
-    public Page<ItemResponseDTO> searchProducts(String searchType, String searchInput, int offset, int pageSize, boolean isCatalogue, String isActive) throws ResourceNotFoundException {
+    public Page<ItemResponseDTO> searchProducts(String searchType, String searchInput, int offset, int pageSize, boolean isCatalogue, String isActive) throws ResourceNotFoundException, AppException {
         Long idSeller = userEntityService.getAuthenticatedUserId();
         SellerRefactor seller = sellerService.findById(idSeller);
         Pageable pageable = PageRequest.of(offset, pageSize);
         int inCatalogue = isCatalogue ? -1 : -2;
         Page<Item> results = itemRepository.findByFilters("%" + searchInput.toUpperCase() + "%", searchType, inCatalogue, isActive,seller, pageable);
-        if (results.getContent().isEmpty()) throw new ResourceNotFoundException("No hay items con esos parametros");
+        if (results.getContent().isEmpty()) throw new AppException("No Content","/search->searchProduct",  000, 204);
         return results.map(item -> {
             ItemResponseDTO itemDTO = getItemResponseDTO(item);
-            itemDTO = calculateColor(itemDTO);
+            //TODO No se puede tratar si no tenemos costos y product-ID
+           // itemDTO = calculateColor(itemDTO);
             return itemDTO;
         });
     }
