@@ -46,24 +46,5 @@ public class SellerController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-
-    @PostMapping("/update-token")
-    public ResponseEntity<TokenResposeDTO> updateToken(@RequestParam String TG) {
-        try {
-            TokenResposeDTO updatedToken = sellerService.updateToken(TG);
-            return new ResponseEntity<>(updatedToken, HttpStatus.OK);
-        } catch (NoSuchElementException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }
-
-    @PostMapping("/update-access-token")
-    public ResponseEntity<String> updateAccessToken(@RequestParam String newAccessToken) {
-        try {
-            sellerService.updateAccessToken(newAccessToken);
-            return new ResponseEntity<>("Access Token actualizado exitosamente.", HttpStatus.OK);
-        } catch (NoSuchElementException e) {
-            return new ResponseEntity<>("No se encontró al vendedor en la base de datos.", HttpStatus.NOT_FOUND);
-        }
-    }
+    
 }
