@@ -5,6 +5,7 @@ import com.msmeli.dto.request.EmployeeRegisterRequestDTO;
 import com.msmeli.dto.request.SellerRequestDTO;
 import com.msmeli.dto.request.TokenRequestDTO;
 import com.msmeli.dto.request.UserRegisterRequestDTO;
+import com.msmeli.dto.response.EmployeesResponseDto;
 import com.msmeli.dto.response.TokenResposeDTO;
 import com.msmeli.dto.response.UserResponseDTO;
 import com.msmeli.exception.AlreadyExistsException;
@@ -13,6 +14,7 @@ import com.msmeli.feignClient.MeliFeignClient;
 import com.msmeli.model.Employee;
 import com.msmeli.model.Seller;
 import com.msmeli.model.SellerRefactor;
+import com.msmeli.model.Stock;
 import com.msmeli.repository.EmployeeRepository;
 import com.msmeli.repository.SellerRefactorRepository;
 import com.msmeli.repository.SellerRepository;
@@ -25,6 +27,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class SellerServiceImpl implements SellerService {
@@ -208,32 +211,26 @@ public class SellerServiceImpl implements SellerService {
     }
 
     @Override
-    public List<Employee> getEmployeesBySellerId(Long sellerId) {
-        SellerRefactor seller = null;
-        try {
-            seller = sellerRefactorRepository.findById(sellerId)
-                    .orElseThrow(() -> new ResourceNotFoundException("No se encontró el vendedor en la base de datos"));
-        } catch (ResourceNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        return seller.getEmployees();
+    public List<EmployeesResponseDto> getEmployeesBySellerId() throws ResourceNotFoundException {
+        Long idSeller = getAuthenticatedUserId();
+        SellerRefactor seller = findById(idSeller);
+        List<Employee> employeeList = seller.getEmployees();
+
+        List<EmployeesResponseDto> employeesListDTO = employeeList.stream()
+                .map(employee -> mapper.map(employee, EmployeesResponseDto.class))
+                .collect(Collectors.toList());
+
+        return employeesListDTO;
     }
 
-    @Override
-    public Map<String, Object> getEmployeesInfoBySellerId(Long sellerId) {
-        List<Employee> employees = getEmployeesBySellerId(sellerId);
-        int totalEmployees = employees.size();
+     @Override
+    public List<EmployeesResponseDto> getAllEmployees() {
+        List<Employee> allEmployees = employeeRepository.findAll();
 
-        Map<String, Object> result = new HashMap<>();
-        result.put("employees", employees);
-        result.put("totalEmployees", totalEmployees);
+        List<EmployeesResponseDto> employeesListDTO = allEmployees.stream()
+                .map(employee -> mapper.map(employee, EmployeesResponseDto.class))
+                .collect(Collectors.toList());
 
-        return result;
+        return employeesListDTO;
     }
-
-    @Override
-    public List<Employee> getAllEmployees() {
-        return employeeRepository.findAll();
-    }
-
 }

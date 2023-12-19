@@ -1,6 +1,7 @@
 package com.msmeli.controller;
 
 
+import com.msmeli.dto.response.EmployeesResponseDto;
 import com.msmeli.dto.response.TokenResposeDTO;
 import com.msmeli.exception.ResourceNotFoundException;
 import com.msmeli.model.Employee;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/seller")
@@ -73,15 +75,16 @@ public class SellerController {
         }
     }
 
-    @GetMapping("/employeesInfo/{sellerId}")
-    public ResponseEntity<Map<String, Object>> getEmployeesInfoBySellerId(@PathVariable Long sellerId) {
-        Map<String, Object> employeesInfo = sellerService.getEmployeesInfoBySellerId(sellerId);
-        return ResponseEntity.ok(employeesInfo);
+        @GetMapping("/getEmployeesBySellerId")
+    public ResponseEntity<List<EmployeesResponseDto>> getEmployeesBySellerId() throws ResourceNotFoundException {
+        List<EmployeesResponseDto> employeesList = sellerService.getEmployeesBySellerId();
+        return ResponseEntity.ok(employeesList);
     }
 
-    @GetMapping("/employees/all")
-    public ResponseEntity<List<Employee>> getAllEmployees() {
-        List<Employee> employees = sellerService.getAllEmployees();
-        return ResponseEntity.ok(employees);
+    @GetMapping("/getAllEmployees")
+    public ResponseEntity<List<EmployeesResponseDto>> getAllEmployees() {
+        List<EmployeesResponseDto> employeesList = sellerService.getAllEmployees();
+        return ResponseEntity.ok(employeesList);
     }
+
 }

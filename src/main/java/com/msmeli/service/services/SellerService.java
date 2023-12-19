@@ -2,8 +2,8 @@ package com.msmeli.service.services;
 
 import com.msmeli.dto.request.EmployeeRegisterRequestDTO;
 import com.msmeli.dto.request.SellerRequestDTO;
-import com.msmeli.dto.request.TokenRequestDTO;
 import com.msmeli.dto.request.UserRegisterRequestDTO;
+import com.msmeli.dto.response.EmployeesResponseDto;
 import com.msmeli.dto.response.TokenResposeDTO;
 import com.msmeli.dto.response.UserResponseDTO;
 import com.msmeli.exception.AlreadyExistsException;
@@ -38,4 +38,22 @@ public interface SellerService {
     SellerRefactor findById(Long id) throws ResourceNotFoundException;
 
     TokenResposeDTO refreshToken();
+
+    List<EmployeesResponseDto> getEmployeesBySellerId() throws ResourceNotFoundException;
+
+    //    @Override
+    //    public List<Employee> getEmployeesBySellerId(Long sellerId) {
+    //        SellerRefactor seller = null;
+    //        try {
+    //            seller = sellerRefactorRepository.findById(sellerId)
+    //                    .orElseThrow(() -> new ResourceNotFoundException("No se encontró el vendedor en la base de datos"));
+    //        } catch (ResourceNotFoundException e) {
+    //            throw new RuntimeException(e);
+    //        }
+    //        return seller.getEmployees();
+    //    }
+    //
+    //
+    //
+    List<EmployeesResponseDto> getAllEmployees();
 }
