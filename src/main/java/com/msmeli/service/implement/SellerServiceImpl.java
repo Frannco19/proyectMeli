@@ -55,17 +55,50 @@ public class SellerServiceImpl implements SellerService {
         this.mapper = mapper;
     }
 
+    /**
+     * Recupera la información de un vendedor mediante su ID.
+     *
+     * Este método busca y devuelve un Optional que puede contener la información del vendedor
+     * correspondiente al ID proporcionado. Si no se encuentra un vendedor con el ID dado,
+     * el Optional estará vacío.
+     *
+     * @param id Identificador único del vendedor.
+     * @return Optional<Seller> Un Optional que puede contener la información del vendedor correspondiente al ID proporcionado.
+     *                         Si no se encuentra un vendedor con el ID dado, el Optional estará vacío.
+     */
     @Override
     public Optional<Seller> getSeller(Integer id) {
         return sellerRepository.findById(id);
     }
 
+    /**
+     * Crea un nuevo vendedor en el sistema utilizando la información proporcionada en la solicitud.
+     *
+     * Este método utiliza un objeto SellerRequestDTO para mapear los datos de la solicitud a un objeto Seller
+     * y luego guarda el nuevo vendedor en el repositorio de vendedores.
+     *
+     * @param sellerRequestDTO La información de la solicitud que contiene los detalles del nuevo vendedor.
+     * @return Seller El objeto que representa al vendedor recién creado y almacenado en el sistema.
+     */
     @Override
     public Seller create(SellerRequestDTO sellerRequestDTO) {
         Seller seller = mapper.map(sellerRequestDTO, Seller.class);
         return sellerRepository.save(seller);
     }
 
+    /**
+     * Crea un nuevo vendedor en el sistema utilizando la información proporcionada en la solicitud.
+     *
+     * Este método delega la creación del nuevo vendedor al servicio de entidades de usuario
+     * y devuelve un objeto UserResponseDTO que contiene la información del vendedor recién creado.
+     *
+     * @param userRegisterRequestDTO La información de la solicitud que contiene los detalles del nuevo vendedor.
+     * @return UserResponseDTO Un objeto que representa la respuesta con la información del vendedor recién creado.
+     * @throws ResourceNotFoundException Si ocurre un error al buscar recursos necesarios para la creación del vendedor,
+     *                                    se lanza una excepción ResourceNotFoundException con un mensaje explicativo.
+     * @throws AlreadyExistsException Si ya existe un vendedor con la misma información proporcionada en la solicitud,
+     *                                se lanza una excepción AlreadyExistsException con un mensaje explicativo.
+     */
     @Override
     public UserResponseDTO createSeller(UserRegisterRequestDTO userRegisterRequestDTO) throws ResourceNotFoundException, AlreadyExistsException {
         //Seller seller = sellerRepository.findById(userRegisterRequestDTO.getSeller_id()).orElseThrow(() -> new ResourceNotFoundException(NOT_FOUND));
@@ -73,11 +106,32 @@ public class SellerServiceImpl implements SellerService {
         return userEntityService.createSeller(userRegisterRequestDTO);
     }
 
+    /**
+     * Crea un nuevo empleado en el sistema utilizando la información proporcionada en la solicitud.
+     *
+     * Este método delega la creación del nuevo empleado al servicio de entidades de usuario
+     * y devuelve un objeto UserResponseDTO que contiene la información del empleado recién creado.
+     *
+     * @param employeeRegisterDTO La información de la solicitud que contiene los detalles del nuevo empleado.
+     * @return UserResponseDTO Un objeto que representa la respuesta con la información del empleado recién creado.
+     * @throws ResourceNotFoundException Si ocurre un error al buscar recursos necesarios para la creación del empleado,
+     *                                    se lanza una excepción ResourceNotFoundException con un mensaje explicativo.
+     * @throws AlreadyExistsException Si ya existe un empleado con la misma información proporcionada en la solicitud,
+     *                                se lanza una excepción AlreadyExistsException con un mensaje explicativo.
+     */
     @Override
     public UserResponseDTO createEmployee(EmployeeRegisterRequestDTO employeeRegisterDTO) throws ResourceNotFoundException, AlreadyExistsException {
         return userEntityService.createEmployee(employeeRegisterDTO);
     }
 
+    /**
+     * Recupera una lista de todos los vendedores almacenados en el sistema.
+     *
+     * Este método consulta el repositorio de vendedores para obtener y devolver una lista que contiene
+     * todos los vendedores disponibles en el sistema.
+     *
+     * @return List<Seller> Una lista que contiene todos los vendedores almacenados en el sistema.
+     */
     @Override
     public List<Seller> findAll() {
         return sellerRepository.findAll();
@@ -111,7 +165,18 @@ public class SellerServiceImpl implements SellerService {
 
 
     }
-
+    /**
+     * Renueva el token de acceso para el vendedor autenticado.
+     *
+     * Este método recupera el ID del vendedor autenticado, busca la información del vendedor en la base de datos,
+     * y utiliza el token de actualización del vendedor para solicitar un nuevo token de acceso al servicio externo.
+     *
+     * @return TokenResposeDTO Un objeto que representa el nuevo token de acceso generado.
+     *
+     * @throws NoSuchElementException Si no se encuentra el vendedor en la base de datos con el ID proporcionado,
+     *                                se lanza una excepción NoSuchElementException con un mensaje indicando la ausencia
+     *                                del vendedor en la base de datos.
+     */
     public TokenResposeDTO refreshToken() {
         Long id = getAuthenticatedUserId();
         SellerRefactor seller = sellerRefactorRepository.findById(id)
@@ -177,22 +242,64 @@ public class SellerServiceImpl implements SellerService {
         sellerRefactorRepository.save(seller);
     }
 
-
+    /**
+     * Recupera la información del vendedor mediante su ID.
+     *
+     * Este método busca y devuelve la información del vendedor correspondiente al ID proporcionado.
+     *
+     * @param id Identificador único del vendedor.
+     * @return SellerRefactor La información del vendedor correspondiente al ID proporcionado.
+     * @throws ResourceNotFoundException Si no se encuentra un vendedor con el ID proporcionado,
+     *                                    se lanza una excepción ResourceNotFoundException con un mensaje
+     *                                    indicando que no se encontró el recurso.
+     */
     @Override
     public SellerRefactor findById(Long id) throws ResourceNotFoundException {
         return sellerRefactorRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException(NOT_FOUND));
     }
 
+    /**
+     * Recupera la información del vendedor mediante su ID.
+     *
+     * Este método busca y devuelve la información del vendedor correspondiente al ID proporcionado.
+     *
+     * @param id Identificador único del vendedor.
+     * @return Seller La información del vendedor correspondiente al ID proporcionado.
+     * @throws ResourceNotFoundException Si no se encuentra un vendedor con el ID proporcionado,
+     *                                    se lanza una excepción ResourceNotFoundException con un mensaje
+     *                                    indicando que no se encontró el recurso.
+     */
     @Override
     public Seller findById(Integer id) throws ResourceNotFoundException {
         return sellerRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException(NOT_FOUND));
     }
 
+    /**
+     * Recupera la información del vendedor mediante su ID único de vendedor.
+     *
+     * Este método busca y devuelve la información del vendedor correspondiente al ID único de vendedor proporcionado.
+     *
+     * @param sellerId ID único de vendedor que identifica de manera exclusiva a un vendedor.
+     * @return Seller La información del vendedor correspondiente al ID único de vendedor proporcionado.
+     * @throws ResourceNotFoundException Si no se encuentra un vendedor con el ID único de vendedor proporcionado,
+     *                                    se lanza una excepción ResourceNotFoundException con un mensaje
+     *                                    indicando que no se encontró el recurso.
+     */
     @Override
     public Seller findBySellerId(Long sellerId) throws ResourceNotFoundException {
         return sellerRepository.findBySellerId(sellerId).orElseThrow(()->new ResourceNotFoundException("No hay sellers con ese id."));
     }
 
+    /**
+     * Recupera el ID del usuario autenticado actualmente.
+     *
+     * Este método utiliza el contexto de seguridad de Spring para obtener la información de autenticación del usuario.
+     * Si el usuario está autenticado y la información principal es una instancia de UserEntityUserDetails,
+     * se devuelve el ID del usuario; de lo contrario, se devuelve null.
+     *
+     * @return Long El ID del usuario autenticado actualmente, o null si el usuario no está autenticado o
+     *              la información principal no es una instancia de UserEntityUserDetails.
+     */
     private Long getAuthenticatedUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
