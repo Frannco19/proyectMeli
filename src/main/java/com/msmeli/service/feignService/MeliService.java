@@ -161,7 +161,7 @@ public class MeliService {
         List<Item> items = new ArrayList<>();
 
 
-        do {
+       // do {
             items.clear();
 
             responseDTO = meliFeignClient.getSellerByNickname("MORO TECH", offset);
@@ -207,6 +207,7 @@ public class MeliService {
             offset = offset + 50;
         } while (!responseDTO.getResults().isEmpty());
     }*/
+
 
     public ItemCatalogDTO getSellerItemCatalog(String product_catalog_id, int limit, int page) {
         /*el paginado de la api de meli funciona por offset(a partir de que elemento) y no por pagina.*/
