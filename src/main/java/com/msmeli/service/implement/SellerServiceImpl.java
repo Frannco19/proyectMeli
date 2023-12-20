@@ -165,17 +165,25 @@ public class SellerServiceImpl implements SellerService {
 
 
     }
+    
     /**
      * Renueva el token de acceso para el vendedor autenticado.
-     *
-     * Este método recupera el ID del vendedor autenticado, busca la información del vendedor en la base de datos,
-     * y utiliza el token de actualización del vendedor para solicitar un nuevo token de acceso al servicio externo.
+     * <p>
+     * Este método realiza las siguientes acciones:
+     * 1. Obtiene el ID del vendedor autenticado.
+     * 2. Busca y recupera la información del vendedor desde la base de datos mediante el ID.
+     * 3. Construye una solicitud de actualización de token utilizando el refresh token del vendedor.
+     * 4. Realiza la solicitud de actualización del token mediante el MeliFeignClient.
+     * 5. Actualiza el nuevo refresh token y token de acceso en la entidad SellerRefactor.
+     * 6. Guarda la entidad actualizada en la base de datos.
+     * 7. Devuelve el objeto TokenResposeDTO que representa el nuevo token de acceso generado.
      *
      * @return TokenResposeDTO Un objeto que representa el nuevo token de acceso generado.
      *
-     * @throws NoSuchElementException Si no se encuentra el vendedor en la base de datos con el ID proporcionado,
-     *                                se lanza una excepción NoSuchElementException con un mensaje indicando la ausencia
-     *                                del vendedor en la base de datos.
+     * @throws NoSuchElementException Si no se encuentra el vendedor en la base de datos con el ID proporcionado.
+     * @throws IllegalStateException   Si la respuesta del MeliFeignClient es nula.
+     *                                 Se lanza esta excepción cuando la respuesta es nula para evitar posibles
+     *                                 NullPointerException al intentar acceder a sus propiedades.
      */
     public TokenResposeDTO refreshToken() {
         Long id = getAuthenticatedUserId();
@@ -190,7 +198,24 @@ public class SellerServiceImpl implements SellerService {
                 .grant_type("refresh_token")
                 .build();
 
-        return meliFeignClient.refreshToken(tokenRequestDTO);
+        // Realiza la solicitud de actualización del token mediante el FeignClient
+        TokenResposeDTO tokenResponse = meliFeignClient.refreshToken(tokenRequestDTO);
+
+        // Verifica si la respuesta es nula antes de intentar acceder a sus propiedades
+        if (tokenResponse != null) {
+            // Actualizar el nuevo refresh token y tokenML en la entidad SellerRefactor
+            seller.setRefreshToken(tokenResponse.getRefresh_token());
+            seller.setTokenMl(tokenResponse.getAccess_token());
+
+            // Guardar la entidad actualizada en la base de datos
+            sellerRefactorRepository.save(seller);
+        } else {
+            // Manejar la situación en la que la respuesta del FeignClient es nula
+            // Puedes lanzar una excepción, imprimir un mensaje de registro, etc.
+            throw new IllegalStateException("La respuesta del refreshToken de MeliFeignClient es nula");
+        }
+
+        return tokenResponse;
     }
 
     /**
