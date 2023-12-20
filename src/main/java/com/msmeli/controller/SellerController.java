@@ -1,11 +1,10 @@
 package com.msmeli.controller;
 
 
-<<<<<<< HEAD
 import com.msmeli.dto.request.EmployeeUpdateRequestDTO;
-=======
+
 import com.msmeli.dto.response.EmployeesResponseDto;
->>>>>>> bba0f1eea6de5ed291955afb0477259f221ca04e
+
 import com.msmeli.dto.response.TokenResposeDTO;
 import com.msmeli.dto.response.UserResponseDTO;
 import com.msmeli.exception.AlreadyExistsException;
@@ -13,15 +12,15 @@ import com.msmeli.exception.ResourceNotFoundException;
 import com.msmeli.model.Employee;
 import com.msmeli.service.services.ItemService;
 import com.msmeli.service.services.SellerService;
-<<<<<<< HEAD
+
 import com.msmeli.service.services.UserEntityService;
-=======
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
->>>>>>> bba0f1eea6de5ed291955afb0477259f221ca04e
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -85,7 +84,7 @@ public class SellerController {
         }
     }
 
-<<<<<<< HEAD
+
     @DeleteMapping("/eliminar/{employeeId}")
     public ResponseEntity<String> deleteEmployee(@PathVariable Long employeeId) {
         try {
@@ -110,7 +109,7 @@ public class SellerController {
     }
 
 
-=======
+
         @GetMapping("/getEmployeesBySellerId")
     public ResponseEntity<List<EmployeesResponseDto>> getEmployeesBySellerId() throws ResourceNotFoundException {
         List<EmployeesResponseDto> employeesList = sellerService.getEmployeesBySellerId();
@@ -123,5 +122,5 @@ public class SellerController {
         return ResponseEntity.ok(employeesList);
     }
 
->>>>>>> bba0f1eea6de5ed291955afb0477259f221ca04e
+
 }
