@@ -1,5 +1,7 @@
 package com.msmeli.service.feignService;
 
+import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPath;
 import com.msmeli.feignClient.MeliFeignClient;
 import com.msmeli.model.Category;
 import com.msmeli.model.Item;
@@ -111,6 +113,19 @@ public class MeliServiceTest {
             meliService.getSeller(sellerId);
         }, "Seller not found");
     }
+
+    @Test
+    public void testGetPositionMethod() {
+        // Arrange
+        DocumentContext documentContext = JsonPath.parse("{\"position\": 42}");
+
+        // Act
+        Integer result = meliService.getPositionMethod(documentContext);
+
+        // Assert
+        assertEquals(42, result);
+    }
+
 
 
 
