@@ -5,6 +5,7 @@ import com.msmeli.dto.ItemCatalogDTO;
 import com.msmeli.dto.response.BuyBoxWinnerResponseDTO;
 import com.msmeli.dto.response.ItemResponseDTO;
 import com.msmeli.dto.response.OneProductResponseDTO;
+import com.msmeli.exception.AppException;
 import com.msmeli.exception.ResourceNotFoundException;
 import com.msmeli.service.feignService.MeliService;
 import com.msmeli.service.services.ItemService;
@@ -49,7 +50,7 @@ public class ItemController {
             @RequestParam(value = "offset", defaultValue = "0") int offset,
             @RequestParam(value = "pageSize", defaultValue = "5") int pageSize,
             @RequestParam(value = "isActive", defaultValue = "null") String isActive
-    ) throws ResourceNotFoundException {
+    ) throws ResourceNotFoundException, AppException {
         return itemService.searchProducts(searchType, searchInput, offset, pageSize, isCatalogue, isActive);
     }
 

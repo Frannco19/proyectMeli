@@ -1,5 +1,6 @@
 package com.msmeli.configuration.security;
 
+import com.msmeli.configuration.security.filter.FilterChainExceptionHandler;
 import com.msmeli.configuration.security.filter.JwtAuthFilter;
 import com.msmeli.configuration.security.service.UserEntityUserDetailsService;
 import org.springframework.context.annotation.Bean;
@@ -27,9 +28,11 @@ import org.springframework.web.filter.CorsFilter;
 @EnableMethodSecurity
 public class SecurityConfig {
 
+    private final FilterChainExceptionHandler filterChainExceptionHandler;
     private final JwtAuthFilter jwtAuthFilter;
 
-    public SecurityConfig(JwtAuthFilter jwtAuthFilter) {
+    public SecurityConfig(FilterChainExceptionHandler filterChainExceptionHandler, JwtAuthFilter jwtAuthFilter) {
+        this.filterChainExceptionHandler = filterChainExceptionHandler;
         this.jwtAuthFilter = jwtAuthFilter;
     }
 
@@ -76,6 +79,7 @@ public class SecurityConfig {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authenticationProvider(authenticationProvider())
+                .addFilterBefore(filterChainExceptionHandler, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }

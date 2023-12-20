@@ -41,6 +41,16 @@ public class SellerController {
 
     }
 
+    @PostMapping("/refresh-token")
+    public ResponseEntity<TokenResposeDTO> refreshToken() {
+        try {
+            TokenResposeDTO refreshedToken = sellerService.refreshToken();
+            return new ResponseEntity<>(refreshedToken, HttpStatus.OK);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
     @PostMapping("/update-token")
     public ResponseEntity<TokenResposeDTO> updateToken(@RequestParam String TG) {
         try {

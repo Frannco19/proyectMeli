@@ -39,13 +39,7 @@ public class AuthController {
     }
     @PostMapping("/login")
     @Operation(summary = "Endpoint para autenticar usuario.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Devuelve el token y refreshToken del usuario.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = UserAuthResponseDTO.class))}),
-            @ApiResponse(responseCode = "400", description = "Solicitud erronea.", content = @Content),
-            @ApiResponse(responseCode = "404", description = "Usuario no registrado.", content = @Content),
-            @ApiResponse(responseCode = "500", description = "Error del servidor", content = @Content)})
     public ResponseEntity<UserAuthResponseDTO> login(@Valid @RequestBody AuthRequestDTO authRequestDTO) throws ResourceNotFoundException{
-        System.out.println("Estoy en el endpoid de logueo");
         Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequestDTO.getUsername(), authRequestDTO.getPassword()));
         if (authenticate.isAuthenticated()) {
             return ResponseEntity.status(HttpStatus.OK).body(userEntityService.userAuthenticateAndGetToken(authRequestDTO.getUsername()));
@@ -57,20 +51,12 @@ public class AuthController {
 
     @PostMapping("/register-seller")
     @Operation(summary = "Endpoint para crear Seller, se espera UserRegisterRequestDTO.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Usuario creado correctamente.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDTO.class))}),
-            @ApiResponse(responseCode = "400", description = "Solicitud erronea.", content = @Content),
-            @ApiResponse(responseCode = "500", description = "Error del servidor.", content = @Content)})
     public ResponseEntity<UserResponseDTO> registerSeller(@Valid @RequestBody UserRegisterRequestDTO userEntity) throws ResourceNotFoundException, AlreadyExistsException{
         return ResponseEntity.status(HttpStatus.CREATED).body(sellerService.createSeller(userEntity));
     }
 
     @PostMapping("/register-employee")
     @Operation(summary = "Endpoint para crear un Empleado se espera un UserRegisterRequestDTO")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Usuario creado correctamente.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDTO.class))}),
-            @ApiResponse(responseCode = "400", description = "Solicitud erronea.", content = @Content),
-            @ApiResponse(responseCode = "500", description = "Error del servidor.", content = @Content)})
     public ResponseEntity<UserResponseDTO>registerEmployee(@Valid @RequestBody EmployeeRegisterRequestDTO employeeRegisterDTO) throws ResourceNotFoundException, AlreadyExistsException {
         return ResponseEntity.status(HttpStatus.CREATED).body(sellerService.createEmployee(employeeRegisterDTO));
     }
