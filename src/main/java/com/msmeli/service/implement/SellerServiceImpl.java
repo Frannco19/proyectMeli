@@ -210,6 +210,12 @@ public class SellerServiceImpl implements SellerService {
         }
     }
 
+    /**
+     * Obtiene la lista de empleados asociados al vendedor autenticado.
+     *
+     * @return Lista de objetos EmployeesResponseDto que representan los empleados del vendedor.
+     * @throws ResourceNotFoundException Si no se encuentra el recurso asociado al vendedor.
+     */
     @Override
     public List<EmployeesResponseDto> getEmployeesBySellerId() throws ResourceNotFoundException {
         Long idSeller = getAuthenticatedUserId();
@@ -223,6 +229,11 @@ public class SellerServiceImpl implements SellerService {
         return employeesListDTO;
     }
 
+    /**
+     * Obtiene la lista de todos los empleados.
+     *
+     * @return Lista de objetos EmployeesResponseDto que representan todos los empleados.
+     */
      @Override
     public List<EmployeesResponseDto> getAllEmployees() {
         List<Employee> allEmployees = employeeRepository.findAll();
