@@ -41,19 +41,5 @@ public interface SellerService {
 
     List<EmployeesResponseDto> getEmployeesBySellerId() throws ResourceNotFoundException;
 
-    //    @Override
-    //    public List<Employee> getEmployeesBySellerId(Long sellerId) {
-    //        SellerRefactor seller = null;
-    //        try {
-    //            seller = sellerRefactorRepository.findById(sellerId)
-    //                    .orElseThrow(() -> new ResourceNotFoundException("No se encontró el vendedor en la base de datos"));
-    //        } catch (ResourceNotFoundException e) {
-    //            throw new RuntimeException(e);
-    //        }
-    //        return seller.getEmployees();
-    //    }
-    //
-    //
-    //
     List<EmployeesResponseDto> getAllEmployees();
 }
