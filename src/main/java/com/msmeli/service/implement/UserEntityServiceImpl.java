@@ -3,10 +3,7 @@ package com.msmeli.service.implement;
 import com.msmeli.configuration.security.entity.UserEntityUserDetails;
 import com.msmeli.configuration.security.service.JwtService;
 import com.msmeli.configuration.security.service.UserEntityRefreshTokenService;
-import com.msmeli.dto.request.EmployeeRegisterRequestDTO;
-import com.msmeli.dto.request.UpdatePassRequestDTO;
-import com.msmeli.dto.request.UserRefreshTokenRequestDTO;
-import com.msmeli.dto.request.UserRegisterRequestDTO;
+import com.msmeli.dto.request.*;
 import com.msmeli.dto.response.UserAuthResponseDTO;
 import com.msmeli.dto.response.UserResponseDTO;
 import com.msmeli.exception.AlreadyExistsException;
@@ -23,6 +20,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -97,6 +95,35 @@ public class UserEntityServiceImpl implements com.msmeli.service.services.UserEn
     }
 
     @Override
+    @Transactional
+    public UserResponseDTO updateEmployee(Long employeeId, EmployeeUpdateRequestDTO employeeUpdateDTO)
+            throws ResourceNotFoundException, AlreadyExistsException {
+        // Obtener el empleado existente por su ID
+        Employee existingEmployee = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new ResourceNotFoundException("Empleado no encontrado con ID: " + employeeId));
+
+        // Validar si el nuevo nombre de usuario ya existe
+        if (!existingEmployee.getUsername().equals(employeeUpdateDTO.getUsername())
+                && userEntityRepository.findByUsername(employeeUpdateDTO.getUsername()).isPresent()) {
+            throw new AlreadyExistsException("El nombre de usuario ya existe.");
+        }
+
+        // Actualizar los campos necesarios
+        existingEmployee.setUsername(employeeUpdateDTO.getUsername());
+        existingEmployee.setPassword(passwordEncoder.encode(employeeUpdateDTO.getPassword()));
+        existingEmployee.setEmail(employeeUpdateDTO.getEmail());
+        existingEmployee.setNombre(employeeUpdateDTO.getNombre());
+        existingEmployee.setApellido(employeeUpdateDTO.getApellido());
+        existingEmployee.setRol(employeeUpdateDTO.getRol());
+
+        // Guardar la entidad actualizada
+        employeeRepository.save(existingEmployee);
+
+        // Mapear la entidad a DTO y devolver la respuesta
+        return mapper.map(existingEmployee, UserResponseDTO.class);
+    }
+
+    @Override
     public UserResponseDTO read(Long id) throws ResourceNotFoundException {
         return userEntityRepository.findById(id).map(user -> mapper.map(user, UserResponseDTO.class)).orElseThrow(() -> new ResourceNotFoundException(NOT_FOUND));
     }
@@ -121,6 +148,16 @@ public class UserEntityServiceImpl implements com.msmeli.service.services.UserEn
         Optional<UserEntity> userSearch = userEntityRepository.findById(id);
         if (userSearch.isEmpty()) throw new ResourceNotFoundException(NOT_FOUND);
         userEntityRepository.deleteById(id);
+    }
+
+    @Override
+    public void deleteEmployee(Long employeeId) throws ResourceNotFoundException {
+        // Obtener el empleado por su ID
+        Employee employeeToDelete = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new ResourceNotFoundException("Empleado no encontrado con ID: " + employeeId));
+
+        // Eliminar el empleado
+        employeeRepository.delete(employeeToDelete);
     }
 
     @Override
