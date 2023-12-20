@@ -2,6 +2,7 @@ package com.msmeli.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.msmeli.model.Employee;
+import com.msmeli.model.RoleEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,6 +19,6 @@ public class EmployeesResponseDto {
     private Long id;
     private String nombre;
     private String apellido;
-    private String rol;
+    private List<RoleEntity> roles;
 
 }
