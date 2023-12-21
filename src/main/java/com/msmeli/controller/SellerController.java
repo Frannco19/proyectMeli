@@ -61,18 +61,13 @@ public class SellerController {
             return new ResponseEntity<>(refreshedToken, HttpStatus.OK);
         } catch (NoSuchElementException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            // Manejo de otras excepciones
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @PostMapping("/update-token")
-    public ResponseEntity<TokenResposeDTO> updateToken(@RequestParam String TG) {
-        try {
-            TokenResposeDTO updatedToken = sellerService.updateToken(TG);
-            return new ResponseEntity<>(updatedToken, HttpStatus.OK);
-        } catch (NoSuchElementException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }
+
 
     @PostMapping("/update-access-token")
     public ResponseEntity<String> updateAccessToken(@RequestParam String newAccessToken) {

@@ -1,4 +1,5 @@
 package com.msmeli.service.implement;
+<<<<<<< HEAD
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -229,3 +230,5 @@ public class SellerServiceImplTest {
 
 
 }
+=======
+>>>>>>> b1d706ed810139a7dd8ed9878e73079e1ec0c169
