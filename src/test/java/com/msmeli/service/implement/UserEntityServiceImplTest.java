@@ -1,28 +1,45 @@
 package com.msmeli.service.implement;
 
+import com.msmeli.configuration.security.entity.UserEntityUserDetails;
+import com.msmeli.dto.request.EmployeeRegisterRequestDTO;
 import com.msmeli.dto.response.UserAuthResponseDTO;
 import com.msmeli.dto.response.UserResponseDTO;
+import com.msmeli.exception.AlreadyExistsException;
 import com.msmeli.exception.ResourceNotFoundException;
+import com.msmeli.model.Employee;
 import com.msmeli.model.RoleEntity;
+import com.msmeli.model.SellerRefactor;
 import com.msmeli.model.UserEntity;
+import com.msmeli.repository.EmployeeRepository;
+import com.msmeli.repository.SellerRefactorRepository;
 import com.msmeli.repository.UserEntityRepository;
+import com.msmeli.service.services.EmailService;
 import com.msmeli.service.services.RoleEntityService;
 import com.msmeli.util.Role;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
 
 public class UserEntityServiceImplTest {
 
@@ -36,7 +53,15 @@ public class UserEntityServiceImplTest {
     private PasswordEncoder passwordEncoder;
 
     @Mock
-    private ModelMapper mapper;
+    private SellerRefactorRepository sellerRefactorRepository;
+
+    @Mock
+    private EmployeeRepository employeeRepository;
+
+    @Mock
+    private EmailService emailService;
+    @Mock
+    private Authentication authentication;
 
     @Mock
     private RoleEntityService roleEntityService;
@@ -47,53 +72,47 @@ public class UserEntityServiceImplTest {
     }
 
 
-    /*@Test
-    public void testCreateUser() throws ResourceNotFoundException {
-        // Definir el comportamiento esperado del repositorio
-        UserRegisterRequestDTO requestDTO = new UserRegisterRequestDTO();
-        requestDTO.setUsername("testuser");
+
+    @Test
+    void testCreateEmployee() throws AlreadyExistsException, ResourceNotFoundException {
+        // Configuración del mock
+        when(passwordEncoder.encode(any())).thenReturn("hashedPassword");
+        when(roleEntityService.findByName(Role.EMPLOYEE)).thenReturn(new RoleEntity());
+        when(sellerRefactorRepository.findById(any())).thenReturn(Optional.of(new SellerRefactor()));
+
+        // Llamada al método que deseas probar
+        EmployeeRegisterRequestDTO requestDTO = new EmployeeRegisterRequestDTO();
+        requestDTO.setUsername("username");
         requestDTO.setPassword("password");
         requestDTO.setRePassword("password");
 
-        when(userEntityRepository.findByUsername("testuser")).thenReturn(Optional.empty());
-        when(roleEntityService.findByName(Role.USER)).thenReturn(new RoleEntity());
+        UserResponseDTO result = userEntityServiceImpl.createEmployee(requestDTO);
 
-        UserEntity userEntity = new UserEntity();
-        when(userEntityRepository.save(any(UserEntity.class))).thenReturn(userEntity);
+        // Verificaciones
+        verify(passwordEncoder, times(2)).encode(any());
+        verify(roleEntityService, times(1)).findByName(Role.EMPLOYEE);
+        verify(sellerRefactorRepository, times(1)).findById(any());
+        verify(employeeRepository, times(1)).save(any(Employee.class));
 
-        // Configurar el comportamiento del password encoder
-        when(passwordEncoder.encode("password")).thenReturn("hashedPassword");
-
-        // Llamar al método y verificar el resultado
-        try {
-            UserResponseDTO responseDTO = userEntityService.create(requestDTO);
-            assertNotNull(responseDTO);
-            // Puedes realizar más aserciones según sea necesario
-        } catch (ResourceNotFoundException | AlreadyExistsException e) {
-            fail("Se lanzó una excepción de manera inesperada: " + e.getMessage());
-        }
-
-        // Verificar que el método sendMail se haya llamado con los parámetros adecuados
-        verify(emailService).sendMail(eq(userEntity.getEmail()), eq("Welcome to MoroTech App"), anyString());
-    }*/
+    }
 
 
-    @SneakyThrows
     @Test
-    public void testReadUser() {
-        // Definir el comportamiento esperado del repositorio
+    void testReadUser() {
+        // Arrange
         UserEntity userEntity = new UserEntity();
         userEntity.setId(1L);
         when(userEntityRepository.findById(1L)).thenReturn(Optional.of(userEntity));
 
-        // Llamar al método y verificar el resultado
+        // Act
         try {
             UserResponseDTO responseDTO = userEntityServiceImpl.read(1L);
 
-            //assertNotNull(responseDTO);
-            //assertEquals(1L, responseDTO.getId());
+            // Assert
+            assertNotNull(responseDTO, "ResponseDTO should not be null");
+            assertEquals(1L, responseDTO.getId(), "Incorrect user ID");
         } catch (ResourceNotFoundException e) {
-            fail("Se lanzó una ResourceNotFoundException de manera inesperada.");
+            fail("Unexpected ResourceNotFoundException: " + e.getMessage());
         }
     }
 
@@ -187,4 +206,77 @@ public class UserEntityServiceImplTest {
             fail("Se lanzó una ResourceNotFoundException de manera inesperada.");
         }
     }
+
+
+    @Test
+    void testRecoverPassword() throws ResourceNotFoundException {
+        // Configuración del mock
+        String username = "testUser";
+        UserEntity userEntity = new UserEntity();
+        userEntity.setEmail("test@example.com");
+
+        when(userEntityRepository.findByUsername(username)).thenReturn(Optional.of(userEntity));
+
+        // Llamada al método que deseas probar
+        Map<String, String> result = userEntityServiceImpl.recoverPassword(username);
+
+        // Verificaciones
+        verify(emailService,  times(1)).sendMail(eq("test@example.com"), eq("Recuperar contraseña"), anyString());
+        assertEquals("Correo electrónico de recuperación de contraseña enviado correctamente a testUser", result.get("message"));
+    }
+
+    @Test
+    void testRecoverPasswordUserNotFound() {
+        // Configuración del mock cuando el usuario no se encuentra
+        String username = "nonExistingUser";
+
+        when(userEntityRepository.findByUsername(username)).thenReturn(Optional.empty());
+
+        // Verificación de la excepción lanzada
+        assertThrows(ResourceNotFoundException.class, () -> userEntityServiceImpl.recoverPassword(username));
+
+        // Verificación de que el servicio de envío de correo no se invoca
+        try {
+            verify(emailService, never()).sendMail(anyString(), anyString(), anyString());
+        } catch (ResourceNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
+    void testGetAuthenticatedUserId() {
+        // Configuración del mock
+        UserEntityUserDetails userDetails = mock(UserEntityUserDetails.class);
+        SellerRefactor sellerRefactor = new SellerRefactor();
+        sellerRefactor.setId(1L);
+        Employee employee = new Employee();
+        employee.setSellerRefactor(sellerRefactor);
+
+        // Configuración de SecurityContextHolder
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities())
+        );
+
+        when(authentication.getPrincipal()).thenReturn(userDetails);
+        when(userDetails.getUserEntity()).thenReturn(employee);
+
+        // Llamada al método que deseas probar
+        Long result = userEntityServiceImpl.getAuthenticatedUserId();
+
+        // Verificaciones
+        assertEquals(1L, result);
+    }
+
+    @Test
+    void testGetAuthenticatedUserIdNoAuthentication() {
+        // Configuración de SecurityContextHolder sin autenticación
+        SecurityContextHolder.clearContext();
+
+        // Llamada al método que deseas probar
+        Long result = userEntityServiceImpl.getAuthenticatedUserId();
+
+        // Verificaciones
+        assertNull(result);
+    }
+
 }
