@@ -15,7 +15,6 @@ import lombok.Setter;
 public class Employee extends UserEntity{
     private String nombre;
     private String apellido;
-    private String rol;
     @ManyToOne
     @JoinColumn(name = "sellerRefactor_id")
     private SellerRefactor sellerRefactor;
