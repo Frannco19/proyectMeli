@@ -7,12 +7,17 @@ import static org.mockito.Mockito.*;
 
 import com.msmeli.dto.request.EmployeeRegisterRequestDTO;
 import com.msmeli.dto.request.SellerRequestDTO;
+import com.msmeli.dto.request.TokenRequestDTO;
 import com.msmeli.dto.request.UserRegisterRequestDTO;
+import com.msmeli.dto.response.EmployeesResponseDto;
+import com.msmeli.dto.response.TokenResposeDTO;
 import com.msmeli.dto.response.UserResponseDTO;
 import com.msmeli.exception.AlreadyExistsException;
 import com.msmeli.exception.ResourceNotFoundException;
 import com.msmeli.feignClient.MeliFeignClient;
+import com.msmeli.model.Employee;
 import com.msmeli.model.Seller;
+import com.msmeli.model.SellerRefactor;
 import com.msmeli.repository.EmployeeRepository;
 import com.msmeli.repository.SellerRefactorRepository;
 import com.msmeli.repository.SellerRepository;
@@ -133,6 +138,93 @@ public class SellerServiceImplTest {
         assertNotNull(result);
         assertEquals(1, result.size());
         assertEquals(expectedSeller, result.get(0));
+    }
+
+    @Test
+    public void testSaveToken() {
+        // Arrange
+        Long sellerId = 1L;
+        String TG = "testToken";
+        SellerRefactor seller = new SellerRefactor();
+        when(sellerRefactorRepository.findById(sellerId)).thenReturn(Optional.of(seller));
+        TokenRequestDTO tokenRequestDTO = new TokenRequestDTO();
+        when(meliFeignClient.tokenForTG(tokenRequestDTO)).thenReturn(new TokenResposeDTO());
+
+        // Act
+        TokenResposeDTO result = sellerService.saveToken(TG);
+
+        // Assert
+        assertNotNull(result);
+        // Añade más aserciones según tu lógica
+    }
+
+    @Test
+    public void testRefreshToken() {
+        // Arrange
+        Long sellerId = 1L;
+        SellerRefactor seller = new SellerRefactor();
+
+        // Configura el comportamiento de sellerRefactorRepository
+        when(sellerRefactorRepository.findById(sellerId)).thenReturn(Optional.of(seller));
+
+        // Act
+        TokenResposeDTO result = sellerService.refreshToken();
+
+        // Assert
+        assertNotNull(result);
+        // Añade más aserciones según tu lógica
+    }
+
+
+    @Test
+    public void testUpdateToken() {
+        // Arrange
+        Long sellerId = 1L;
+        String TG = "testToken";
+        SellerRefactor seller = new SellerRefactor();
+        when(sellerRefactorRepository.findById(sellerId)).thenReturn(Optional.of(seller));
+
+        // Configura un TokenResponseDTO simulado que debería devolver meliFeignClient
+        TokenResposeDTO simulatedTokenResponse = new TokenResposeDTO();
+        when(meliFeignClient.tokenForTG(any(TokenRequestDTO.class))).thenReturn(simulatedTokenResponse);
+
+        // Act
+        TokenResposeDTO result = sellerService.updateToken(TG);
+
+        // Assert
+        assertNotNull(result);
+        // Añade más aserciones según tu lógica
+    }
+
+
+    @Test
+    public void testGetEmployeesBySellerId() throws ResourceNotFoundException {
+        // Arrange
+        Long sellerId = 1L;
+        SellerRefactor seller = new SellerRefactor();
+        when(sellerRefactorRepository.findById(sellerId)).thenReturn(Optional.of(seller));
+        List<Employee> employeeList = Collections.singletonList(new Employee());
+        when(employeeRepository.findAll()).thenReturn(employeeList);
+
+        // Act
+        List<EmployeesResponseDto> result = sellerService.getEmployeesBySellerId();
+
+        // Assert
+        assertNotNull(result);
+    }
+
+    @Test
+    public void testGetAllEmployees() {
+        // Arrange
+        List<Employee> allEmployees = Collections.singletonList(new Employee());
+        when(employeeRepository.findAll()).thenReturn(allEmployees);
+
+        // Act
+        List<EmployeesResponseDto> result = sellerService.getAllEmployees();
+
+        // Assert
+        assertNotNull(result);
+        // Añade más aserciones según tu lógica
     }
 
 

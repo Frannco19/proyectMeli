@@ -2,6 +2,7 @@ package com.msmeli.service.feignService;
 
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
+import com.msmeli.controller.AuthController;
 import com.msmeli.feignClient.MeliFeignClient;
 import com.msmeli.model.Category;
 import com.msmeli.model.Employee;
@@ -9,6 +10,7 @@ import com.msmeli.model.Item;
 import com.msmeli.model.Seller;
 import com.msmeli.repository.*;
 import com.msmeli.service.implement.UserEntityServiceImpl;
+import com.msmeli.service.services.UserEntityService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -43,13 +45,6 @@ public class MeliServiceTest {
     @Mock
     private SellerTransactionRepository sellerTransactionRepository;
 
-    @Mock
-    private EmployeeRepository employeeRepository;
-
-
-    @InjectMocks
-    private UserEntityServiceImpl userEntityService;
-
     @InjectMocks
     private MeliService meliService;
 
@@ -58,22 +53,6 @@ public class MeliServiceTest {
         MockitoAnnotations.initMocks(this);
     }
 
-
-    @Test
-    public void testDeleteEmployee() {
-        // Crear un empleado para la prueba
-        Employee employee = new Employee();
-        employee.setId(1L);
-
-        // Configurar el comportamiento del repositorio al buscar el empleado por ID
-        when(employeeRepository.findById(1L)).thenReturn(Optional.of(employee));
-
-        // Llamar al método deleteEmployee
-        assertDoesNotThrow(() -> userEntityService.deleteEmployee(1L));
-
-        // Verificar que el método delete del repositorio fue llamado con el empleado
-        verify(employeeRepository, times(1)).delete(employee);
-    }
 
     @Test
     public void testGetItemById() {
@@ -151,8 +130,5 @@ public class MeliServiceTest {
         // Assert
         assertEquals(42, result);
     }
-
-
-
 
 }
