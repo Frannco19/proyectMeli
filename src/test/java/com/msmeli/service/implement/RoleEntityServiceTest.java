@@ -29,29 +29,41 @@ public class RoleEntityServiceTest {
 
     @Test
     public void testFindByName() {
-        // Configurar comportamiento simulado para el mock
-        Role role = Role.SELLER;  // O el valor que desees probar
+
+        Role role = Role.SELLER;
 
         RoleEntity roleEntity = new RoleEntity();
-        roleEntity.setName(SELLER);  // O el nombre que corresponde al rol
+        roleEntity.setName(SELLER);
 
         when(roleRepository.findByName(role)).thenReturn(Optional.of(roleEntity));
 
-        // Llamar al método que estás probando
+
         RoleEntity result = null;
         try {
             result = roleEntityService.findByName(role);
         } catch (ResourceNotFoundException e) {
-            throw new RuntimeException(e);
+            fail("No debería lanzar una excepción en este caso");
         }
+
+
+        verify(roleRepository, atLeastOnce()).findByName(role);
+
+        assertEquals("SELLER", result.getName());
+    }
+
+    @Test
+    public void testFindByNameNotFound() {
+        // Configurar comportamiento simulado para el mock cuando no se encuentra el rol
+        Role role = Role.SELLER;
+
+        when(roleRepository.findByName(role)).thenReturn(Optional.empty());
+
+        // Llamar al método que estás probando y esperar la excepción
+        assertThrows(ResourceNotFoundException.class, () -> roleEntityService.findByName(role));
 
         // Verificar que los métodos necesarios se hayan llamado
         verify(roleRepository, atLeastOnce()).findByName(role);
-
-        // Realizar aserciones
-        assertEquals("SELLER", result.getName());  // O el valor esperado según tu lógica
     }
-
     @Test
     public void testFindByNameWhenRoleNotFound() {
         // Configurar comportamiento simulado para el mock cuando no se encuentra el rol
@@ -65,5 +77,4 @@ public class RoleEntityServiceTest {
         verify(roleRepository, atLeastOnce()).findByName(role);
     }
 
-    // Puedes seguir escribiendo más pruebas para otros métodos de RoleEntityService
 }

@@ -1,53 +1,86 @@
 package com.msmeli.service.implement;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import com.msmeli.model.CategoryName;
 import com.msmeli.repository.CategoryNameRepository;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Arrays;
+import java.lang.reflect.InvocationTargetException;
+import java.time.Duration;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.*;
+import static java.util.Collections.emptyList;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
+import static org.mockito.Mockito.when;
+import static org.mockito.MockitoAnnotations.openMocks;
+import static org.utbot.runtime.utils.java.UtUtils.setField;
 
 @ExtendWith(MockitoExtension.class)
-public class CategoryNameImplTest {
+public final class CategoryNameImplTest {
+    @InjectMocks
+    private CategoryNameImpl categoryNameImpl;
 
     @Mock
-    private CategoryNameRepository categoryNameRepository;
+    private CategoryNameRepository categoryNameRepositoryMock;
 
-    @InjectMocks
-    private CategoryNameImpl categoryNameService;
+    private AutoCloseable mockitoCloseable;
+
+    ///region Test suites for executable com.msmeli.service.implement.CategoryNameImpl.findAll
+
+    ///region SYMBOLIC EXECUTION: SUCCESSFUL EXECUTIONS for method findAll()
+
+    /**
+     * @utbot.classUnderTest {@link CategoryNameImpl}
+     * @utbot.methodUnderTest {@link CategoryNameImpl#findAll()}
+     * @utbot.invokes {@link CategoryNameRepository#findAll()}
+     * @utbot.returnsFrom {@code return categoryNameRepository.findAll();}
+     */
+    @Test
+    @DisplayName("findAll: CategoryNameRepositoryFindAll -> return categoryNameRepository.findAll()")
+    public void testFindAll_CategoryNameRepositoryFindAll() {
+        (when(categoryNameRepositoryMock.findAll())).thenReturn(((List) null));
+
+        List actual = categoryNameImpl.findAll();
+
+        assertNull(actual);
+    }
 
     @Test
+    @DisplayName("findAll: return categoryNameRepository.findAll() : True -> ThrowNullPointerException")
+    public void testFindAll_ThrowNullPointerException() throws ClassNotFoundException, IllegalAccessException, NoSuchFieldException, InvocationTargetException, NoSuchMethodException {
+        setField(categoryNameImpl, "com.msmeli.service.implement.CategoryNameImpl", "categoryNameRepository", null);
+        
+        /* This test fails because method [com.msmeli.service.implement.CategoryNameImpl.findAll] produces [java.lang.NullPointerException]
+            com.msmeli.service.implement.CategoryNameImpl.findAll(CategoryNameImpl.java:19) */
+        categoryNameImpl.findAll();
+    }
+
+    @Test
+    @DisplayName("findAll: ")
+    @Timeout(value = 1000L, unit = TimeUnit.MILLISECONDS)
     public void testFindAll() {
-        // Configurar comportamiento simulado para el mock
-        CategoryName category1 = new CategoryName();
-        category1.setName("NombreCategoría1");
-
-        CategoryName category2 = new CategoryName();
-        category2.setName("NombreCategoría2");
-
-        List<CategoryName> expectedCategories = Arrays.asList(category1, category2);
-
-        when(categoryNameRepository.findAll()).thenReturn(expectedCategories);
-
-        // Llamar al método que estás probando
-        List<CategoryName> result = categoryNameService.findAll();
-
-// Verificar que los métodos necesarios se hayan llamado
-        verify(categoryNameRepository, atLeastOnce()).findAll();
-
-// Realizar aserciones
-        assertEquals(expectedCategories, result);
+        List list = emptyList();
+        (when(categoryNameRepositoryMock.findAll())).thenReturn(list);
+        
+        /* This execution may take longer than the 1000 ms timeout
+         and therefore fail due to exceeding the timeout. */
+        assertTimeoutPreemptively(Duration.ofMillis(1000L), () -> categoryNameImpl.findAll());
+    }
 
 
+
+    @BeforeEach
+    public void setUp() {
+        mockitoCloseable = openMocks(this);
+    }
+
+    @AfterEach
+    public void tearDown() throws Exception {
+        mockitoCloseable.close();
     }
 
 }
