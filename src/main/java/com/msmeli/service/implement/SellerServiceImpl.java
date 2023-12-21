@@ -5,13 +5,17 @@ import com.msmeli.dto.request.EmployeeRegisterRequestDTO;
 import com.msmeli.dto.request.SellerRequestDTO;
 import com.msmeli.dto.request.TokenRequestDTO;
 import com.msmeli.dto.request.UserRegisterRequestDTO;
+import com.msmeli.dto.response.EmployeesResponseDto;
 import com.msmeli.dto.response.TokenResposeDTO;
 import com.msmeli.dto.response.UserResponseDTO;
 import com.msmeli.exception.AlreadyExistsException;
 import com.msmeli.exception.ResourceNotFoundException;
 import com.msmeli.feignClient.MeliFeignClient;
+import com.msmeli.model.Employee;
 import com.msmeli.model.Seller;
 import com.msmeli.model.SellerRefactor;
+import com.msmeli.model.Stock;
+import com.msmeli.repository.EmployeeRepository;
 import com.msmeli.repository.SellerRefactorRepository;
 import com.msmeli.repository.SellerRepository;
 import com.msmeli.service.services.SellerService;
@@ -22,9 +26,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class SellerServiceImpl implements SellerService {
@@ -33,6 +36,8 @@ public class SellerServiceImpl implements SellerService {
     private final SellerRefactorRepository sellerRefactorRepository;
     private final MeliFeignClient meliFeignClient;
     private final UserEntityService userEntityService;
+    private final EmployeeRepository employeeRepository;
+
     private ModelMapper mapper;
     private static final String NOT_FOUND = "Seller no encontrado.";
     @Value("${meli.grantType}")
@@ -47,11 +52,12 @@ public class SellerServiceImpl implements SellerService {
     private String meliRedirectUri;
 
 
-    public SellerServiceImpl(SellerRepository sellerRepository, SellerRefactorRepository sellerRefactorRepository, MeliFeignClient meliFeignClient, UserEntityService userEntityService, ModelMapper mapper) {
+    public SellerServiceImpl(SellerRepository sellerRepository, SellerRefactorRepository sellerRefactorRepository, MeliFeignClient meliFeignClient, UserEntityService userEntityService, EmployeeRepository employeeRepository, ModelMapper mapper) {
         this.sellerRepository = sellerRepository;
         this.sellerRefactorRepository = sellerRefactorRepository;
         this.meliFeignClient = meliFeignClient;
         this.userEntityService = userEntityService;
+        this.employeeRepository = employeeRepository;
         this.mapper = mapper;
     }
 
@@ -285,5 +291,40 @@ public class SellerServiceImpl implements SellerService {
         } else {
             return null;
         }
+    }
+
+    /**
+     * Obtiene la lista de empleados asociados al vendedor autenticado.
+     *
+     * @return Lista de objetos EmployeesResponseDto que representan los empleados del vendedor.
+     * @throws ResourceNotFoundException Si no se encuentra el recurso asociado al vendedor.
+     */
+    @Override
+    public List<EmployeesResponseDto> getEmployeesBySellerId() throws ResourceNotFoundException {
+        Long idSeller = getAuthenticatedUserId();
+        SellerRefactor seller = findById(idSeller);
+        List<Employee> employeeList = seller.getEmployees();
+
+        List<EmployeesResponseDto> employeesListDTO = employeeList.stream()
+                .map(employee -> mapper.map(employee, EmployeesResponseDto.class))
+                .collect(Collectors.toList());
+
+        return employeesListDTO;
+    }
+
+    /**
+     * Obtiene la lista de todos los empleados.
+     *
+     * @return Lista de objetos EmployeesResponseDto que representan todos los empleados.
+     */
+     @Override
+    public List<EmployeesResponseDto> getAllEmployees() {
+        List<Employee> allEmployees = employeeRepository.findAll();
+
+        List<EmployeesResponseDto> employeesListDTO = allEmployees.stream()
+                .map(employee -> mapper.map(employee, EmployeesResponseDto.class))
+                .collect(Collectors.toList());
+
+        return employeesListDTO;
     }
 }

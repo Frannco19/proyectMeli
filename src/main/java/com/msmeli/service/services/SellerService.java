@@ -2,8 +2,8 @@ package com.msmeli.service.services;
 
 import com.msmeli.dto.request.EmployeeRegisterRequestDTO;
 import com.msmeli.dto.request.SellerRequestDTO;
-import com.msmeli.dto.request.TokenRequestDTO;
 import com.msmeli.dto.request.UserRegisterRequestDTO;
+import com.msmeli.dto.response.EmployeesResponseDto;
 import com.msmeli.dto.response.TokenResposeDTO;
 import com.msmeli.dto.response.UserResponseDTO;
 import com.msmeli.exception.AlreadyExistsException;
@@ -34,4 +34,8 @@ public interface SellerService {
     SellerRefactor findById(Long id) throws ResourceNotFoundException;
 
     TokenResposeDTO refreshToken();
+
+    List<EmployeesResponseDto> getEmployeesBySellerId() throws ResourceNotFoundException;
+
+    List<EmployeesResponseDto> getAllEmployees();
 }
