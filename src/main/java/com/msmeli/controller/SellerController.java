@@ -1,10 +1,17 @@
 package com.msmeli.controller;
 
 
+import com.msmeli.dto.response.EmployeesResponseDto;
 import com.msmeli.dto.response.TokenResposeDTO;
 import com.msmeli.exception.ResourceNotFoundException;
+import com.msmeli.model.Employee;
 import com.msmeli.service.services.ItemService;
 import com.msmeli.service.services.SellerService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/seller")
@@ -44,18 +52,13 @@ public class SellerController {
             return new ResponseEntity<>(refreshedToken, HttpStatus.OK);
         } catch (NoSuchElementException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            // Manejo de otras excepciones
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @PostMapping("/update-token")
-    public ResponseEntity<TokenResposeDTO> updateToken(@RequestParam String TG) {
-        try {
-            TokenResposeDTO updatedToken = sellerService.updateToken(TG);
-            return new ResponseEntity<>(updatedToken, HttpStatus.OK);
-        } catch (NoSuchElementException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }
+
 
     @PostMapping("/update-access-token")
     public ResponseEntity<String> updateAccessToken(@RequestParam String newAccessToken) {
@@ -66,4 +69,18 @@ public class SellerController {
             return new ResponseEntity<>("No se encontró al vendedor en la base de datos.", HttpStatus.NOT_FOUND);
         }
     }
+
+        @GetMapping("/getEmployeesBySellerId")
+    public ResponseEntity<List<EmployeesResponseDto>> getEmployeesBySellerId() throws ResourceNotFoundException {
+        List<EmployeesResponseDto> employeesList = sellerService.getEmployeesBySellerId();
+        return ResponseEntity.ok(employeesList);
+    }
+
+    @GetMapping("/getAllEmployees")
+    public ResponseEntity<List<EmployeesResponseDto>> getAllEmployees() {
+        List<EmployeesResponseDto> employeesList = sellerService.getAllEmployees();
+        return ResponseEntity.ok(employeesList);
+    }
+
+
 }

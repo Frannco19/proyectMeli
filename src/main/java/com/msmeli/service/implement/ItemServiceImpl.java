@@ -1,6 +1,5 @@
 package com.msmeli.service.implement;
 
-import com.msmeli.configuration.security.entity.UserEntityUserDetails;
 import com.msmeli.dto.feign.ItemFeignDTO;
 import com.msmeli.dto.feign.ItemIdsResponseDTO;
 import com.msmeli.dto.response.BuyBoxWinnerResponseDTO;
