@@ -232,7 +232,7 @@ public class ItemServiceImpl implements ItemService {
      * @param itemResponseDTO DTO de itemResponseDTO donse se cargar el dato
      * @return devuelve el Dto cargado
      */
-    private ItemResponseDTO calculateColor(ItemResponseDTO itemResponseDTO) {
+    private ItemResponseDTO calculateColor(ItemResponseDTO itemResponseDTO) throws ResourceNotFoundException {
         BuyBoxWinnerResponseDTO firstPlace = null;
         double winnerPrice = 0.0;
         double adjustedPrice = 0.0;
