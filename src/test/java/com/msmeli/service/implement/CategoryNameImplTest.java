@@ -42,17 +42,17 @@ public final class CategoryNameImplTest {
     @Test
     @DisplayName("findAll: CategoryNameRepositoryFindAll -> return categoryNameRepository.findAll()")
     public void testFindAll_CategoryNameRepositoryFindAll() {
-        (when(categoryNameRepositoryMock.findAll())).thenReturn(((List) null));
+        (Mockito.when(categoryNameRepositoryMock.findAll())).thenReturn(((List) null));
 
         List actual = categoryNameImpl.findAll();
 
-        assertNull(actual);
+        Assertions.assertNull(actual);
     }
 
     @Test
     @DisplayName("findAll: return categoryNameRepository.findAll() : True -> ThrowNullPointerException")
     public void testFindAll_ThrowNullPointerException() throws ClassNotFoundException, IllegalAccessException, NoSuchFieldException, InvocationTargetException, NoSuchMethodException {
-        setField(categoryNameImpl, "com.msmeli.service.implement.CategoryNameImpl", "categoryNameRepository", null);
+        UtUtils.setField(categoryNameImpl, "com.msmeli.service.implement.CategoryNameImpl", "categoryNameRepository", null);
         
         /* This test fails because method [com.msmeli.service.implement.CategoryNameImpl.findAll] produces [java.lang.NullPointerException]
             com.msmeli.service.implement.CategoryNameImpl.findAll(CategoryNameImpl.java:19) */
@@ -63,19 +63,19 @@ public final class CategoryNameImplTest {
     @DisplayName("findAll: ")
     @Timeout(value = 1000L, unit = TimeUnit.MILLISECONDS)
     public void testFindAll() {
-        List list = emptyList();
-        (when(categoryNameRepositoryMock.findAll())).thenReturn(list);
+        List list = Collections.emptyList();
+        (Mockito.when(categoryNameRepositoryMock.findAll())).thenReturn(list);
         
         /* This execution may take longer than the 1000 ms timeout
          and therefore fail due to exceeding the timeout. */
-        assertTimeoutPreemptively(Duration.ofMillis(1000L), () -> categoryNameImpl.findAll());
+        Assertions.assertTimeoutPreemptively(Duration.ofMillis(1000L), () -> categoryNameImpl.findAll());
     }
 
 
 
     @BeforeEach
     public void setUp() {
-        mockitoCloseable = openMocks(this);
+        mockitoCloseable = MockitoAnnotations.openMocks(this);
     }
 
     @AfterEach

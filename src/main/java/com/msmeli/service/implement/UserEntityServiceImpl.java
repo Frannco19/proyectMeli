@@ -3,10 +3,7 @@ package com.msmeli.service.implement;
 import com.msmeli.configuration.security.entity.UserEntityUserDetails;
 import com.msmeli.configuration.security.service.JwtService;
 import com.msmeli.configuration.security.service.UserEntityRefreshTokenService;
-import com.msmeli.dto.request.EmployeeRegisterRequestDTO;
-import com.msmeli.dto.request.UpdatePassRequestDTO;
-import com.msmeli.dto.request.UserRefreshTokenRequestDTO;
-import com.msmeli.dto.request.UserRegisterRequestDTO;
+import com.msmeli.dto.request.*;
 import com.msmeli.dto.response.UserAuthResponseDTO;
 import com.msmeli.dto.response.UserResponseDTO;
 import com.msmeli.exception.AlreadyExistsException;
@@ -23,6 +20,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -96,6 +94,8 @@ public class UserEntityServiceImpl implements com.msmeli.service.services.UserEn
         return mapper.map(newEmployee,UserResponseDTO.class);
     }
 
+
+
     @Override
     public UserResponseDTO read(Long id) throws ResourceNotFoundException {
         return userEntityRepository.findById(id).map(user -> mapper.map(user, UserResponseDTO.class)).orElseThrow(() -> new ResourceNotFoundException(NOT_FOUND));
@@ -122,6 +122,8 @@ public class UserEntityServiceImpl implements com.msmeli.service.services.UserEn
         if (userSearch.isEmpty()) throw new ResourceNotFoundException(NOT_FOUND);
         userEntityRepository.deleteById(id);
     }
+
+
 
     @Override
     public UserResponseDTO modifyUserRoles(Long userId) throws ResourceNotFoundException {

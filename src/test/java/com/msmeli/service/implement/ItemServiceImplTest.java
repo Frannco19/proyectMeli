@@ -77,14 +77,14 @@ public class ItemServiceImplTest {
         Pageable pageable = PageRequest.of(offset, pageSize);
         List<Item> items = new ArrayList<>(); // create a list of items for the test
         Page<Item> itemPage = new PageImpl<>(items, pageable, items.size());
-        when(itemRepository.getItemsBySellerId(eq(sellerId), eq(pageable))).thenReturn(itemPage);
+        Mockito.when(itemRepository.getItemsBySellerId(ArgumentMatchers.eq(sellerId), ArgumentMatchers.eq(pageable))).thenReturn(itemPage);
 
         // Act
         Page<ItemResponseDTO> result = itemService.getSellerItems(sellerId, offset, pageSize);
 
         // Assert
-        assertNotNull(result);
-        assertEquals(items.size(), result.getContent().size());
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(items.size(), result.getContent().size());
         // Add more assertions based on the behavior of your method
     }
 
@@ -102,21 +102,21 @@ public class ItemServiceImplTest {
         Long idSeller = 1L;
         Pageable pageable = PageRequest.of(offset, pageSize);
         SellerRefactor seller = new SellerRefactor(); // create a seller for the test
-        when(userEntityService.getAuthenticatedUserId()).thenReturn(idSeller);
-        when(sellerService.findById(eq(idSeller))).thenReturn(seller);
+        Mockito.when(userEntityService.getAuthenticatedUserId()).thenReturn(idSeller);
+        Mockito.when(sellerService.findById(ArgumentMatchers.eq(idSeller))).thenReturn(seller);
 
         // ... Mock the behavior for other dependencies ...
 
         Page<Item> results = new PageImpl<>(new ArrayList<>()); // create a page of items for the test
-        when(itemRepository.findByFilters(eq("%" + searchInput.toUpperCase() + "%"), eq(searchType), eq(-1), eq(isActive), eq(seller), eq(pageable)))
+        Mockito.when(itemRepository.findByFilters(ArgumentMatchers.eq("%" + searchInput.toUpperCase() + "%"), ArgumentMatchers.eq(searchType), ArgumentMatchers.eq(-1), ArgumentMatchers.eq(isActive), ArgumentMatchers.eq(seller), ArgumentMatchers.eq(pageable)))
                 .thenReturn(results);
 
         // Act
         Page<ItemResponseDTO> result = itemService.searchProducts(searchType, searchInput, offset, pageSize, isCatalogue, isActive);
 
         // Assert
-        assertNotNull(result);
-        assertEquals(results.getContent().size(), result.getContent().size());
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(results.getContent().size(), result.getContent().size());
         // Add more assertions based on the behavior of your method
     }
 

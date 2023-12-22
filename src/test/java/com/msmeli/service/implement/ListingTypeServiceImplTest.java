@@ -29,13 +29,13 @@ public class ListingTypeServiceImplTest {
         listingType.setId(typeId);
         listingType.setName(expectedName);
 
-        when(listingTypeRepository.getListingTypeName(eq(typeId))).thenReturn(listingType);
+        Mockito.when(listingTypeRepository.getListingTypeName(ArgumentMatchers.eq(typeId))).thenReturn(listingType);
 
         // Act
         String result = listingTypeService.getListingTypeName(typeId);
 
         // Assert
-        assertEquals(expectedName, result);
+        Assertions.assertEquals(expectedName, result);
     }
 
     @Test
@@ -44,13 +44,13 @@ public class ListingTypeServiceImplTest {
         String typeId = "nonExistentTypeId";
 
         // Simula que el repositorio devuelve null
-        when(listingTypeRepository.getListingTypeName(eq(typeId))).thenReturn(null);
+        Mockito.when(listingTypeRepository.getListingTypeName(ArgumentMatchers.eq(typeId))).thenReturn(null);
 
         // Act
         String result = listingTypeService.getListingTypeName(typeId);
 
         // Assert
-        assertNull(result);
+        Assertions.assertNull(result);
     }
 
     @Test
@@ -59,13 +59,13 @@ public class ListingTypeServiceImplTest {
         String typeId = "someTypeId";
 
         // Simula que el repositorio devuelve null
-        when(listingTypeRepository.getListingTypeName(eq(typeId))).thenReturn(null);
+        Mockito.when(listingTypeRepository.getListingTypeName(ArgumentMatchers.eq(typeId))).thenReturn(null);
 
         // Act
         String result = listingTypeService.getListingTypeName(typeId);
 
         // Assert
-        assertNull(result);
+        Assertions.assertNull(result);
     }
 
 

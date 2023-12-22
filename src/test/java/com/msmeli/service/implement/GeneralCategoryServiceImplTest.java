@@ -39,13 +39,13 @@ public class GeneralCategoryServiceImplTest {
         List<GeneralCategory> mockCategories = Arrays.asList(category1, category2);
 
         // Configurar los mocks
-        when(generalCategoryRepository.findAll()).thenReturn(mockCategories);
+        Mockito.when(generalCategoryRepository.findAll()).thenReturn(mockCategories);
 
         // Llamar al método que se está probando
         List<GeneralCategory> result = generalCategoryService.findAll();
 
         // Verificar el resultado
-        assertEquals(mockCategories, result);
+        Assertions.assertEquals(mockCategories, result);
     }
 
 }

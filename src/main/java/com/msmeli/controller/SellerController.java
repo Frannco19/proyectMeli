@@ -1,23 +1,29 @@
 package com.msmeli.controller;
 
 
+import com.msmeli.dto.request.EmployeeUpdateRequestDTO;
+
 import com.msmeli.dto.response.EmployeesResponseDto;
+
 import com.msmeli.dto.response.TokenResposeDTO;
+import com.msmeli.dto.response.UserResponseDTO;
+import com.msmeli.exception.AlreadyExistsException;
 import com.msmeli.exception.ResourceNotFoundException;
 import com.msmeli.model.Employee;
 import com.msmeli.service.services.ItemService;
 import com.msmeli.service.services.SellerService;
+
+import com.msmeli.service.services.UserEntityService;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -25,13 +31,16 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/seller")
 public class SellerController {
-
     private final SellerService sellerService;
     private final ItemService itemService;
 
-    public SellerController(SellerService sellerService, ItemService itemService) {
+
+    private final UserEntityService userEntityService;
+
+    public SellerController(SellerService sellerService, ItemService itemService, UserEntityService userEntityService) {
         this.sellerService = sellerService;
         this.itemService = itemService;
+        this.userEntityService = userEntityService;
     }
 
     @PostMapping("/tokenForTG")
@@ -57,9 +66,8 @@ public class SellerController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    
 
-        @GetMapping("/getEmployeesBySellerId")
+    @GetMapping("/getEmployeesBySellerId")
     public ResponseEntity<List<EmployeesResponseDto>> getEmployeesBySellerId() throws ResourceNotFoundException {
         List<EmployeesResponseDto> employeesList = sellerService.getEmployeesBySellerId();
         return ResponseEntity.ok(employeesList);
