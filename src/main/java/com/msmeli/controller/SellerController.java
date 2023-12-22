@@ -57,18 +57,7 @@ public class SellerController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-
-
-//    @PostMapping("/update-access-token")
-//    public ResponseEntity<String> updateAccessToken(@RequestParam String newAccessToken) {
-//        try {
-//            sellerService.updateAccessToken(newAccessToken);
-//            return new ResponseEntity<>("Access Token actualizado exitosamente.", HttpStatus.OK);
-//        } catch (NoSuchElementException e) {
-//            return new ResponseEntity<>("No se encontró al vendedor en la base de datos.", HttpStatus.NOT_FOUND);
-//        }
-//    }
+    
 
         @GetMapping("/getEmployeesBySellerId")
     public ResponseEntity<List<EmployeesResponseDto>> getEmployeesBySellerId() throws ResourceNotFoundException {

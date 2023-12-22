@@ -23,7 +23,7 @@ public class OneProductResponseDTO {
     private String listing_type_id;
     private int catalog_position;
     private int bestSellerPosition;
-    private String seller_nickname;
+    //private String seller_nickname;
     private String category_id;
     private Date created_date_item;
     private Date updated_date_item;

@@ -13,18 +13,13 @@ import com.msmeli.dto.response.OptionsDTO;
 import com.msmeli.exception.ResourceNotFoundException;
 import com.msmeli.feignClient.MeliFeignClient;
 import com.msmeli.model.*;
-import com.msmeli.repository.CategoryRepository;
-import com.msmeli.repository.ItemRepository;
-import com.msmeli.repository.ListingTypeRepository;
-import com.msmeli.repository.SellerRepository;
+import com.msmeli.repository.*;
+import com.msmeli.service.services.SellerService;
+import com.msmeli.service.services.UserEntityService;
 import feign.FeignException;
 import org.modelmapper.ModelMapper;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -38,17 +33,21 @@ public class MeliService {
     private final CategoryRepository categoryRepository;
     private final SellerRepository sellerRepository;
     private final ListingTypeRepository listingTypeRepository;
+    private  final UserEntityService userEntityService;
+    private final SellerService sellerService;
 
     private final ObjectMapper objectMapper;
 
     private final ModelMapper modelMapper;
 
-    public MeliService(MeliFeignClient meliFeignClient, ItemRepository itemRepository, CategoryRepository categoryRepository, SellerRepository sellerRepository, ListingTypeRepository listingTypeRepository, ObjectMapper objectMapper1) {
+    public MeliService(MeliFeignClient meliFeignClient, ItemRepository itemRepository, CategoryRepository categoryRepository, SellerRepository sellerRepository, ListingTypeRepository listingTypeRepository, UserEntityService userEntityService, SellerService sellerService, ObjectMapper objectMapper1) {
         this.meliFeignClient = meliFeignClient;
         this.itemRepository = itemRepository;
         this.categoryRepository = categoryRepository;
         this.sellerRepository = sellerRepository;
         this.listingTypeRepository = listingTypeRepository;
+        this.userEntityService = userEntityService;
+        this.sellerService = sellerService;
         this.objectMapper = objectMapper1;
         this.modelMapper = new ModelMapper();
     }
@@ -236,21 +235,32 @@ public class MeliService {
         return responseDTO;
     }
 
+    /**
+     *
+     * @param productId id que para indentificar el catalogo en la api de MERCADO LIBRE
+     * @return DTO Con los datos del mejor pocisionado en el catalogo
+     * @throws ResourceNotFoundException
+     */
     public BuyBoxWinnerResponseDTO getBuyBoxWinner(String productId) throws ResourceNotFoundException {
 
-        BoxWinnerDTO result = meliFeignClient.getProductWinnerSearch(productId);
+        Long id = userEntityService.getAuthenticatedUserId();
+        SellerRefactor user = sellerService.findById(id);
+
+        BoxWinnerDTO result = meliFeignClient.getProductWinnerSearch(productId,"Bearer " + user.getTokenMl());
         SellerDTO seller = meliFeignClient.getSellerBySellerId(result.getBuy_box_winner().getSeller_id());
 
         BuyBoxWinnerResponseDTO responseDTO = modelMapper.map(result.getBuy_box_winner(), BuyBoxWinnerResponseDTO.class);
 
         responseDTO.setSeller_nickname(seller.getSeller().getNickname());
-        responseDTO.setListing_type_id(getListingTypeNameFromBd(responseDTO.getListing_type_id()).getName());
+        //responseDTO.setListing_type_id(getListingTypeNameFromBd(responseDTO.getListing_type_id()).getName());
         return responseDTO;
     }
 
-    public BuyBoxWinnerResponseDTO getBuyBoxWinnerCatalog(String productId) {
+    public BuyBoxWinnerResponseDTO getBuyBoxWinnerCatalog(String productId) throws ResourceNotFoundException {
+        Long id = userEntityService.getAuthenticatedUserId();
+        SellerRefactor user = sellerService.findById(id);
 
-        BoxWinnerDTO result = meliFeignClient.getProductWinnerSearch(productId);
+        BoxWinnerDTO result = meliFeignClient.getProductWinnerSearch(productId ,"Bearer " + user.getTokenMl());
 
         return modelMapper.map(result.getBuy_box_winner(), BuyBoxWinnerResponseDTO.class);
     }

@@ -18,7 +18,7 @@ public class Item {
     private String id;
 
     private String title;
-
+    private String catalog_listing;
     private String catalog_product_id;
     @Column(length = 5000)
     private String description;
