@@ -17,6 +17,7 @@ public class ItemFeignDTO {
     private String id;
     private String title;
     private String catalog_product_id;
+    private String catalog_listing;
     private int price;
     private int sold_quantity;
     private int available_quantity;

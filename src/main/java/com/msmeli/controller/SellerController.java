@@ -67,7 +67,6 @@ public class SellerController {
         }
     }
 
-
     @GetMapping("/getEmployeesBySellerId")
     public ResponseEntity<List<EmployeesResponseDto>> getEmployeesBySellerId() throws ResourceNotFoundException {
         List<EmployeesResponseDto> employeesList = sellerService.getEmployeesBySellerId();

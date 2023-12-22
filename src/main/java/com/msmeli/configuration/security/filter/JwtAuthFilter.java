@@ -37,22 +37,35 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String token = null;
         String username = null;
         try {
-            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            if(validateAuthHeader(authHeader)){
                 token = authHeader.substring(7);
                 username = jwtService.extractUsername(token);
-            }
-            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = userEntityUserDetailsService.loadUserByUsername(username);
                 if (jwtService.validateToken(token, userDetails)) {
                     UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, token, userDetails.getAuthorities());
                     authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                }else {
+                    SecurityContextHolder.clearContext();
                 }
+            }else {
+                SecurityContextHolder.clearContext();
+
             }
+
         }catch (Exception ex) {
             throw new SecurityException("Error en la Autenticacion: " + ex.getMessage(),"JWT", 000);
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    private boolean validateAuthHeader(String authHeader){
+        boolean respuesta = true;
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            respuesta = false;
+
+        }
+        return respuesta;
     }
 }

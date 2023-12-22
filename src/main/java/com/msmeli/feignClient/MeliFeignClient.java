@@ -28,7 +28,7 @@ public interface MeliFeignClient {
     public ItemCatalogDTO getProductSearch(@PathVariable String productId,@RequestParam int limit,@RequestParam int offset);
 
     @GetMapping("/products/{productId}")
-    public BoxWinnerDTO getProductWinnerSearch(@PathVariable String productId);
+    public BoxWinnerDTO getProductWinnerSearch(@PathVariable String productId, @RequestHeader("Authorization") String authorization);
 
     @GetMapping("/sites/MLA/search?nickname={nickname}&catalog_listing=true&offset={offset}")
     public SellerDTO getSellerByNickname(@PathVariable String nickname, @PathVariable int offset);

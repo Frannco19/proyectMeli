@@ -149,12 +149,13 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public OneProductResponseDTO getOneProduct(String productId) throws ResourceNotFoundException {
         Item item = itemRepository.findByProductId(productId);
-        Seller seller = sellerService.findBySellerId(Long.valueOf(item.getSellerId()));
+        //Seller seller = sellerService.findBySellerId(Long.valueOf(item.getSellerId()));
 
         OneProductResponseDTO responseDTO = mapper.map(item, OneProductResponseDTO.class);
-        responseDTO.setSeller_nickname(seller.getNickname());
+       // responseDTO.setSeller_nickname(seller.getNickname());
 
-        responseDTO.setCatalog_position(meliService.getCatalogPosition(item.getId(), productId));
+        //responseDTO.setCatalog_position(meliService.getCatalogPosition(item.getId(), productId));
+        responseDTO.setCatalog_position(item.getCatalog_position());
         return responseDTO;
     }
 
@@ -231,7 +232,7 @@ public class ItemServiceImpl implements ItemService {
      * @param itemResponseDTO DTO de itemResponseDTO donse se cargar el dato
      * @return devuelve el Dto cargado
      */
-    private ItemResponseDTO calculateColor(ItemResponseDTO itemResponseDTO) {
+    private ItemResponseDTO calculateColor(ItemResponseDTO itemResponseDTO) throws ResourceNotFoundException {
         BuyBoxWinnerResponseDTO firstPlace = null;
         double winnerPrice = 0.0;
         double adjustedPrice = 0.0;
