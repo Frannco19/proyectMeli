@@ -52,7 +52,6 @@ public class EmployeeServiceImpl implements EmployeeService {
         existingEmployee.setEmail(employeeUpdateDTO.getEmail());
         existingEmployee.setNombre(employeeUpdateDTO.getNombre());
         existingEmployee.setApellido(employeeUpdateDTO.getApellido());
-        existingEmployee.setRol(employeeUpdateDTO.getRol());
 
         // Guardar la entidad actualizada
         employeeRepository.save(existingEmployee);
