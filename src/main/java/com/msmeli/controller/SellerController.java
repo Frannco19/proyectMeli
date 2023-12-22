@@ -57,7 +57,7 @@ public class SellerController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
+    
 
         @GetMapping("/getEmployeesBySellerId")
     public ResponseEntity<List<EmployeesResponseDto>> getEmployeesBySellerId() throws ResourceNotFoundException {
