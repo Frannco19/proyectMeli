@@ -67,14 +67,14 @@ public class SellerServiceImplTest {
         // Arrange
         int sellerId = 1;
         Seller expectedSeller = new Seller();
-        when(sellerRepository.findById(sellerId)).thenReturn(Optional.of(expectedSeller));
+        Mockito.when(sellerRepository.findById(sellerId)).thenReturn(Optional.of(expectedSeller));
 
         // Act
         Optional<Seller> result = sellerService.getSeller(sellerId);
 
         // Assert
-        assertTrue(result.isPresent());
-        assertEquals(expectedSeller, result.get());
+        Assertions.assertTrue(result.isPresent());
+        Assertions.assertEquals(expectedSeller, result.get());
     }
 
     @Test
@@ -82,16 +82,16 @@ public class SellerServiceImplTest {
         // Arrange
         SellerRequestDTO sellerRequestDTO = new SellerRequestDTO();
         Seller expectedSeller = new Seller();
-        when(mapper.map(eq(sellerRequestDTO), eq(Seller.class))).thenReturn(expectedSeller);
-        when(sellerRepository.save(expectedSeller)).thenReturn(expectedSeller);
+        Mockito.when(mapper.map(ArgumentMatchers.eq(sellerRequestDTO), ArgumentMatchers.eq(Seller.class))).thenReturn(expectedSeller);
+        Mockito.when(sellerRepository.save(expectedSeller)).thenReturn(expectedSeller);
 
         // Act
         Seller result = sellerService.create(sellerRequestDTO);
 
         // Assert
-        assertNotNull(result);
-        assertEquals(expectedSeller, result);
-        verify(sellerRepository, times(1)).save(expectedSeller);
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(expectedSeller, result);
+        Mockito.verify(sellerRepository, Mockito.times(1)).save(expectedSeller);
     }
 
     @Test
@@ -99,15 +99,15 @@ public class SellerServiceImplTest {
         // Arrange
         UserRegisterRequestDTO userRegisterRequestDTO = new UserRegisterRequestDTO();
         UserResponseDTO expectedResponse = new UserResponseDTO();
-        when(userEntityService.createSeller(userRegisterRequestDTO)).thenReturn(expectedResponse);
+        Mockito.when(userEntityService.createSeller(userRegisterRequestDTO)).thenReturn(expectedResponse);
 
         // Act
         UserResponseDTO result = sellerService.createSeller(userRegisterRequestDTO);
 
         // Assert
-        assertNotNull(result);
-        assertEquals(expectedResponse, result);
-        verify(userEntityService, times(1)).createSeller(userRegisterRequestDTO);
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(expectedResponse, result);
+        Mockito.verify(userEntityService, Mockito.times(1)).createSeller(userRegisterRequestDTO);
     }
 
     @Test
@@ -115,30 +115,30 @@ public class SellerServiceImplTest {
         // Arrange
         EmployeeRegisterRequestDTO employeeRegisterDTO = new EmployeeRegisterRequestDTO();
         UserResponseDTO expectedResponse = new UserResponseDTO();
-        when(userEntityService.createEmployee(employeeRegisterDTO)).thenReturn(expectedResponse);
+        Mockito.when(userEntityService.createEmployee(employeeRegisterDTO)).thenReturn(expectedResponse);
 
         // Act
         UserResponseDTO result = sellerService.createEmployee(employeeRegisterDTO);
 
         // Assert
-        assertNotNull(result);
-        assertEquals(expectedResponse, result);
-        verify(userEntityService, times(1)).createEmployee(employeeRegisterDTO);
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(expectedResponse, result);
+        Mockito.verify(userEntityService, Mockito.times(1)).createEmployee(employeeRegisterDTO);
     }
 
     @Test
     public void testFindAll() {
         // Arrange
         Seller expectedSeller = new Seller();
-        when(sellerRepository.findAll()).thenReturn(Collections.singletonList(expectedSeller));
+        Mockito.when(sellerRepository.findAll()).thenReturn(Collections.singletonList(expectedSeller));
 
         // Act
         List<Seller> result = sellerService.findAll();
 
         // Assert
-        assertNotNull(result);
-        assertEquals(1, result.size());
-        assertEquals(expectedSeller, result.get(0));
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(1, result.size());
+        Assertions.assertEquals(expectedSeller, result.get(0));
     }
 
     @Test
@@ -147,15 +147,15 @@ public class SellerServiceImplTest {
         Long sellerId = 1L;
         String TG = "testToken";
         SellerRefactor seller = new SellerRefactor();
-        when(sellerRefactorRepository.findById(sellerId)).thenReturn(Optional.of(seller));
+        Mockito.when(sellerRefactorRepository.findById(sellerId)).thenReturn(Optional.of(seller));
         TokenRequestDTO tokenRequestDTO = new TokenRequestDTO();
-        when(meliFeignClient.tokenForTG(tokenRequestDTO)).thenReturn(new TokenResposeDTO());
+        Mockito.when(meliFeignClient.tokenForTG(tokenRequestDTO)).thenReturn(new TokenResposeDTO());
 
         // Act
         TokenResposeDTO result = sellerService.saveToken(TG);
 
         // Assert
-        assertNotNull(result);
+        Assertions.assertNotNull(result);
         // Añade más aserciones según tu lógica
     }
 
@@ -166,13 +166,13 @@ public class SellerServiceImplTest {
         SellerRefactor seller = new SellerRefactor();
 
         // Configura el comportamiento de sellerRefactorRepository
-        when(sellerRefactorRepository.findById(sellerId)).thenReturn(Optional.of(seller));
+        Mockito.when(sellerRefactorRepository.findById(sellerId)).thenReturn(Optional.of(seller));
 
         // Act
         TokenResposeDTO result = sellerService.refreshToken();
 
         // Assert
-        assertNotNull(result);
+        Assertions.assertNotNull(result);
         // Añade más aserciones según tu lógica
     }
 
@@ -183,17 +183,17 @@ public class SellerServiceImplTest {
         Long sellerId = 1L;
         String TG = "testToken";
         SellerRefactor seller = new SellerRefactor();
-        when(sellerRefactorRepository.findById(sellerId)).thenReturn(Optional.of(seller));
+        Mockito.when(sellerRefactorRepository.findById(sellerId)).thenReturn(Optional.of(seller));
 
         // Configura un TokenResponseDTO simulado que debería devolver meliFeignClient
         TokenResposeDTO simulatedTokenResponse = new TokenResposeDTO();
-        when(meliFeignClient.tokenForTG(any(TokenRequestDTO.class))).thenReturn(simulatedTokenResponse);
+        Mockito.when(meliFeignClient.tokenForTG(ArgumentMatchers.any(TokenRequestDTO.class))).thenReturn(simulatedTokenResponse);
 
         // Act
         TokenResposeDTO result = sellerService.updateToken(TG);
 
         // Assert
-        assertNotNull(result);
+        Assertions.assertNotNull(result);
         // Añade más aserciones según tu lógica
     }
 
@@ -203,28 +203,28 @@ public class SellerServiceImplTest {
         // Arrange
         Long sellerId = 1L;
         SellerRefactor seller = new SellerRefactor();
-        when(sellerRefactorRepository.findById(sellerId)).thenReturn(Optional.of(seller));
+        Mockito.when(sellerRefactorRepository.findById(sellerId)).thenReturn(Optional.of(seller));
         List<Employee> employeeList = Collections.singletonList(new Employee());
-        when(employeeRepository.findAll()).thenReturn(employeeList);
+        Mockito.when(employeeRepository.findAll()).thenReturn(employeeList);
 
         // Act
         List<EmployeesResponseDto> result = sellerService.getEmployeesBySellerId();
 
         // Assert
-        assertNotNull(result);
+        Assertions.assertNotNull(result);
     }
 
     @Test
     public void testGetAllEmployees() {
         // Arrange
         List<Employee> allEmployees = Collections.singletonList(new Employee());
-        when(employeeRepository.findAll()).thenReturn(allEmployees);
+        Mockito.when(employeeRepository.findAll()).thenReturn(allEmployees);
 
         // Act
         List<EmployeesResponseDto> result = sellerService.getAllEmployees();
 
         // Assert
-        assertNotNull(result);
+        Assertions.assertNotNull(result);
         // Añade más aserciones según tu lógica
     }
 

@@ -68,44 +68,7 @@ public class SellerController {
     }
 
 
-
-    @PostMapping("/update-access-token")
-    public ResponseEntity<String> updateAccessToken(@RequestParam String newAccessToken) {
-        try {
-            sellerService.updateAccessToken(newAccessToken);
-            return new ResponseEntity<>("Access Token actualizado exitosamente.", HttpStatus.OK);
-        } catch (NoSuchElementException e) {
-            return new ResponseEntity<>("No se encontró al vendedor en la base de datos.", HttpStatus.NOT_FOUND);
-        }
-    }
-
-
-    @DeleteMapping("/eliminar/{employeeId}")
-    public ResponseEntity<String> deleteEmployee(@PathVariable Long employeeId) {
-        try {
-            userEntityService.deleteEmployee(employeeId);
-            return new ResponseEntity<>("Empleado eliminado con éxito", HttpStatus.OK);
-        } catch (ResourceNotFoundException e) {
-            return new ResponseEntity<>("Empleado no encontrado", HttpStatus.NOT_FOUND);
-        }
-    }
-
-    @PutMapping("/editar/{employeeId}")
-    public ResponseEntity<UserResponseDTO> updateEmployee(@PathVariable Long employeeId,
-                                                          @RequestBody EmployeeUpdateRequestDTO employeeUpdateDTO) {
-        try {
-            UserResponseDTO updatedEmployee = userEntityService.updateEmployee(employeeId, employeeUpdateDTO);
-            return new ResponseEntity<>(updatedEmployee, HttpStatus.OK);
-        } catch (ResourceNotFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } catch (AlreadyExistsException e) {
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
-        }
-    }
-
-
-
-        @GetMapping("/getEmployeesBySellerId")
+    @GetMapping("/getEmployeesBySellerId")
     public ResponseEntity<List<EmployeesResponseDto>> getEmployeesBySellerId() throws ResourceNotFoundException {
         List<EmployeesResponseDto> employeesList = sellerService.getEmployeesBySellerId();
         return ResponseEntity.ok(employeesList);

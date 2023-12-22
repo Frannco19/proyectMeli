@@ -94,34 +94,7 @@ public class UserEntityServiceImpl implements com.msmeli.service.services.UserEn
         return mapper.map(newEmployee,UserResponseDTO.class);
     }
 
-    @Override
-    @Transactional
-    public UserResponseDTO updateEmployee(Long employeeId, EmployeeUpdateRequestDTO employeeUpdateDTO)
-            throws ResourceNotFoundException, AlreadyExistsException {
-        // Obtener el empleado existente por su ID
-        Employee existingEmployee = employeeRepository.findById(employeeId)
-                .orElseThrow(() -> new ResourceNotFoundException("Empleado no encontrado con ID: " + employeeId));
 
-        // Validar si el nuevo nombre de usuario ya existe
-        if (!existingEmployee.getUsername().equals(employeeUpdateDTO.getUsername())
-                && userEntityRepository.findByUsername(employeeUpdateDTO.getUsername()).isPresent()) {
-            throw new AlreadyExistsException("El nombre de usuario ya existe.");
-        }
-
-        // Actualizar los campos necesarios
-        existingEmployee.setUsername(employeeUpdateDTO.getUsername());
-        existingEmployee.setPassword(passwordEncoder.encode(employeeUpdateDTO.getPassword()));
-        existingEmployee.setEmail(employeeUpdateDTO.getEmail());
-        existingEmployee.setNombre(employeeUpdateDTO.getNombre());
-        existingEmployee.setApellido(employeeUpdateDTO.getApellido());
-        existingEmployee.setRol(employeeUpdateDTO.getRol());
-
-        // Guardar la entidad actualizada
-        employeeRepository.save(existingEmployee);
-
-        // Mapear la entidad a DTO y devolver la respuesta
-        return mapper.map(existingEmployee, UserResponseDTO.class);
-    }
 
     @Override
     public UserResponseDTO read(Long id) throws ResourceNotFoundException {
@@ -150,15 +123,7 @@ public class UserEntityServiceImpl implements com.msmeli.service.services.UserEn
         userEntityRepository.deleteById(id);
     }
 
-    @Override
-    public void deleteEmployee(Long employeeId) throws ResourceNotFoundException {
-        // Obtener el empleado por su ID
-        Employee employeeToDelete = employeeRepository.findById(employeeId)
-                .orElseThrow(() -> new ResourceNotFoundException("Empleado no encontrado con ID: " + employeeId));
 
-        // Eliminar el empleado
-        employeeRepository.delete(employeeToDelete);
-    }
 
     @Override
     public UserResponseDTO modifyUserRoles(Long userId) throws ResourceNotFoundException {

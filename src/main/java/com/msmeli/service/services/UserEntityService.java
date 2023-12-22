@@ -5,8 +5,6 @@ import com.msmeli.dto.response.UserAuthResponseDTO;
 import com.msmeli.dto.response.UserResponseDTO;
 import com.msmeli.exception.AlreadyExistsException;
 import com.msmeli.exception.ResourceNotFoundException;
-import com.msmeli.model.Seller;
-import com.msmeli.model.SellerRefactor;
 import com.msmeli.model.UserEntity;
 
 import java.util.List;
@@ -16,9 +14,6 @@ public interface UserEntityService {
     UserResponseDTO createSeller(UserRegisterRequestDTO userRegisterRequestDTO) throws ResourceNotFoundException, AlreadyExistsException;
     UserResponseDTO createEmployee(EmployeeRegisterRequestDTO employeeRegisterRequestDTO) throws ResourceNotFoundException, AlreadyExistsException;
 
-    UserResponseDTO updateEmployee(Long employeeId, EmployeeUpdateRequestDTO employeeUpdateDTO) throws ResourceNotFoundException, AlreadyExistsException;
-
-
     UserResponseDTO read(Long id) throws ResourceNotFoundException;
 
     List<UserResponseDTO> readAll() throws ResourceNotFoundException;
@@ -26,8 +21,6 @@ public interface UserEntityService {
     UserEntity update(UserEntity userEntity) throws ResourceNotFoundException;
 
     void delete(Long id) throws ResourceNotFoundException;
-
-    void deleteEmployee(Long employeeId) throws ResourceNotFoundException;
 
     UserResponseDTO modifyUserRoles(Long userId) throws ResourceNotFoundException;
 

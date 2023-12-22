@@ -33,22 +33,22 @@ public class RoleEntityServiceTest {
         Role role = Role.SELLER;
 
         RoleEntity roleEntity = new RoleEntity();
-        roleEntity.setName(SELLER);
+        roleEntity.setName(Role.SELLER);
 
-        when(roleRepository.findByName(role)).thenReturn(Optional.of(roleEntity));
+        Mockito.when(roleRepository.findByName(role)).thenReturn(Optional.of(roleEntity));
 
 
         RoleEntity result = null;
         try {
             result = roleEntityService.findByName(role);
         } catch (ResourceNotFoundException e) {
-            fail("No debería lanzar una excepción en este caso");
+            Assertions.fail("No debería lanzar una excepción en este caso");
         }
 
 
-        verify(roleRepository, atLeastOnce()).findByName(role);
+        Mockito.verify(roleRepository, Mockito.atLeastOnce()).findByName(role);
 
-        assertEquals("SELLER", result.getName());
+        Assertions.assertEquals("SELLER", result.getName());
     }
 
     @Test
@@ -56,25 +56,25 @@ public class RoleEntityServiceTest {
         // Configurar comportamiento simulado para el mock cuando no se encuentra el rol
         Role role = Role.SELLER;
 
-        when(roleRepository.findByName(role)).thenReturn(Optional.empty());
+        Mockito.when(roleRepository.findByName(role)).thenReturn(Optional.empty());
 
         // Llamar al método que estás probando y esperar la excepción
-        assertThrows(ResourceNotFoundException.class, () -> roleEntityService.findByName(role));
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> roleEntityService.findByName(role));
 
         // Verificar que los métodos necesarios se hayan llamado
-        verify(roleRepository, atLeastOnce()).findByName(role);
+        Mockito.verify(roleRepository, Mockito.atLeastOnce()).findByName(role);
     }
     @Test
     public void testFindByNameWhenRoleNotFound() {
         // Configurar comportamiento simulado para el mock cuando no se encuentra el rol
         Role role = null /* Crear un objeto Role según tus necesidades */;
-        when(roleRepository.findByName(role)).thenReturn(Optional.empty());
+        Mockito.when(roleRepository.findByName(role)).thenReturn(Optional.empty());
 
         // Llamar al método que estás probando y verificar que se lance la excepción esperada
-        assertThrows(ResourceNotFoundException.class, () -> roleEntityService.findByName(role));
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> roleEntityService.findByName(role));
 
         // Verificar que los métodos necesarios se hayan llamado
-        verify(roleRepository, atLeastOnce()).findByName(role);
+        Mockito.verify(roleRepository, Mockito.atLeastOnce()).findByName(role);
     }
 
 }

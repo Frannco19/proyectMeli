@@ -57,34 +57,34 @@ public class MeliServiceTest {
     @Test
     public void testGetItemById() {
         // Configura el comportamiento simulado del repositorio de ítems
-        when(itemRepository.findById("itemId")).thenReturn(Optional.of(new Item(/* Datos del ítem */)));
+        Mockito.when(itemRepository.findById("itemId")).thenReturn(Optional.of(new Item(/* Datos del ítem */)));
 
         // Llama al método que deseas probar
         try {
             Item item = meliService.getItemById("itemId");
 
             // Realiza afirmaciones sobre el resultado
-            assertNotNull(item);
+            Assertions.assertNotNull(item);
             // Agrega más afirmaciones según sea necesario
         } catch (Exception e) {
-            fail("Excepción no esperada: " + e.getMessage());
+            Assertions.fail("Excepción no esperada: " + e.getMessage());
         }
     }
 
     @Test
     public void testGetCategory() {
         // Configura el comportamiento simulado del repositorio de categorías
-        when(categoryRepository.findById("categoryId")).thenReturn(Optional.of(new Category(/* Datos de la categoría */)));
+        Mockito.when(categoryRepository.findById("categoryId")).thenReturn(Optional.of(new Category(/* Datos de la categoría */)));
 
         // Llama al método que deseas probar
         try {
             Category category = meliService.getCategory("categoryId");
 
             // Realiza afirmaciones sobre el resultado
-            assertNotNull(category);
+            Assertions.assertNotNull(category);
             // Agrega más afirmaciones según sea necesario
         } catch (Exception e) {
-            fail("Excepción no esperada: " + e.getMessage());
+            Assertions.fail("Excepción no esperada: " + e.getMessage());
         }
     }
 
@@ -93,17 +93,17 @@ public class MeliServiceTest {
         // Configura el comportamiento simulado del repositorio de vendedores
         int sellerId = 123; // El ID del vendedor que deseas buscar
         Seller seller = new Seller(/* Datos del vendedor simulado */);
-        when(sellerRepository.findById(sellerId)).thenReturn(Optional.of(seller));
+        Mockito.when(sellerRepository.findById(sellerId)).thenReturn(Optional.of(seller));
 
         // Llama al método que deseas probar
         try {
             Seller resultSeller = meliService.getSeller(sellerId);
 
             // Realiza afirmaciones sobre el resultado
-            assertNotNull(resultSeller);
+            Assertions.assertNotNull(resultSeller);
             // Agrega más afirmaciones según sea necesario
         } catch (Exception e) {
-            fail("Excepción no esperada: " + e.getMessage());
+            Assertions.fail("Excepción no esperada: " + e.getMessage());
         }
     }
 
@@ -111,10 +111,10 @@ public class MeliServiceTest {
     public void testGetSellerWhenSellerNotFound() {
         // Configura el comportamiento simulado del repositorio de vendedores cuando no se encuentra el vendedor
         int sellerId = 456; // Un ID de vendedor que no existe en el repositorio
-        when(sellerRepository.findById(sellerId)).thenReturn(Optional.empty());
+        Mockito.when(sellerRepository.findById(sellerId)).thenReturn(Optional.empty());
 
         // Llama al método que deseas probar y espera una excepción
-        assertThrows(Exception.class, () -> {
+        Assertions.assertThrows(Exception.class, () -> {
             meliService.getSeller(sellerId);
         }, "Seller not found");
     }
@@ -128,7 +128,7 @@ public class MeliServiceTest {
         Integer result = meliService.getPositionMethod(documentContext);
 
         // Assert
-        assertEquals(42, result);
+        Assertions.assertEquals(42, result);
     }
 
 }

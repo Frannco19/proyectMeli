@@ -450,6 +450,7 @@ public final class SellerControllerTest {
         sellerController.updateToken(null);
     }
     ///endregion
+    ///endregion
 
     ///region Errors report for updateToken
 
@@ -462,5 +463,4 @@ public final class SellerControllerTest {
     }
     ///endregion
 
-    ///endregion
 }
