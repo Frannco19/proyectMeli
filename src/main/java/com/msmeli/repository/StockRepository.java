@@ -22,4 +22,9 @@ public interface StockRepository extends JpaRepository<Stock, Integer> {
 
     @Query("SELECT s FROM Stock s WHERE s.user_id.seller.id = ?1")
     Page<Stock> findAllBySellerId(Long id, Pageable pageable);
+
+    @Query("SELECT s FROM Stock s WHERE s.user_id.id = :userId")
+    List<Stock> findAllByUserId(Long userId);
+
+
 }
