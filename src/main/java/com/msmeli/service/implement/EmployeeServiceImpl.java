@@ -46,12 +46,22 @@ public class EmployeeServiceImpl implements EmployeeService {
             throw new AlreadyExistsException("El nombre de usuario ya existe.");
         }
 
-        // Actualizar los campos necesarios
-        existingEmployee.setUsername(employeeUpdateDTO.getUsername());
-        existingEmployee.setPassword(passwordEncoder.encode(employeeUpdateDTO.getPassword()));
-        existingEmployee.setEmail(employeeUpdateDTO.getEmail());
-        existingEmployee.setNombre(employeeUpdateDTO.getNombre());
-        existingEmployee.setApellido(employeeUpdateDTO.getApellido());
+        // Actualizar solo los campos proporcionados en la solicitud
+        if (employeeUpdateDTO.getUsername() != null) {
+            existingEmployee.setUsername(employeeUpdateDTO.getUsername());
+        }
+        if (employeeUpdateDTO.getPassword() != null) {
+            existingEmployee.setPassword(passwordEncoder.encode(employeeUpdateDTO.getPassword()));
+        }
+        if (employeeUpdateDTO.getEmail() != null) {
+            existingEmployee.setEmail(employeeUpdateDTO.getEmail());
+        }
+        if (employeeUpdateDTO.getNombre() != null) {
+            existingEmployee.setNombre(employeeUpdateDTO.getNombre());
+        }
+        if (employeeUpdateDTO.getApellido() != null) {
+            existingEmployee.setApellido(employeeUpdateDTO.getApellido());
+        }
 
         // Guardar la entidad actualizada
         employeeRepository.save(existingEmployee);
