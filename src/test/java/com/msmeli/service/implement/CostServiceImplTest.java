@@ -6,6 +6,7 @@ import com.msmeli.model.Item;
 import com.msmeli.model.Stock;
 import com.msmeli.repository.CostRepository;
 import com.msmeli.service.feignService.MeliService;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
