@@ -123,4 +123,29 @@ public class StockServiceImpl implements StockService {
         if(stockList.getContent().isEmpty()) throw new ResourceNotFoundException("El seller buscado no posee stock");
         return stockList;
     }
+
+
+    public List<StockDTO> findAllByUserId(Long userId) {
+        List<Stock> stockList = stockRepository.findAllByUserId(userId);
+
+        // Ahora, crea instancias de StockDTO a partir de Stock
+        List<StockDTO> stockDTOList = stockList.stream()
+                .map(stock -> new StockDTO(
+                        stock.getId(),
+                        stock.getSku(),
+                        stock.getAvailable_quantity(),
+                        stock.getPrice(),
+                        stock.getRegister_date(),
+                        // Aquí deberías crear una instancia de SupplierStockResponseDTO si es necesario
+                        null  // Por ahora, establezco null, ya que no proporcionaste cómo obtener SupplierStockResponseDTO
+                ))
+                .collect(Collectors.toList());
+
+        return stockDTOList;
+    }
+
+
+
+
+
 }
