@@ -195,8 +195,7 @@ public class ItemServiceImpl implements ItemService {
         Long idSeller = userEntityService.getAuthenticatedUserId();
         SellerRefactor seller = sellerService.findById(idSeller);
         Pageable pageable = PageRequest.of(offset, pageSize);
-        int inCatalogue = isCatalogue ? -1 : -2;
-        Page<Item> results = itemRepository.findByFilters("%" + searchInput.toUpperCase() + "%", searchType, inCatalogue, isActive,seller, pageable);
+        Page<Item> results = itemRepository.findByFilters("%" + searchInput.toUpperCase() + "%", searchType, isCatalogue, isActive,seller, pageable);
         if (results.getContent().isEmpty()) throw new AppException("No Content","/search->searchProduct",  000, 204);
         return results.map(item -> {
             ItemResponseDTO itemDTO = getItemResponseDTO(item);

@@ -30,7 +30,7 @@ public interface ItemRepository extends JpaRepository<Item, String> {
 
     Page<Item> findByIdContaining(String id, Pageable pageable);
 //TODO CAMBIAR RANGO catalog_position CUANDO SE AGREDE EL MODULO DE CONSTO Y STOCK
-    @Query("SELECT i FROM Item i WHERE ((:searchType = 'id' AND i.id like :searchInput) OR (:searchType = 'sku' AND i.sku like :searchInput)) AND ((:inCatalogue = -1 AND i.catalog_position > 0 ) OR (:inCatalogue = -2 AND i.catalog_position > -2)) AND ((:isActive = 'null' AND i.status != :isActive) OR i.status = :isActive) AND i.sellerRefactor = :seller")
-    Page<Item> findByFilters(@Param("searchInput") String searchInput, @Param("searchType") String searchType, @Param("inCatalogue") int inCatalogue, @Param("isActive") String isActive, @Param("seller") SellerRefactor seller, Pageable pageable);
+    @Query("SELECT i FROM Item i WHERE ((:searchType = 'id' AND i.id like :searchInput) OR (:searchType = 'sku' AND i.sku like :searchInput)) AND ((:isCatalogue = TRUE AND i.catalog_listing = 'true' ) OR (:isCatalogue = FALSE AND i.catalog_listing = 'false')) AND ((:isActive = 'null' AND i.status != :isActive) OR i.status = :isActive) AND i.sellerRefactor = :seller")
+    Page<Item> findByFilters(@Param("searchInput") String searchInput, @Param("searchType") String searchType, @Param("isCatalogue") boolean isCatalogue, @Param("isActive") String isActive, @Param("seller") SellerRefactor seller, Pageable pageable);
     Page<Item> findAllBySellerId(Integer sellerId, Pageable pageable);
 }
