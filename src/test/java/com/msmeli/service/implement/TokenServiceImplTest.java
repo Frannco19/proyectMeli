@@ -7,11 +7,10 @@ import static org.mockito.Mockito.*;
 
 import com.msmeli.model.Token;
 import com.msmeli.repository.TokenRepository;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.*;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 
 import java.util.List;

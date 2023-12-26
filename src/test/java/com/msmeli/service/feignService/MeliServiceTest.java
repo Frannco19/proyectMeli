@@ -3,46 +3,37 @@ package com.msmeli.service.feignService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
-<<<<<<< HEAD:src/test/service/feignService/MeliServiceTest.java
-import com.msmeli.controller.AuthController;
-=======
 import com.msmeli.dto.BoxWinnerDTO;
-import com.msmeli.dto.ItemAttributesDTO;
-import com.msmeli.dto.ItemCatalogDTO;
 import com.msmeli.dto.SellerDTO;
 import com.msmeli.dto.response.BuyBoxWinnerResponseDTO;
 import com.msmeli.dto.response.CatalogItemResponseDTO;
 import com.msmeli.exception.ResourceNotFoundException;
->>>>>>> ce68fa85b6d639ea2cf747b3f0840ee804593cdc:src/test/java/com/msmeli/service/feignService/MeliServiceTest.java
 import com.msmeli.feignClient.MeliFeignClient;
 import com.msmeli.model.Category;
-import com.msmeli.model.Employee;
 import com.msmeli.model.Item;
 import com.msmeli.model.ListingType;
 import com.msmeli.model.Seller;
 import com.msmeli.repository.*;
-import com.msmeli.service.implement.UserEntityServiceImpl;
-import com.msmeli.service.services.UserEntityService;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.springframework.test.context.junit4.SpringRunner;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-<<<<<<< HEAD:src/test/service/feignService/MeliServiceTest.java
-import static org.mockito.Mockito.*;
-=======
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
->>>>>>> ce68fa85b6d639ea2cf747b3f0840ee804593cdc:src/test/java/com/msmeli/service/feignService/MeliServiceTest.java
 
+@ExtendWith(MockitoExtension.class)
+@RunWith(SpringRunner.class)
 public class MeliServiceTest {
 
     @Mock
@@ -74,23 +65,10 @@ public class MeliServiceTest {
 
     @BeforeEach
     void setUp() {
-        meliFeignClient = mock(MeliFeignClient.class);
-        itemRepository = mock(ItemRepository.class);
-        categoryRepository = mock(CategoryRepository.class);
-        sellerRepository = mock(SellerRepository.class);
-        listingTypeRepository = mock(ListingTypeRepository.class);
-        objectMapper = mock(ObjectMapper.class);
-        modelMapper = new ModelMapper();
-
-        meliService = new MeliService(
-                meliFeignClient,
-                itemRepository,
-                categoryRepository,
-                sellerRepository,
-                listingTypeRepository,
-                objectMapper
-        );
+        MockitoAnnotations.openMocks(this);
     }
+
+
 
 
     @Test
@@ -170,8 +148,7 @@ public class MeliServiceTest {
         Assertions.assertEquals(42, result);
     }
 
-<<<<<<< HEAD:src/test/service/feignService/MeliServiceTest.java
-=======
+
     @Test
     void testGetListingTypeNameFromBd() throws ResourceNotFoundException {
         // Mocking behavior
@@ -179,7 +156,7 @@ public class MeliServiceTest {
         when(listingTypeRepository.findById("listingTypeId")).thenReturn(Optional.of(listingType));
 
         // Call the method to be tested
-        ListingType result = new MeliService(null, null, null, null, listingTypeRepository, null)
+        ListingType result = new MeliService(null, null, null, null, listingTypeRepository, null, null, null)
                 .getListingTypeNameFromBd("listingTypeId");
 
         // Assert the result
@@ -193,7 +170,7 @@ public class MeliServiceTest {
 
         // Call the method and assert the exception
         assertThrows(ResourceNotFoundException.class,
-                () -> new MeliService(null, null, null, null, listingTypeRepository, null)
+                () -> new MeliService(null, null, null, null, listingTypeRepository, null, null, null)
                         .getListingTypeNameFromBd("nonExistentListingTypeId"));
     }
 
@@ -201,12 +178,12 @@ public class MeliServiceTest {
     void testGetBuyBoxWinner() throws ResourceNotFoundException {
         // Mocking behavior
         BoxWinnerDTO mockResultDTO = createMockBoxWinnerDTO();
-        when(meliFeignClient.getProductWinnerSearch(anyString())).thenReturn(mockResultDTO);
+        when(meliFeignClient.getProductWinnerSearch(anyString(), anyString())).thenReturn(mockResultDTO);
 
         SellerDTO mockSellerDTO = createMockSellerDTO();
         when(meliFeignClient.getSellerBySellerId(Integer.valueOf(anyString()))).thenReturn(mockSellerDTO);
 
-        MeliService meliService = new MeliService(meliFeignClient, null, null, null, null, null);
+        MeliService meliService = new MeliService(meliFeignClient, null, null, null, null, null, null, null);
 
         // Call the method to be tested
         BuyBoxWinnerResponseDTO resultDTO = meliService.getBuyBoxWinner("productId");
@@ -233,15 +210,15 @@ public class MeliServiceTest {
     }
 
     @Test
-    void testGetBuyBoxWinnerCatalog() {
+    void testGetBuyBoxWinnerCatalog() throws ResourceNotFoundException {
         // Mocking behavior
         BoxWinnerDTO mockResultDTO = createMockBoxWinnerDTO();
-        when(meliFeignClient.getProductWinnerSearch(anyString())).thenReturn(mockResultDTO);
+        when(meliFeignClient.getProductWinnerSearch(anyString(), anyString())).thenReturn(mockResultDTO);
 
-        MeliService meliService = new MeliService(meliFeignClient, null, null, null, null, objectMapper);
+        MeliService meliService = new MeliService(meliFeignClient, null, null, null, null, null, null, null);
 
         // Call the method to be tested
-        BuyBoxWinnerResponseDTO resultDTO = meliService.getBuyBoxWinnerCatalog("productId");
+        BuyBoxWinnerResponseDTO resultDTO = meliService.getBuyBoxWinnerCatalog("productId"); //simular token
 
         // Assert the result
         assertEquals(mockResultDTO.getBuy_box_winner().getListing_type_id(),
@@ -251,5 +228,4 @@ public class MeliServiceTest {
 
 
 
->>>>>>> ce68fa85b6d639ea2cf747b3f0840ee804593cdc:src/test/java/com/msmeli/service/feignService/MeliServiceTest.java
 }
