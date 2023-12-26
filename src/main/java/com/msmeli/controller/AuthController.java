@@ -40,11 +40,8 @@ public class AuthController {
     @PostMapping("/login")
     @Operation(summary = "Endpoint para autenticar usuario.")
     public ResponseEntity<UserAuthResponseDTO> login(@Valid @RequestBody AuthRequestDTO authRequestDTO) throws ResourceNotFoundException{
-        Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequestDTO.getUsername(), authRequestDTO.getPassword()));
-        if (authenticate.isAuthenticated()) {
             return ResponseEntity.status(HttpStatus.OK).body(userEntityService.userAuthenticateAndGetToken(authRequestDTO.getUsername()));
-        }
-        throw new UsernameNotFoundException("Solicitud de usuario invalida");
+
     }
 
 

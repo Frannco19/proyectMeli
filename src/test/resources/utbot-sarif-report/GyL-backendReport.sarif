@@ -19,6 +19,269 @@
           "help" : {
             "text" : "https://docs.oracle.com/javase/8/docs/api/java/lang/NullPointerException.html"
           }
+<<<<<<< HEAD
+        } ]
+      }
+    },
+    "results" : [ {
+      "ruleId" : "utbot.exception.NullPointerException",
+      "level" : "error",
+      "message" : {
+        "text" : "Unexpected exception: java.lang.NullPointerException.\nTest case: `login(null)`\n[Generated test for this case](1)"
+      },
+      "locations" : [ {
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "src/main/java/com/msmeli/controller/AuthController.java",
+            "uriBaseId" : "%SRCROOT%"
+          },
+          "region" : {
+            "startLine" : 43,
+            "startColumn" : 9
+          }
+        }
+      }, {
+        "logicalLocations" : [ {
+          "fullyQualifiedName" : "com.msmeli.controller.AuthController"
+        } ]
+      } ],
+      "relatedLocations" : [ {
+        "id" : 1,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "src/test/java/com/msmeli/controller/AuthControllerTest.java",
+            "uriBaseId" : "%SRCROOT%"
+          },
+          "region" : {
+            "startLine" : 28,
+            "startColumn" : 5
+          }
+        }
+      } ],
+      "codeFlows" : [ {
+        "threadFlows" : [ {
+          "locations" : [ {
+            "location" : {
+              "message" : {
+                "text" : "AuthControllerTest.testLogin_ThrowNullPointerException(AuthControllerTest.java:37)"
+              },
+              "physicalLocation" : {
+                "artifactLocation" : {
+                  "uri" : "src/test/java/com/msmeli/controller/AuthControllerTest.java",
+                  "uriBaseId" : "%SRCROOT%"
+                },
+                "region" : {
+                  "startLine" : 37,
+                  "startColumn" : 13
+                }
+              }
+            }
+          }, {
+            "location" : {
+              "message" : {
+                "text" : "com.msmeli.controller.AuthController.login(AuthController.java:43)"
+              },
+              "physicalLocation" : {
+                "artifactLocation" : {
+                  "uri" : "src/main/java/com/msmeli/controller/AuthController.java",
+                  "uriBaseId" : "%SRCROOT%"
+                },
+                "region" : {
+                  "startLine" : 43,
+                  "startColumn" : 9
+                }
+              }
+            }
+          } ]
+        } ]
+      } ]
+    }, {
+      "ruleId" : "utbot.exception.NullPointerException",
+      "level" : "error",
+      "message" : {
+        "text" : "Unexpected exception: java.lang.NullPointerException.\nTest case: `login(<AuthRequestDTO>)`\n[Generated test for this case](1)"
+      },
+      "locations" : [ {
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "src/main/java/com/msmeli/controller/AuthController.java",
+            "uriBaseId" : "%SRCROOT%"
+          },
+          "region" : {
+            "startLine" : 44,
+            "startColumn" : 9
+          }
+        }
+      }, {
+        "logicalLocations" : [ {
+          "fullyQualifiedName" : "com.msmeli.controller.AuthController"
+        } ]
+      } ],
+      "relatedLocations" : [ {
+        "id" : 1,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "src/test/java/com/msmeli/controller/AuthControllerTest.java",
+            "uriBaseId" : "%SRCROOT%"
+          },
+          "region" : {
+            "startLine" : 53,
+            "startColumn" : 5
+          }
+        }
+      } ],
+      "codeFlows" : [ {
+        "threadFlows" : [ {
+          "locations" : [ {
+            "location" : {
+              "message" : {
+                "text" : "AuthControllerTest.testLogin_AuthenticationIsAuthenticated(AuthControllerTest.java:67)"
+              },
+              "physicalLocation" : {
+                "artifactLocation" : {
+                  "uri" : "src/test/java/com/msmeli/controller/AuthControllerTest.java",
+                  "uriBaseId" : "%SRCROOT%"
+                },
+                "region" : {
+                  "startLine" : 67,
+                  "startColumn" : 13
+                }
+              }
+            }
+          }, {
+            "location" : {
+              "message" : {
+                "text" : "com.msmeli.controller.AuthController.login(AuthController.java:44)"
+              },
+              "physicalLocation" : {
+                "artifactLocation" : {
+                  "uri" : "src/main/java/com/msmeli/controller/AuthController.java",
+                  "uriBaseId" : "%SRCROOT%"
+                },
+                "region" : {
+                  "startLine" : 44,
+                  "startColumn" : 9
+                }
+              }
+            }
+          } ]
+        } ]
+      } ]
+    } ]
+  }, {
+    "tool" : {
+      "driver" : {
+        "name" : "UnitTestBot",
+        "organization" : "utbot.org",
+        "version" : "1.0",
+        "rules" : [ {
+          "id" : "utbot.exception.NullPointerException",
+          "name" : "NullPointerException",
+          "shortDescription" : {
+            "text" : "Unexpected NullPointerException detected."
+          },
+          "fullDescription" : {
+            "text" : "Seems like an exception NullPointerException might be thrown."
+          },
+          "help" : {
+            "text" : "https://docs.oracle.com/javase/8/docs/api/java/lang/NullPointerException.html"
+          }
+        } ]
+      }
+    },
+    "results" : [ {
+      "ruleId" : "utbot.exception.NullPointerException",
+      "level" : "error",
+      "message" : {
+        "text" : "Unexpected exception: java.lang.NullPointerException.\nTest case: `findAll()`\n[Generated test for this case](1)"
+      },
+      "locations" : [ {
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "src/main/java/com/msmeli/controller/CategoryNameController.java",
+            "uriBaseId" : "%SRCROOT%"
+          },
+          "region" : {
+            "startLine" : 28,
+            "startColumn" : 9
+          }
+        }
+      }, {
+        "logicalLocations" : [ {
+          "fullyQualifiedName" : "com.msmeli.controller.CategoryNameController"
+        } ]
+      } ],
+      "relatedLocations" : [ {
+        "id" : 1,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "src/test/java/com/msmeli/controller/CategoryNameControllerTest.java",
+            "uriBaseId" : "%SRCROOT%"
+          },
+          "region" : {
+            "startLine" : 53,
+            "startColumn" : 5
+          }
+        }
+      } ],
+      "codeFlows" : [ {
+        "threadFlows" : [ {
+          "locations" : [ {
+            "location" : {
+              "message" : {
+                "text" : "CategoryNameControllerTest.testFindAll_ThrowNullPointerException(CategoryNameControllerTest.java:58)"
+              },
+              "physicalLocation" : {
+                "artifactLocation" : {
+                  "uri" : "src/test/java/com/msmeli/controller/CategoryNameControllerTest.java",
+                  "uriBaseId" : "%SRCROOT%"
+                },
+                "region" : {
+                  "startLine" : 58,
+                  "startColumn" : 9
+                }
+              }
+            }
+          }, {
+            "location" : {
+              "message" : {
+                "text" : "com.msmeli.controller.CategoryNameController.findAll(CategoryNameController.java:28)"
+              },
+              "physicalLocation" : {
+                "artifactLocation" : {
+                  "uri" : "src/main/java/com/msmeli/controller/CategoryNameController.java",
+                  "uriBaseId" : "%SRCROOT%"
+                },
+                "region" : {
+                  "startLine" : 28,
+                  "startColumn" : 9
+                }
+              }
+            }
+          } ]
+        } ]
+      } ]
+    } ]
+  }, {
+    "tool" : {
+      "driver" : {
+        "name" : "UnitTestBot",
+        "organization" : "utbot.org",
+        "version" : "1.0",
+        "rules" : [ {
+          "id" : "utbot.exception.NullPointerException",
+          "name" : "NullPointerException",
+          "shortDescription" : {
+            "text" : "Unexpected NullPointerException detected."
+          },
+          "fullDescription" : {
+            "text" : "Seems like an exception NullPointerException might be thrown."
+          },
+          "help" : {
+            "text" : "https://docs.oracle.com/javase/8/docs/api/java/lang/NullPointerException.html"
+          }
+=======
+>>>>>>> b1d706ed810139a7dd8ed9878e73079e1ec0c169
         }, {
           "id" : "utbot.exception.TimeoutException",
           "name" : "TimeoutException",
@@ -38,33 +301,58 @@
       "ruleId" : "utbot.exception.NullPointerException",
       "level" : "error",
       "message" : {
+<<<<<<< HEAD
+        "text" : "Unexpected exception: java.lang.NullPointerException.\nTest case: `deleteEmployee(null)`\n[Generated test for this case](1)"
+=======
         "text" : "Unexpected NullPointerException.\nTest case: `findAll()`\n[Generated test for this case](1)"
+>>>>>>> b1d706ed810139a7dd8ed9878e73079e1ec0c169
       },
       "locations" : [ {
         "physicalLocation" : {
           "artifactLocation" : {
+<<<<<<< HEAD
+            "uri" : "src/main/java/com/msmeli/controller/SellerController.java",
+            "uriBaseId" : "%SRCROOT%"
+          },
+          "region" : {
+            "startLine" : 91,
+            "startColumn" : 13
+=======
             "uri" : "src/main/java/com/msmeli/service/implement/CategoryNameImpl.java",
             "uriBaseId" : "%SRCROOT%"
           },
           "region" : {
             "startLine" : 19,
             "startColumn" : 9
+>>>>>>> b1d706ed810139a7dd8ed9878e73079e1ec0c169
           }
         }
       }, {
         "logicalLocations" : [ {
+<<<<<<< HEAD
+          "fullyQualifiedName" : "com.msmeli.controller.SellerController"
+=======
           "fullyQualifiedName" : "com.msmeli.service.implement.CategoryNameImpl"
+>>>>>>> b1d706ed810139a7dd8ed9878e73079e1ec0c169
         } ]
       } ],
       "relatedLocations" : [ {
         "id" : 1,
         "physicalLocation" : {
           "artifactLocation" : {
+<<<<<<< HEAD
+            "uri" : "src/test/java/com/msmeli/controller/SellerControllerTest.java",
+            "uriBaseId" : "%SRCROOT%"
+          },
+          "region" : {
+            "startLine" : 42,
+=======
             "uri" : "src/test/java/com/msmeli/service/implement/CategoryNameImplTest.java",
             "uriBaseId" : "%SRCROOT%"
           },
           "region" : {
             "startLine" : 72,
+>>>>>>> b1d706ed810139a7dd8ed9878e73079e1ec0c169
             "startColumn" : 5
           }
         }
@@ -74,6 +362,13 @@
           "locations" : [ {
             "location" : {
               "message" : {
+<<<<<<< HEAD
+                "text" : "SellerControllerTest.testDeleteEmployee_UserEntityServiceDeleteEmployee(SellerControllerTest.java:47)"
+              },
+              "physicalLocation" : {
+                "artifactLocation" : {
+                  "uri" : "src/test/java/com/msmeli/controller/SellerControllerTest.java",
+=======
                 "text" : "CategoryNameImplTest.testFindAll_ThrowNullPointerException(CategoryNameImplTest.java:77)"
               },
               "physicalLocation" : {
@@ -557,10 +852,13 @@
               "physicalLocation" : {
                 "artifactLocation" : {
                   "uri" : "src/main/java/com/msmeli/service/implement/CostServiceImpl.java",
+>>>>>>> b1d706ed810139a7dd8ed9878e73079e1ec0c169
                   "uriBaseId" : "%SRCROOT%"
                 },
                 "region" : {
                   "startLine" : 47,
+<<<<<<< HEAD
+=======
                   "startColumn" : 17
                 }
               }
@@ -617,10 +915,25 @@
                 },
                 "region" : {
                   "startLine" : 78,
+>>>>>>> b1d706ed810139a7dd8ed9878e73079e1ec0c169
                   "startColumn" : 9
                 }
               }
             }
+<<<<<<< HEAD
+          }, {
+            "location" : {
+              "message" : {
+                "text" : "com.msmeli.controller.SellerController.deleteEmployee(SellerController.java:91)"
+              },
+              "physicalLocation" : {
+                "artifactLocation" : {
+                  "uri" : "src/main/java/com/msmeli/controller/SellerController.java",
+                  "uriBaseId" : "%SRCROOT%"
+                },
+                "region" : {
+                  "startLine" : 91,
+=======
           } ]
         } ]
       } ]
@@ -689,6 +1002,7 @@
                 },
                 "region" : {
                   "startLine" : 50,
+>>>>>>> b1d706ed810139a7dd8ed9878e73079e1ec0c169
                   "startColumn" : 13
                 }
               }
@@ -696,6 +1010,13 @@
           } ]
         } ]
       } ]
+<<<<<<< HEAD
+    }, {
+      "ruleId" : "utbot.exception.NullPointerException",
+      "level" : "error",
+      "message" : {
+        "text" : "Unexpected exception: java.lang.NullPointerException.\nTest case: `getAllEmployees()`\n[Generated test for this case](1)"
+=======
     } ]
   }, {
     "tool" : {
@@ -723,10 +1044,18 @@
       "level" : "error",
       "message" : {
         "text" : "                    Unexpected behavior: Timeout 0 ms for phase InvocationPhase elapsed, controller timeout - 1.\n                    Test case: `sendMail(\n\n, \n\t\n, \n\t\n)`\n                    [Generated test for this case](1)"
+>>>>>>> b1d706ed810139a7dd8ed9878e73079e1ec0c169
       },
       "locations" : [ {
         "physicalLocation" : {
           "artifactLocation" : {
+<<<<<<< HEAD
+            "uri" : "src/main/java/com/msmeli/controller/SellerController.java",
+            "uriBaseId" : "%SRCROOT%"
+          },
+          "region" : {
+            "startLine" : 121,
+=======
             "uri" : "src/main/java/com/msmeli/service/implement/EmailService.java",
             "uriBaseId" : "%SRCROOT%"
           },
@@ -846,23 +1175,36 @@
           },
           "region" : {
             "startLine" : 175,
+>>>>>>> b1d706ed810139a7dd8ed9878e73079e1ec0c169
             "startColumn" : 9
           }
         }
       }, {
         "logicalLocations" : [ {
+<<<<<<< HEAD
+          "fullyQualifiedName" : "com.msmeli.controller.SellerController"
+=======
           "fullyQualifiedName" : "com.msmeli.service.implement.ItemServiceImpl"
+>>>>>>> b1d706ed810139a7dd8ed9878e73079e1ec0c169
         } ]
       } ],
       "relatedLocations" : [ {
         "id" : 1,
         "physicalLocation" : {
           "artifactLocation" : {
+<<<<<<< HEAD
+            "uri" : "src/test/java/com/msmeli/controller/SellerControllerTest.java",
+            "uriBaseId" : "%SRCROOT%"
+          },
+          "region" : {
+            "startLine" : 105,
+=======
             "uri" : "src/test/java/com/msmeli/service/implement/ItemServiceImplTest.java",
             "uriBaseId" : "%SRCROOT%"
           },
           "region" : {
             "startLine" : 129,
+>>>>>>> b1d706ed810139a7dd8ed9878e73079e1ec0c169
             "startColumn" : 5
           }
         }
@@ -872,6 +1214,17 @@
           "locations" : [ {
             "location" : {
               "message" : {
+<<<<<<< HEAD
+                "text" : "SellerControllerTest.testGetAllEmployees_SellerServiceGetAllEmployees(SellerControllerTest.java:110)"
+              },
+              "physicalLocation" : {
+                "artifactLocation" : {
+                  "uri" : "src/test/java/com/msmeli/controller/SellerControllerTest.java",
+                  "uriBaseId" : "%SRCROOT%"
+                },
+                "region" : {
+                  "startLine" : 110,
+=======
                 "text" : "ItemServiceImplTest.testCreateProductsCosts_ThrowNullPointerException(ItemServiceImplTest.java:134)"
               },
               "physicalLocation" : {
@@ -881,6 +1234,7 @@
                 },
                 "region" : {
                   "startLine" : 134,
+>>>>>>> b1d706ed810139a7dd8ed9878e73079e1ec0c169
                   "startColumn" : 9
                 }
               }
@@ -888,6 +1242,17 @@
           }, {
             "location" : {
               "message" : {
+<<<<<<< HEAD
+                "text" : "com.msmeli.controller.SellerController.getAllEmployees(SellerController.java:121)"
+              },
+              "physicalLocation" : {
+                "artifactLocation" : {
+                  "uri" : "src/main/java/com/msmeli/controller/SellerController.java",
+                  "uriBaseId" : "%SRCROOT%"
+                },
+                "region" : {
+                  "startLine" : 121,
+=======
                 "text" : "com.msmeli.service.implement.ItemServiceImpl.createProductsCosts(ItemServiceImpl.java:175)"
               },
               "physicalLocation" : {
@@ -897,6 +1262,7 @@
                 },
                 "region" : {
                   "startLine" : 175,
+>>>>>>> b1d706ed810139a7dd8ed9878e73079e1ec0c169
                   "startColumn" : 9
                 }
               }
@@ -905,32 +1271,343 @@
         } ]
       } ]
     }, {
+<<<<<<< HEAD
+      "ruleId" : "utbot.exception.NullPointerException",
+      "level" : "error",
+      "message" : {
+        "text" : "Unexpected exception: java.lang.NullPointerException.\nTest case: `getEmployeesBySellerId()`\n[Generated test for this case](1)"
+=======
       "ruleId" : "utbot.exception.IllegalStateException",
       "level" : "error",
       "message" : {
         "text" : "Unexpected IllegalStateException: java.lang.IllegalStateException: No context is set. Please use `withUtContext() {...}` or `setUtContext().use {...}`. Thread: 27: ForkJoinPool.commonPool-worker-2.\nTest case: `createProductsCosts()`\n[Generated test for this case](1)"
+>>>>>>> b1d706ed810139a7dd8ed9878e73079e1ec0c169
       },
       "locations" : [ {
         "physicalLocation" : {
           "artifactLocation" : {
+<<<<<<< HEAD
+            "uri" : "src/main/java/com/msmeli/controller/SellerController.java",
+            "uriBaseId" : "%SRCROOT%"
+          },
+          "region" : {
+            "startLine" : 115,
+=======
             "uri" : "src/main/java/com/msmeli/service/implement/ItemServiceImpl.java",
             "uriBaseId" : "%SRCROOT%"
           },
           "region" : {
             "startLine" : 175,
+>>>>>>> b1d706ed810139a7dd8ed9878e73079e1ec0c169
             "startColumn" : 9
           }
         }
       }, {
         "logicalLocations" : [ {
+<<<<<<< HEAD
+          "fullyQualifiedName" : "com.msmeli.controller.SellerController"
+=======
           "fullyQualifiedName" : "com.msmeli.service.implement.ItemServiceImpl"
+>>>>>>> b1d706ed810139a7dd8ed9878e73079e1ec0c169
         } ]
       } ],
       "relatedLocations" : [ {
         "id" : 1,
         "physicalLocation" : {
           "artifactLocation" : {
+<<<<<<< HEAD
+            "uri" : "src/test/java/com/msmeli/controller/SellerControllerTest.java",
+            "uriBaseId" : "%SRCROOT%"
+          },
+          "region" : {
+            "startLine" : 168,
+            "startColumn" : 5
+          }
+        }
+      } ],
+      "codeFlows" : [ {
+        "threadFlows" : [ {
+          "locations" : [ {
+            "location" : {
+              "message" : {
+                "text" : "SellerControllerTest.testGetEmployeesBySellerId_SellerServiceGetEmployeesBySellerId(SellerControllerTest.java:173)"
+              },
+              "physicalLocation" : {
+                "artifactLocation" : {
+                  "uri" : "src/test/java/com/msmeli/controller/SellerControllerTest.java",
+                  "uriBaseId" : "%SRCROOT%"
+                },
+                "region" : {
+                  "startLine" : 173,
+                  "startColumn" : 9
+                }
+              }
+            }
+          }, {
+            "location" : {
+              "message" : {
+                "text" : "com.msmeli.controller.SellerController.getEmployeesBySellerId(SellerController.java:115)"
+              },
+              "physicalLocation" : {
+                "artifactLocation" : {
+                  "uri" : "src/main/java/com/msmeli/controller/SellerController.java",
+                  "uriBaseId" : "%SRCROOT%"
+                },
+                "region" : {
+                  "startLine" : 115,
+                  "startColumn" : 9
+                }
+              }
+            }
+          } ]
+        } ]
+      } ]
+    }, {
+      "ruleId" : "utbot.exception.NullPointerException",
+      "level" : "error",
+      "message" : {
+        "text" : "Unexpected exception: java.lang.NullPointerException.\nTest case: `prueba()`\n[Generated test for this case](1)"
+      },
+      "locations" : [ {
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "src/main/java/com/msmeli/controller/SellerController.java",
+            "uriBaseId" : "%SRCROOT%"
+          },
+          "region" : {
+            "startLine" : 53,
+            "startColumn" : 9
+          }
+        }
+      }, {
+        "logicalLocations" : [ {
+          "fullyQualifiedName" : "com.msmeli.controller.SellerController"
+        } ]
+      } ],
+      "relatedLocations" : [ {
+        "id" : 1,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "src/test/java/com/msmeli/controller/SellerControllerTest.java",
+            "uriBaseId" : "%SRCROOT%"
+          },
+          "region" : {
+            "startLine" : 219,
+            "startColumn" : 5
+          }
+        }
+      } ],
+      "codeFlows" : [ {
+        "threadFlows" : [ {
+          "locations" : [ {
+            "location" : {
+              "message" : {
+                "text" : "SellerControllerTest.testPrueba_ItemServiceSaveAllItemForSeller_1(SellerControllerTest.java:224)"
+              },
+              "physicalLocation" : {
+                "artifactLocation" : {
+                  "uri" : "src/test/java/com/msmeli/controller/SellerControllerTest.java",
+                  "uriBaseId" : "%SRCROOT%"
+                },
+                "region" : {
+                  "startLine" : 224,
+                  "startColumn" : 9
+                }
+              }
+            }
+          }, {
+            "location" : {
+              "message" : {
+                "text" : "com.msmeli.controller.SellerController.prueba(SellerController.java:53)"
+              },
+              "physicalLocation" : {
+                "artifactLocation" : {
+                  "uri" : "src/main/java/com/msmeli/controller/SellerController.java",
+                  "uriBaseId" : "%SRCROOT%"
+                },
+                "region" : {
+                  "startLine" : 53,
+                  "startColumn" : 9
+                }
+              }
+            }
+          } ]
+        } ]
+      } ]
+    }, {
+      "ruleId" : "utbot.exception.NullPointerException",
+      "level" : "error",
+      "message" : {
+        "text" : "Unexpected exception: java.lang.NullPointerException.\nTest case: `refreshToken()`\n[Generated test for this case](1)"
+      },
+      "locations" : [ {
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "src/main/java/com/msmeli/controller/SellerController.java",
+            "uriBaseId" : "%SRCROOT%"
+          },
+          "region" : {
+            "startLine" : 60,
+            "startColumn" : 13
+          }
+        }
+      }, {
+        "logicalLocations" : [ {
+          "fullyQualifiedName" : "com.msmeli.controller.SellerController"
+        } ]
+      } ],
+      "relatedLocations" : [ {
+        "id" : 1,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "src/test/java/com/msmeli/controller/SellerControllerTest.java",
+            "uriBaseId" : "%SRCROOT%"
+          },
+          "region" : {
+            "startLine" : 253,
+            "startColumn" : 5
+          }
+        }
+      } ],
+      "codeFlows" : [ {
+        "threadFlows" : [ {
+          "locations" : [ {
+            "location" : {
+              "message" : {
+                "text" : "SellerControllerTest.testRefreshToken_SellerServiceRefreshToken(SellerControllerTest.java:258)"
+              },
+              "physicalLocation" : {
+                "artifactLocation" : {
+                  "uri" : "src/test/java/com/msmeli/controller/SellerControllerTest.java",
+                  "uriBaseId" : "%SRCROOT%"
+                },
+                "region" : {
+                  "startLine" : 258,
+                  "startColumn" : 9
+                }
+              }
+            }
+          }, {
+            "location" : {
+              "message" : {
+                "text" : "com.msmeli.controller.SellerController.refreshToken(SellerController.java:60)"
+              },
+              "physicalLocation" : {
+                "artifactLocation" : {
+                  "uri" : "src/main/java/com/msmeli/controller/SellerController.java",
+                  "uriBaseId" : "%SRCROOT%"
+                },
+                "region" : {
+                  "startLine" : 60,
+                  "startColumn" : 13
+                }
+              }
+            }
+          } ]
+        } ]
+      } ]
+    }, {
+      "ruleId" : "utbot.exception.NullPointerException",
+      "level" : "error",
+      "message" : {
+        "text" : "Unexpected exception: java.lang.NullPointerException.\nTest case: `tokenForTg(null)`\n[Generated test for this case](1)"
+      },
+      "locations" : [ {
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "src/main/java/com/msmeli/controller/SellerController.java",
+            "uriBaseId" : "%SRCROOT%"
+          },
+          "region" : {
+            "startLine" : 48,
+            "startColumn" : 9
+          }
+        }
+      }, {
+        "logicalLocations" : [ {
+          "fullyQualifiedName" : "com.msmeli.controller.SellerController"
+        } ]
+      } ],
+      "relatedLocations" : [ {
+        "id" : 1,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "src/test/java/com/msmeli/controller/SellerControllerTest.java",
+            "uriBaseId" : "%SRCROOT%"
+          },
+          "region" : {
+            "startLine" : 305,
+            "startColumn" : 5
+          }
+        }
+      } ],
+      "codeFlows" : [ {
+        "threadFlows" : [ {
+          "locations" : [ {
+            "location" : {
+              "message" : {
+                "text" : "SellerControllerTest.testTokenForTg_SellerServiceSaveToken_1(SellerControllerTest.java:310)"
+              },
+              "physicalLocation" : {
+                "artifactLocation" : {
+                  "uri" : "src/test/java/com/msmeli/controller/SellerControllerTest.java",
+                  "uriBaseId" : "%SRCROOT%"
+                },
+                "region" : {
+                  "startLine" : 310,
+                  "startColumn" : 9
+                }
+              }
+            }
+          }, {
+            "location" : {
+              "message" : {
+                "text" : "com.msmeli.controller.SellerController.tokenForTg(SellerController.java:48)"
+              },
+              "physicalLocation" : {
+                "artifactLocation" : {
+                  "uri" : "src/main/java/com/msmeli/controller/SellerController.java",
+                  "uriBaseId" : "%SRCROOT%"
+                },
+                "region" : {
+                  "startLine" : 48,
+                  "startColumn" : 9
+                }
+              }
+            }
+          } ]
+        } ]
+      } ]
+    }, {
+      "ruleId" : "utbot.exception.NullPointerException",
+      "level" : "error",
+      "message" : {
+        "text" : "Unexpected exception: java.lang.NullPointerException.\nTest case: `updateAccessToken(null)`\n[Generated test for this case](1)"
+      },
+      "locations" : [ {
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "src/main/java/com/msmeli/controller/SellerController.java",
+            "uriBaseId" : "%SRCROOT%"
+          },
+          "region" : {
+            "startLine" : 80,
+            "startColumn" : 13
+          }
+        }
+      }, {
+        "logicalLocations" : [ {
+          "fullyQualifiedName" : "com.msmeli.controller.SellerController"
+        } ]
+      } ],
+      "relatedLocations" : [ {
+        "id" : 1,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "src/test/java/com/msmeli/controller/SellerControllerTest.java",
+=======
             "uri" : "src/test/java/com/msmeli/service/implement/ItemServiceImplTest.java",
+>>>>>>> b1d706ed810139a7dd8ed9878e73079e1ec0c169
             "uriBaseId" : "%SRCROOT%"
           },
           "region" : {
@@ -944,6 +1621,17 @@
           "locations" : [ {
             "location" : {
               "message" : {
+<<<<<<< HEAD
+                "text" : "SellerControllerTest.testUpdateAccessToken_SellerServiceUpdateAccessToken(SellerControllerTest.java:344)"
+              },
+              "physicalLocation" : {
+                "artifactLocation" : {
+                  "uri" : "src/test/java/com/msmeli/controller/SellerControllerTest.java",
+                  "uriBaseId" : "%SRCROOT%"
+                },
+                "region" : {
+                  "startLine" : 344,
+=======
                 "text" : "ItemServiceImplTest.testCreateProductsCostsThrowsISE(ItemServiceImplTest.java:362)"
               },
               "physicalLocation" : {
@@ -953,6 +1641,7 @@
                 },
                 "region" : {
                   "startLine" : 362,
+>>>>>>> b1d706ed810139a7dd8ed9878e73079e1ec0c169
                   "startColumn" : 9
                 }
               }
@@ -960,6 +1649,17 @@
           }, {
             "location" : {
               "message" : {
+<<<<<<< HEAD
+                "text" : "com.msmeli.controller.SellerController.updateAccessToken(SellerController.java:80)"
+              },
+              "physicalLocation" : {
+                "artifactLocation" : {
+                  "uri" : "src/main/java/com/msmeli/controller/SellerController.java",
+                  "uriBaseId" : "%SRCROOT%"
+                },
+                "region" : {
+                  "startLine" : 80,
+=======
                 "text" : "com.msmeli.service.implement.ItemServiceImpl.createProductsCosts(ItemServiceImpl.java:175)"
               },
               "physicalLocation" : {
@@ -1892,6 +2592,7 @@
                 },
                 "region" : {
                   "startLine" : 221,
+>>>>>>> b1d706ed810139a7dd8ed9878e73079e1ec0c169
                   "startColumn" : 13
                 }
               }
@@ -1903,33 +2604,57 @@
       "ruleId" : "utbot.exception.NullPointerException",
       "level" : "error",
       "message" : {
+<<<<<<< HEAD
+        "text" : "Unexpected exception: java.lang.NullPointerException.\nTest case: `updateEmployee(null, null)`\n[Generated test for this case](1)"
+=======
         "text" : "Unexpected NullPointerException.\nTest case: `getItems()`\n[Generated test for this case](1)"
+>>>>>>> b1d706ed810139a7dd8ed9878e73079e1ec0c169
       },
       "locations" : [ {
         "physicalLocation" : {
           "artifactLocation" : {
+<<<<<<< HEAD
+            "uri" : "src/main/java/com/msmeli/controller/SellerController.java",
+            "uriBaseId" : "%SRCROOT%"
+          },
+          "region" : {
+            "startLine" : 102,
+=======
             "uri" : "src/main/java/com/msmeli/service/implement/ItemServiceImpl.java",
             "uriBaseId" : "%SRCROOT%"
           },
           "region" : {
             "startLine" : 221,
+>>>>>>> b1d706ed810139a7dd8ed9878e73079e1ec0c169
             "startColumn" : 13
           }
         }
       }, {
         "logicalLocations" : [ {
+<<<<<<< HEAD
+          "fullyQualifiedName" : "com.msmeli.controller.SellerController"
+=======
           "fullyQualifiedName" : "com.msmeli.service.implement.ItemServiceImpl"
+>>>>>>> b1d706ed810139a7dd8ed9878e73079e1ec0c169
         } ]
       } ],
       "relatedLocations" : [ {
         "id" : 1,
         "physicalLocation" : {
           "artifactLocation" : {
+<<<<<<< HEAD
+            "uri" : "src/test/java/com/msmeli/controller/SellerControllerTest.java",
+            "uriBaseId" : "%SRCROOT%"
+          },
+          "region" : {
+            "startLine" : 373,
+=======
             "uri" : "src/test/java/com/msmeli/service/implement/ItemServiceImplTest.java",
             "uriBaseId" : "%SRCROOT%"
           },
           "region" : {
             "startLine" : 923,
+>>>>>>> b1d706ed810139a7dd8ed9878e73079e1ec0c169
             "startColumn" : 5
           }
         }
@@ -1939,6 +2664,17 @@
           "locations" : [ {
             "location" : {
               "message" : {
+<<<<<<< HEAD
+                "text" : "SellerControllerTest.testUpdateEmployee_UserEntityServiceUpdateEmployee(SellerControllerTest.java:378)"
+              },
+              "physicalLocation" : {
+                "artifactLocation" : {
+                  "uri" : "src/test/java/com/msmeli/controller/SellerControllerTest.java",
+                  "uriBaseId" : "%SRCROOT%"
+                },
+                "region" : {
+                  "startLine" : 378,
+=======
                 "text" : "ItemServiceImplTest.testGetItemsThrowsNPE(ItemServiceImplTest.java:944)"
               },
               "physicalLocation" : {
@@ -1948,6 +2684,7 @@
                 },
                 "region" : {
                   "startLine" : 944,
+>>>>>>> b1d706ed810139a7dd8ed9878e73079e1ec0c169
                   "startColumn" : 9
                 }
               }
@@ -1955,6 +2692,17 @@
           }, {
             "location" : {
               "message" : {
+<<<<<<< HEAD
+                "text" : "com.msmeli.controller.SellerController.updateEmployee(SellerController.java:102)"
+              },
+              "physicalLocation" : {
+                "artifactLocation" : {
+                  "uri" : "src/main/java/com/msmeli/controller/SellerController.java",
+                  "uriBaseId" : "%SRCROOT%"
+                },
+                "region" : {
+                  "startLine" : 102,
+=======
                 "text" : "com.msmeli.service.implement.ItemServiceImpl.getItems(ItemServiceImpl.java:83)"
               },
               "physicalLocation" : {
@@ -2115,6 +2863,7 @@
                 },
                 "region" : {
                   "startLine" : 221,
+>>>>>>> b1d706ed810139a7dd8ed9878e73079e1ec0c169
                   "startColumn" : 13
                 }
               }
@@ -2123,6 +2872,12 @@
         } ]
       } ]
     }, {
+<<<<<<< HEAD
+      "ruleId" : "utbot.exception.TimeoutException",
+      "level" : "error",
+      "message" : {
+        "text" : "Unexpected behavior: Timeout -2 ms for phase InvocationPhase elapsed, controller timeout - 1.\nTest case: `updateEmployee(0, ...)`\n[Generated test for this case](1)"
+=======
       "ruleId" : "utbot.exception.NullPointerException",
       "level" : "error",
       "message" : {
@@ -3694,32 +4449,53 @@
       "level" : "error",
       "message" : {
         "text" : "Unexpected behavior: Timeout 951 ms for phase InvocationPhase elapsed, controller timeout - 1000.\nTest case: `saveAllItemForSeller()`\n[Generated test for this case](1)"
+>>>>>>> b1d706ed810139a7dd8ed9878e73079e1ec0c169
       },
       "locations" : [ {
         "physicalLocation" : {
           "artifactLocation" : {
+<<<<<<< HEAD
+            "uri" : "src/main/java/com/msmeli/controller/SellerController.java",
+            "uriBaseId" : "%SRCROOT%"
+          },
+          "region" : {
+            "startLine" : 99,
+=======
             "uri" : "src/main/java/com/msmeli/service/implement/ItemServiceImpl.java",
             "uriBaseId" : "%SRCROOT%"
           },
           "region" : {
             "startLine" : 103,
+>>>>>>> b1d706ed810139a7dd8ed9878e73079e1ec0c169
             "startColumn" : 5
           }
         }
       }, {
         "logicalLocations" : [ {
+<<<<<<< HEAD
+          "fullyQualifiedName" : "com.msmeli.controller.SellerController"
+=======
           "fullyQualifiedName" : "com.msmeli.service.implement.ItemServiceImpl"
+>>>>>>> b1d706ed810139a7dd8ed9878e73079e1ec0c169
         } ]
       } ],
       "relatedLocations" : [ {
         "id" : 1,
         "physicalLocation" : {
           "artifactLocation" : {
+<<<<<<< HEAD
+            "uri" : "src/test/java/com/msmeli/controller/SellerControllerTest.java",
+            "uriBaseId" : "%SRCROOT%"
+          },
+          "region" : {
+            "startLine" : 391,
+=======
             "uri" : "src/test/java/com/msmeli/service/implement/ItemServiceImplTest.java",
             "uriBaseId" : "%SRCROOT%"
           },
           "region" : {
             "startLine" : 1618,
+>>>>>>> b1d706ed810139a7dd8ed9878e73079e1ec0c169
             "startColumn" : 5
           }
         }
@@ -3729,6 +4505,18 @@
           "locations" : [ {
             "location" : {
               "message" : {
+<<<<<<< HEAD
+                "text" : "SellerControllerTest.testUpdateEmployeeWithCornerCase(SellerControllerTest.java:412)"
+              },
+              "physicalLocation" : {
+                "artifactLocation" : {
+                  "uri" : "src/test/java/com/msmeli/controller/SellerControllerTest.java",
+                  "uriBaseId" : "%SRCROOT%"
+                },
+                "region" : {
+                  "startLine" : 412,
+                  "startColumn" : 17
+=======
                 "text" : "ItemServiceImplTest.testSaveAllItemForSeller(ItemServiceImplTest.java:1606)"
               },
               "physicalLocation" : {
@@ -3739,6 +4527,7 @@
                 "region" : {
                   "startLine" : 1606,
                   "startColumn" : 9
+>>>>>>> b1d706ed810139a7dd8ed9878e73079e1ec0c169
                 }
               }
             }
@@ -3749,34 +4538,60 @@
       "ruleId" : "utbot.exception.NullPointerException",
       "level" : "error",
       "message" : {
+<<<<<<< HEAD
+        "text" : "Unexpected exception: java.lang.NullPointerException.\nTest case: `updateToken(null)`\n[Generated test for this case](1)"
+=======
         "text" : "Unexpected NullPointerException.\nTest case: `searchProducts(null, <String>, 0, 0, false, null)`\n[Generated test for this case](1)"
+>>>>>>> b1d706ed810139a7dd8ed9878e73079e1ec0c169
       },
       "locations" : [ {
         "physicalLocation" : {
           "artifactLocation" : {
+<<<<<<< HEAD
+            "uri" : "src/main/java/com/msmeli/controller/SellerController.java",
+            "uriBaseId" : "%SRCROOT%"
+          },
+          "region" : {
+            "startLine" : 70,
+            "startColumn" : 13
+=======
             "uri" : "src/main/java/com/msmeli/service/implement/ItemServiceImpl.java",
             "uriBaseId" : "%SRCROOT%"
           },
           "region" : {
             "startLine" : 199,
             "startColumn" : 9
+>>>>>>> b1d706ed810139a7dd8ed9878e73079e1ec0c169
           }
         }
       }, {
         "logicalLocations" : [ {
+<<<<<<< HEAD
+          "fullyQualifiedName" : "com.msmeli.controller.SellerController"
+=======
           "fullyQualifiedName" : "com.msmeli.service.implement.ItemServiceImpl"
+>>>>>>> b1d706ed810139a7dd8ed9878e73079e1ec0c169
         } ]
       } ],
       "relatedLocations" : [ {
         "id" : 1,
         "physicalLocation" : {
           "artifactLocation" : {
+<<<<<<< HEAD
+            "uri" : "src/test/java/com/msmeli/controller/SellerControllerTest.java",
+            "uriBaseId" : "%SRCROOT%"
+          },
+          "region" : {
+            "startLine" : 445,
+            "startColumn" : 5
+=======
             "uri" : "src/test/java/com/msmeli/service/implement/ItemServiceImplTest.java",
             "uriBaseId" : "%SRCROOT%"
           },
           "region" : {
             "startLine" : 1,
             "startColumn" : 1
+>>>>>>> b1d706ed810139a7dd8ed9878e73079e1ec0c169
           }
         }
       } ],
@@ -3785,6 +4600,17 @@
           "locations" : [ {
             "location" : {
               "message" : {
+<<<<<<< HEAD
+                "text" : "SellerControllerTest.testUpdateToken_SellerServiceUpdateToken(SellerControllerTest.java:450)"
+              },
+              "physicalLocation" : {
+                "artifactLocation" : {
+                  "uri" : "src/test/java/com/msmeli/controller/SellerControllerTest.java",
+                  "uriBaseId" : "%SRCROOT%"
+                },
+                "region" : {
+                  "startLine" : 450,
+=======
                 "text" : "com.msmeli.service.implement.ItemServiceImpl.searchProducts(ItemServiceImpl.java:199)"
               },
               "physicalLocation" : {
@@ -3794,10 +4620,30 @@
                 },
                 "region" : {
                   "startLine" : 199,
+>>>>>>> b1d706ed810139a7dd8ed9878e73079e1ec0c169
                   "startColumn" : 9
                 }
               }
             }
+<<<<<<< HEAD
+          }, {
+            "location" : {
+              "message" : {
+                "text" : "com.msmeli.controller.SellerController.updateToken(SellerController.java:70)"
+              },
+              "physicalLocation" : {
+                "artifactLocation" : {
+                  "uri" : "src/main/java/com/msmeli/controller/SellerController.java",
+                  "uriBaseId" : "%SRCROOT%"
+                },
+                "region" : {
+                  "startLine" : 70,
+                  "startColumn" : 13
+                }
+              }
+            }
+=======
+>>>>>>> b1d706ed810139a7dd8ed9878e73079e1ec0c169
           } ]
         } ]
       } ]

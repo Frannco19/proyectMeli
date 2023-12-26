@@ -20,8 +20,6 @@ public class CategoryName {
     private String id;
     @Column(name = "Name")
     private String name;
-//    @OneToMany(mappedBy = "category_id")
-//    private List<Item> itemList;
 
 
 }

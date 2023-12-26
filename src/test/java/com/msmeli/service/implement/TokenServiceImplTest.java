@@ -32,27 +32,27 @@ public class TokenServiceImplTest {
     @Test
     public void testSaveToken_FirstTime() {
         // Arrange
-        when(tokenRepository.findAll()).thenReturn(List.of());
-        when(tokenService.getAccessToken("ADMIN")).thenReturn("someAccessToken");
+        Mockito.when(tokenRepository.findAll()).thenReturn(List.of());
+        Mockito.when(tokenService.getAccessToken("ADMIN")).thenReturn("someAccessToken");
 
         // Act
         tokenService.saveToken();
 
         // Assert
-        verify(tokenRepository, times(1)).save(any(Token.class));
+        Mockito.verify(tokenRepository, Mockito.times(1)).save(ArgumentMatchers.any(Token.class));
     }
 
     @Test
     public void testSaveToken_ExistingToken() {
         // Arrange
-        when(tokenRepository.findAll()).thenReturn(List.of(new Token()));
-        when(tokenService.getAccessToken("ADMIN")).thenReturn("existingAccessToken");
+        Mockito.when(tokenRepository.findAll()).thenReturn(List.of(new Token()));
+        Mockito.when(tokenService.getAccessToken("ADMIN")).thenReturn("existingAccessToken");
 
         // Act
         tokenService.saveToken();
 
         // Assert
-        verify(tokenRepository, times(1)).save(any(Token.class));
+        Mockito.verify(tokenRepository, Mockito.times(1)).save(ArgumentMatchers.any(Token.class));
     }
 
     @Test
@@ -60,14 +60,14 @@ public class TokenServiceImplTest {
         // Arrange
         Token token = new Token();
         token.setAccess_token("oldAccessToken");
-        when(tokenRepository.findByUsername("ADMIN")).thenReturn(token);
+        Mockito.when(tokenRepository.findByUsername("ADMIN")).thenReturn(token);
 
         // Act
         tokenService.updateToken("newAccessToken");
 
         // Assert
-        assertEquals("newAccessToken", token.getAccess_token());
-        verify(tokenRepository, times(1)).save(token);
+        Assertions.assertEquals("newAccessToken", token.getAccess_token());
+        Mockito.verify(tokenRepository, Mockito.times(1)).save(token);
     }
 
     @Test
@@ -75,13 +75,13 @@ public class TokenServiceImplTest {
         // Arrange
         Token token = new Token();
         token.setRefresh_token("someRefreshToken");
-        when(tokenRepository.findByUsername("someUser")).thenReturn(token);
+        Mockito.when(tokenRepository.findByUsername("someUser")).thenReturn(token);
 
         // Act
         String refreshToken = tokenService.getRefreshToken("someUser");
 
         // Assert
-        assertEquals("someRefreshToken", refreshToken);
+        Assertions.assertEquals("someRefreshToken", refreshToken);
     }
 
     @Test
@@ -89,13 +89,13 @@ public class TokenServiceImplTest {
         // Arrange
         Token token = new Token();
         token.setAccess_token("someAccessToken");
-        when(tokenRepository.findByUsername("someUser")).thenReturn(token);
+        Mockito.when(tokenRepository.findByUsername("someUser")).thenReturn(token);
 
         // Act
         String accessToken = tokenService.getAccessToken("someUser");
 
         // Assert
-        assertEquals("someAccessToken", accessToken);
+        Assertions.assertEquals("someAccessToken", accessToken);
     }
 
     // Add more test cases as needed

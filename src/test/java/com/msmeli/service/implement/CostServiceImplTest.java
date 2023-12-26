@@ -52,6 +52,6 @@ public class CostServiceImplTest {
 
         // Verificar el resultado
         Mockito.verify(costRepository, Mockito.times(1)).save(Mockito.any());
-        assertNotNull(result);
+        Assertions.assertNotNull(result);
     }
 }
