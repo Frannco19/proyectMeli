@@ -21,7 +21,6 @@ public class ScheduledTasks {
 
     private static final Logger log = LoggerFactory.getLogger(ScheduledTasks.class);
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
-//    private RefreshTokenRequestDTO refreshTokenRequestDTO;
     private final MeliFeignClient meliFeignClient;
     private final ModelMapper mapper;
 
@@ -44,7 +43,7 @@ public class ScheduledTasks {
         this.tokenService = tokenService;
     }
 
-    @Scheduled(fixedRate = 3600000)
+    /*@Scheduled(fixedRate = 3600000)
     @Order(2)
     public void refreshToken(){
         RefreshTokenRequestDTO refreshTokenRequestDTO = new RefreshTokenRequestDTO();
@@ -63,6 +62,6 @@ public class ScheduledTasks {
         log.info("TOKEN refreshToken: {}", refreshToken.getAccess_token());
         log.info("TOKEN : {}", token);
 
-    }
+    }*/
 
 }

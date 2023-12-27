@@ -19,6 +19,7 @@ public class EmailService implements com.msmeli.service.services.EmailService {
         this.javaMailSender = javaMailSender;
     }
 
+
     @Override
     public String sendMail(String to, String subject, String body) throws ResourceNotFoundException {
         try {

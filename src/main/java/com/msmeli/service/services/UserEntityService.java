@@ -1,8 +1,6 @@
 package com.msmeli.service.services;
 
-import com.msmeli.dto.request.UpdatePassRequestDTO;
-import com.msmeli.dto.request.UserRefreshTokenRequestDTO;
-import com.msmeli.dto.request.UserRegisterRequestDTO;
+import com.msmeli.dto.request.*;
 import com.msmeli.dto.response.UserAuthResponseDTO;
 import com.msmeli.dto.response.UserResponseDTO;
 import com.msmeli.exception.AlreadyExistsException;
@@ -13,7 +11,8 @@ import java.util.List;
 import java.util.Map;
 
 public interface UserEntityService {
-    UserResponseDTO create(UserRegisterRequestDTO userRegisterRequestDTO) throws ResourceNotFoundException, AlreadyExistsException;
+    UserResponseDTO createSeller(UserRegisterRequestDTO userRegisterRequestDTO) throws ResourceNotFoundException, AlreadyExistsException;
+    UserResponseDTO createEmployee(EmployeeRegisterRequestDTO employeeRegisterRequestDTO) throws ResourceNotFoundException, AlreadyExistsException;
 
     UserResponseDTO read(Long id) throws ResourceNotFoundException;
 
@@ -36,4 +35,5 @@ public interface UserEntityService {
     UserAuthResponseDTO userRefreshToken(UserRefreshTokenRequestDTO refreshTokenRequestDTO) throws ResourceNotFoundException;
 
     UserAuthResponseDTO userAuthenticateAndGetToken(String username) throws ResourceNotFoundException;
+    Long getAuthenticatedUserId();
 }

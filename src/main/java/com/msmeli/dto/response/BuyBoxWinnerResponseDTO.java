@@ -2,13 +2,15 @@ package com.msmeli.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.msmeli.dto.ShippingDTO;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
-@ToString
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class BuyBoxWinnerResponseDTO {
 
@@ -19,6 +21,7 @@ public class BuyBoxWinnerResponseDTO {
     private Integer sold_quantity;
     private Integer available_quantity;
     private String listing_type_id;
+    private Double original_price;
     private ShippingDTO shipping;
 
 }

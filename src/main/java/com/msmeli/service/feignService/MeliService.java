@@ -10,21 +10,18 @@ import com.msmeli.dto.response.BuyBoxWinnerResponseDTO;
 import com.msmeli.dto.response.CatalogItemResponseDTO;
 import com.msmeli.dto.response.FeeResponseDTO;
 import com.msmeli.dto.response.OptionsDTO;
+import com.msmeli.exception.ResourceNotFoundException;
 import com.msmeli.feignClient.MeliFeignClient;
-import com.msmeli.model.Category;
-import com.msmeli.model.Item;
-import com.msmeli.model.ListingType;
-import com.msmeli.model.Seller;
+import com.msmeli.model.*;
 import com.msmeli.repository.*;
+import com.msmeli.service.services.SellerService;
+import com.msmeli.service.services.UserEntityService;
 import feign.FeignException;
 import org.modelmapper.ModelMapper;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -35,29 +32,22 @@ public class MeliService {
     private final ItemRepository itemRepository;
     private final CategoryRepository categoryRepository;
     private final SellerRepository sellerRepository;
-    private final SellerRatingRepository sellerRatingRepository;
-    private final SellerReputationRepository sellerReputationRepository;
-    private final SellerTransactionRepository sellerTransactionRepository;
-
     private final ListingTypeRepository listingTypeRepository;
+    private  final UserEntityService userEntityService;
+    private final SellerService sellerService;
 
     private final ObjectMapper objectMapper;
 
     private final ModelMapper modelMapper;
 
-    public MeliService(MeliFeignClient meliFeignClient, ItemRepository itemRepository,
-                       CategoryRepository categoryRepository, SellerRepository sellerRepository,
-                       SellerRatingRepository sellerRatingRepository, SellerReputationRepository sellerReputationRepository,
-                       SellerTransactionRepository sellerTransactionRepository, ObjectMapper objectMapper,
-                       ModelMapper modelMapper, ListingTypeRepository listingTypeRepository, ObjectMapper objectMapper1) {
+    public MeliService(MeliFeignClient meliFeignClient, ItemRepository itemRepository, CategoryRepository categoryRepository, SellerRepository sellerRepository, ListingTypeRepository listingTypeRepository, UserEntityService userEntityService, SellerService sellerService, ObjectMapper objectMapper1) {
         this.meliFeignClient = meliFeignClient;
         this.itemRepository = itemRepository;
         this.categoryRepository = categoryRepository;
         this.sellerRepository = sellerRepository;
-        this.sellerRatingRepository = sellerRatingRepository;
-        this.sellerReputationRepository = sellerReputationRepository;
-        this.sellerTransactionRepository = sellerTransactionRepository;
         this.listingTypeRepository = listingTypeRepository;
+        this.userEntityService = userEntityService;
+        this.sellerService = sellerService;
         this.objectMapper = objectMapper1;
         this.modelMapper = new ModelMapper();
     }
@@ -76,12 +66,7 @@ public class MeliService {
 
     public Category saveCategory(String categoryId) {
         DocumentContext json = JsonPath.parse(meliFeignClient.getCategory(categoryId));
-        return categoryRepository.save(
-                Category
-                        .builder()
-                        .categoryId(json.read("$.id"))
-                        .categoryName(json.read("$.name"))
-                        .build());
+        return categoryRepository.save(Category.builder().categoryId(json.read("$.id")).categoryName(json.read("$.name")).build());
     }
 
     public Seller saveSeller(Integer seller_id) {
@@ -89,12 +74,7 @@ public class MeliService {
 
         DocumentContext sellerJson = JsonPath.parse((Object) json.read("$.seller"));
 
-        return sellerRepository.save(
-                Seller
-                        .builder()
-                        .sellerId(sellerJson.read("$.id"))
-                        .nickname(sellerJson.read("$.nickname"))
-                        .build());
+        return sellerRepository.save(Seller.builder().sellerId(sellerJson.read("$.id")).nickname(sellerJson.read("$.nickname")).build());
     }
 
     public String getListingTypeName(String listingTypeId) {
@@ -122,6 +102,9 @@ public class MeliService {
 
     }
 
+    public ListingType getListingTypeNameFromBd(String listingTypeId) throws ResourceNotFoundException {
+        return listingTypeRepository.findById(listingTypeId).orElseThrow(() -> new ResourceNotFoundException("No hay un Listing Type con ese id"));
+    }
 
     public Integer getPositionMethod(DocumentContext positionByItemId) {
         return positionByItemId.read("$.position");
@@ -149,15 +132,12 @@ public class MeliService {
     }
 
     private String getItemSku(ItemAttributesDTO attributes) {
-        List<AttributesDTO> sku = attributes.getAttributes()
-                .parallelStream()
-                .filter(att -> att.getName().equals("SKU"))
-                .toList();
+        List<AttributesDTO> sku = attributes.getAttributes().parallelStream().filter(att -> att.getName().equals("SKU")).toList();
         if (!sku.isEmpty()) return sku.get(0).getValue_name();
         return null;
     }
 
-    @EventListener(ApplicationReadyEvent.class)
+    /*@EventListener(ApplicationReadyEvent.class)
     @Order(3)
     public void saveListingTypes() {
 
@@ -170,17 +150,17 @@ public class MeliService {
         });
 
         listingTypeRepository.saveAll(listingTypes);
+    }*/
 
-    }
-
-    @EventListener(ApplicationReadyEvent.class)
+    /*@EventListener(ApplicationReadyEvent.class)
     @Order(4)
     public void saveSellerItems() {
         int offset = 0;
         SellerDTO responseDTO;
         List<Item> items = new ArrayList<>();
 
-        do {
+
+       // do {
             items.clear();
 
             responseDTO = meliFeignClient.getSellerByNickname("MORO TECH", offset);
@@ -204,6 +184,20 @@ public class MeliService {
                 item.setBest_seller_position(getBestSellerPosition(e.getId(), e.getCatalog_product_id()));
                 item.setCatalog_position(getCatalogPosition(e.getId(), e.getCatalog_product_id()));
 
+
+                String description = "";
+                try {
+                    if (item.getCatalog_product_id() == null)
+                        description = meliFeignClient.getProductDescription(item.getId()).getPlain_text();
+                    else
+                        description = meliFeignClient.getCatalogDescription(item.getCatalog_product_id()).getShort_description().getContent();
+                } catch (FeignException.NotFound | FeignException.InternalServerError ignored) {
+//                    ex.printStackTrace();
+                } finally {
+                    if (description.isEmpty() || description.matches("^\\s*$") || description == null)
+                        description = "No posee descripción";
+                    item.setDescription(description);
+                }
                 items.add(item);
             });
 
@@ -211,40 +205,64 @@ public class MeliService {
 
             offset = offset + 50;
         } while (!responseDTO.getResults().isEmpty());
+    }*/
+
+
+    public ItemCatalogDTO getSellerItemCatalog(String product_catalog_id, int limit, int page) {
+        /*el paginado de la api de meli funciona por offset(a partir de que elemento) y no por pagina.*/
+        int pageN = page * limit;
+        ItemCatalogDTO resultDTO = meliFeignClient.getProductSearch(product_catalog_id, limit, pageN);
+        int position = pageN + 1;
+
+        List<CatalogItemResponseDTO> processedResults = resultDTO.getResults()
+                .parallelStream()
+                .map(e -> {
+
+                    ItemAttributesDTO attributesDTO = meliFeignClient.getItemAtributtes(e.getItem_id());
+                    SellerDTO sellerDTO = meliFeignClient.getSellerBySellerId(e.getSeller_id());
+
+                    e.setCreated_date_item(attributesDTO.getDate_created());
+                    e.setUpdated_date_item(attributesDTO.getLast_updated());
+                    e.setSeller_nickname(sellerDTO.getSeller().getNickname());
+
+                    e.setCatalogPosition(resultDTO.getResults().indexOf(e) + position);
+                    return e;
+                }).toList();
+
+        ItemCatalogDTO responseDTO = new ItemCatalogDTO();
+        responseDTO.setPaging(resultDTO.getPaging());
+        responseDTO.setResults(processedResults);
+        return responseDTO;
     }
 
+    /**
+     *
+     * @param productId id que para indentificar el catalogo en la api de MERCADO LIBRE
+     * @return DTO Con los datos del mejor pocisionado en el catalogo
+     * @throws ResourceNotFoundException
+     */
+    public BuyBoxWinnerResponseDTO getBuyBoxWinner(String productId) throws ResourceNotFoundException {
 
-    public List<CatalogItemResponseDTO> getSellerItemCatalog(String product_catalog_id) {
+        Long id = userEntityService.getAuthenticatedUserId();
+        SellerRefactor user = sellerService.findById(id);
 
-        ItemCatalogDTO responseDTO = meliFeignClient.getProductSearch(product_catalog_id);
-
-        return responseDTO.getResults().parallelStream().peek(e -> {
-
-            int position = responseDTO.getResults().indexOf(e);
-
-            ItemAttributesDTO attributesDTO = meliFeignClient.getItemAtributtes(e.getItem_id());
-            SellerDTO sellerDTO = meliFeignClient.getSellerBySellerId(e.getSeller_id());
-
-            e.setCreated_date_item(attributesDTO.getDate_created());
-            e.setUpdated_date_item(attributesDTO.getLast_updated());
-            e.setSeller_nickname(sellerDTO.getSeller().getNickname());
-
-            e.setCatalogPosition(position + 1);
-
-        }).toList();
-    }
-
-    public BuyBoxWinnerResponseDTO getBuyBoxWinner(String productId) {
-
-        BoxWinnerDTO result = meliFeignClient.getProductWinnerSearch(productId);
+        BoxWinnerDTO result = meliFeignClient.getProductWinnerSearch(productId,"Bearer " + user.getTokenMl());
         SellerDTO seller = meliFeignClient.getSellerBySellerId(result.getBuy_box_winner().getSeller_id());
 
         BuyBoxWinnerResponseDTO responseDTO = modelMapper.map(result.getBuy_box_winner(), BuyBoxWinnerResponseDTO.class);
 
         responseDTO.setSeller_nickname(seller.getSeller().getNickname());
-        responseDTO.setListing_type_id(getListingTypeName(responseDTO.getListing_type_id()));
-
+        //responseDTO.setListing_type_id(getListingTypeNameFromBd(responseDTO.getListing_type_id()).getName());
         return responseDTO;
+    }
+
+    public BuyBoxWinnerResponseDTO getBuyBoxWinnerCatalog(String productId) throws ResourceNotFoundException {
+        Long id = userEntityService.getAuthenticatedUserId();
+        SellerRefactor user = sellerService.findById(id);
+
+        BoxWinnerDTO result = meliFeignClient.getProductWinnerSearch(productId ,"Bearer " + user.getTokenMl());
+
+        return modelMapper.map(result.getBuy_box_winner(), BuyBoxWinnerResponseDTO.class);
     }
 
     public int getCatalogPosition(String itemId, String product_catalog_id) {
@@ -256,11 +274,7 @@ public class MeliService {
 
             ItemCatalogDTO responseDTO = meliFeignClient.getProductSearch(product_catalog_id);
 
-            return IntStream.range(0, responseDTO.getResults().size())
-                    .parallel()
-                    .filter(index -> responseDTO.getResults().get(index).getItem_id().equals(itemId))
-                    .findFirst()
-                    .orElse(-1) + 1;
+            return IntStream.range(0, responseDTO.getResults().size()).parallel().filter(index -> responseDTO.getResults().get(index).getItem_id().equals(itemId)).findFirst().orElse(-1) + 1;
 
         } catch (FeignException.NotFound ignored) {
 
@@ -269,12 +283,27 @@ public class MeliService {
         return -1;
     }
 
-    public OptionsDTO getShippingCostDTO(String itemId){
+    public OptionsDTO getShippingCostDTO(String itemId) {
 
         return meliFeignClient.getShippingCostDTO(itemId);
     }
 
-    public FeeResponseDTO getItemFee(double price, String category_id, String listing_type_id){
-        return meliFeignClient.getItemFee(price,category_id,listing_type_id);
+    public FeeResponseDTO getItemFee(double price, String category_id, String listing_type_id) {
+        return meliFeignClient.getItemFee(price, category_id, listing_type_id);
     }
+
+
+    public List<GeneralCategory> findGeneralCategories() {
+        ArrayList<String> categoriesNotIncluded = new ArrayList<>(Arrays.asList("MLA1540", "MLA1459", "MLA2547", "MLA1743", "MLA1430"));
+        return meliFeignClient.getGeneralCategory().stream().filter(category -> !categoriesNotIncluded.contains(category.getId())).toList();
+    }
+
+    public TopSoldProductCategoryDTO getTopProductsByCategory(String id) {
+        return meliFeignClient.getTopProductsByCategory(id);
+    }
+
+    public TopSoldDetailedProductDTO getTopProductDetails(String id) {
+        return meliFeignClient.getTopProductDetails(id);
+    }
+
 }

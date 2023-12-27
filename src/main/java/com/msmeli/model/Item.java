@@ -12,16 +12,16 @@ import java.util.Date;
 @AllArgsConstructor
 @Getter
 @Setter
-@ToString
 @Table(name = "item", catalog = "msmeli")
 public class Item {
     @Id
     private String id;
 
     private String title;
-
+    private String catalog_listing;
     private String catalog_product_id;
-
+    @Column(length = 5000)
+    private String description;
     private Double price;
 
     private int sold_quantity;
@@ -41,20 +41,22 @@ public class Item {
     private String status;
 
     @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime update_date_db;
-
-    @Temporal(TemporalType.TIMESTAMP)
     private Date created_date_item;
 
     @Temporal(TemporalType.TIMESTAMP)
-    private Date updated_date_item;
+    private LocalDateTime updated_date_item;
 
     private String status_condition;
 
     private String image_url;
 
     private String sku;
+    private String marca;
+    private String gtin;
 
     @OneToOne
     private Cost cost;
+    @ManyToOne
+    @JoinColumn(name = "sellerRefactor_id")
+    private SellerRefactor sellerRefactor;
 }

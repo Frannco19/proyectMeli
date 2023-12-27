@@ -2,7 +2,10 @@ package com.msmeli.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.Date;
 
@@ -10,7 +13,6 @@ import java.util.Date;
 @AllArgsConstructor
 @Getter
 @Setter
-@ToString
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CatalogItemResponseDTO {
 
@@ -26,6 +28,4 @@ public class CatalogItemResponseDTO {
     private Date created_date_item;
     @JsonFormat(pattern = "dd-MM-yyyy")
     private Date updated_date_item;
-
-
 }
