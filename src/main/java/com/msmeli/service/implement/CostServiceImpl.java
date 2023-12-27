@@ -28,10 +28,12 @@ public class CostServiceImpl implements CostService {
 
     @Override
     public Item createProductsCosts(Item item, Stock stock) {
+        //step 1 creacion datos
         Cost cost = mapper.map(item, Cost.class);
         FeeRequestDTO feeRequestDTO = new FeeRequestDTO();
         Double shippingCost = 0.0;
         FeeDetailsDTO feeDetails = null;
+        //step 2
         try {
             cost.setId(item.getId());
             feeRequestDTO.setCategoryId(item.getCategory_id());
@@ -41,11 +43,14 @@ public class CostServiceImpl implements CostService {
             shippingCost = meliService.getShippingCostDTO(item.getId()).getOptions().stream().filter(option -> option.getName().equals("Estándar a sucursal de correo")).findFirst().get().getBase_cost();
         } catch (FeignException.NotFound | FeignException.InternalServerError ignored) {
         } finally {
+
+            //step 3
             if (item.getSku() != null && stock != null) cost.setReplacement_cost(stock.getPrice());
             if (feeDetails != null) {
                 cost.setComision_fee(feeDetails.getPercentage_fee());
                 cost.setComision_discount(feeDetails.getGross_amount());
             }
+            //step 4
             cost.setShipping(shippingCost);
             double total_cost = item.getPrice() * GrossIncome.IIBB.iibPercentage + (cost.getComision_discount() + cost.getShipping() + cost.getReplacement_cost());
             cost.setTotal_cost(Math.round(total_cost * 100) / 100d);

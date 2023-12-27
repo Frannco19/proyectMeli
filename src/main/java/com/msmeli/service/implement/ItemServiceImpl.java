@@ -164,12 +164,30 @@ public class ItemServiceImpl implements ItemService {
         return itemRepository.findAll();
     }
 
+    /**
+     * Metodo qye se encarga de buscar todos los Items de un Seller
+     * @param idSeller id del seller a buscar
+     * @return List<Item> lista de items relacionados al id
+     * @throws AppException en caso de no encontrar nada lanza la exception
+     */
+    @Override
+    public  List<Item> findAllidSeller(Long idSeller) throws AppException {
+        List<Item> listOfItems = itemRepository.findAllBySellerRefactorId(idSeller);
+        if(listOfItems.isEmpty()){
+            throw new AppException("No Content","metodo: findAllidSeller",  000, 204);
+        }
+        return listOfItems;
+    }
+
     @Override
     public Item save(Item item) {
         return itemRepository.save(item);
     }
 
-
+    /**
+     * Metodo se encarga de buscar todos los items relacionados a un seller e invocar por cada uno la funcion
+     * createProductsCost
+     */
     public void createProductsCosts() {
         List<Item> items = findAll();
         items.parallelStream().forEach((item -> save(costService.createProductsCosts(item, stockService.findLastBySku(item.getSku())))
