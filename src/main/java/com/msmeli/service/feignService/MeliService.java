@@ -10,6 +10,7 @@ import com.msmeli.dto.response.BuyBoxWinnerResponseDTO;
 import com.msmeli.dto.response.CatalogItemResponseDTO;
 import com.msmeli.dto.response.FeeResponseDTO;
 import com.msmeli.dto.response.OptionsDTO;
+import com.msmeli.exception.AppException;
 import com.msmeli.exception.ResourceNotFoundException;
 import com.msmeli.feignClient.MeliFeignClient;
 import com.msmeli.model.*;
@@ -288,8 +289,13 @@ public class MeliService {
         return meliFeignClient.getShippingCostDTO(itemId);
     }
 
-    public FeeResponseDTO getItemFee(double price, String category_id, String listing_type_id) {
-        return meliFeignClient.getItemFee(price, category_id, listing_type_id);
+    public FeeResponseDTO getItemFee(double price, String category_id, String listing_type_id) throws AppException {
+        try {
+            return meliFeignClient.getItemFee(price, category_id, listing_type_id);
+        }catch (Exception ex){
+            throw new AppException(ex.getMessage(),"MeliService-> getItemfee",000,204);
+        }
+
     }
 
 
