@@ -30,15 +30,12 @@ public class SupplierStockServiceImplTest {
     @Test
     void testCreateOrUpdateSupplierStock() {
         SupplierStock supplierStock = new SupplierStock();
-        supplierStock.setPrice(10.123); // Set an arbitrary price
+        supplierStock.setPrice(10.123);
 
-        // Mocking behavior
         when(supplierStockRepository.save(supplierStock)).thenReturn(supplierStock);
 
-        // Call the method to be tested
         SupplierStock result = supplierStockService.createOrUpdateSupplierStock(supplierStock);
 
-        // Assert the result
         assertEquals(Math.round(10.123 * 100.0) / 100.0, result.getPrice());
         verify(supplierStockRepository, times(1)).save(supplierStock);
     }
@@ -48,14 +45,11 @@ public class SupplierStockServiceImplTest {
         Supplier supplier = new Supplier();
         List<SupplierStockRequestDTO> stockDTO = Collections.singletonList(new SupplierStockRequestDTO());
 
-        // Mocking behavior
         when(modelMapper.map(any(), eq(SupplierStock.class))).thenReturn(new SupplierStock());
         when(supplierStockRepository.saveAll(anyList())).thenReturn(Collections.emptyList());
 
-        // Call the method to be tested
         List<SupplierStock> result = supplierStockService.create(supplier, stockDTO);
 
-        // Assert the result
         assertEquals(Collections.emptyList(), result);
         verify(supplierStockRepository, times(1)).saveAll(anyList());
     }

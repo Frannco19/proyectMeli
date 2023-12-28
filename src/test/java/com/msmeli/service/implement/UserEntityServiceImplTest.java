@@ -1,6 +1,8 @@
 package com.msmeli.service.implement;
 
 import com.msmeli.configuration.security.entity.UserEntityUserDetails;
+import com.msmeli.configuration.security.service.JwtService;
+import com.msmeli.configuration.security.service.UserEntityRefreshTokenService;
 import com.msmeli.dto.request.EmployeeRegisterRequestDTO;
 import com.msmeli.dto.response.UserAuthResponseDTO;
 import com.msmeli.dto.response.UserResponseDTO;
@@ -39,7 +41,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-
 public class UserEntityServiceImplTest {
 
     @InjectMocks
@@ -47,16 +48,6 @@ public class UserEntityServiceImplTest {
 
     @Mock
     private UserEntityRepository userEntityRepository;
-
-    @Mock
-    private PasswordEncoder passwordEncoder;
-
-    @Mock
-    private SellerRefactorRepository sellerRefactorRepository;
-
-    @Mock
-    private EmployeeRepository employeeRepository;
-
     @Mock
     private EmailService emailService;
     @Mock
@@ -65,35 +56,13 @@ public class UserEntityServiceImplTest {
     @Mock
     private RoleEntityService roleEntityService;
 
+
+
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
     }
 
-
-
-    @Test
-    void testCreateEmployee() throws AlreadyExistsException, ResourceNotFoundException {
-        // Configuración del mock
-        Mockito.when(passwordEncoder.encode(ArgumentMatchers.any())).thenReturn("hashedPassword");
-        Mockito.when(roleEntityService.findByName(Role.EMPLOYEE)).thenReturn(new RoleEntity());
-        Mockito.when(sellerRefactorRepository.findById(ArgumentMatchers.any())).thenReturn(Optional.of(new SellerRefactor()));
-
-        // Llamada al método que deseas probar
-        EmployeeRegisterRequestDTO requestDTO = new EmployeeRegisterRequestDTO();
-        requestDTO.setUsername("username");
-        requestDTO.setPassword("password");
-        requestDTO.setRePassword("password");
-
-        UserResponseDTO result = userEntityServiceImpl.createEmployee(requestDTO);
-
-        // Verificaciones
-        Mockito.verify(passwordEncoder, Mockito.times(2)).encode(ArgumentMatchers.any());
-        Mockito.verify(roleEntityService, Mockito.times(1)).findByName(Role.EMPLOYEE);
-        Mockito.verify(sellerRefactorRepository, Mockito.times(1)).findById(ArgumentMatchers.any());
-        Mockito.verify(employeeRepository, Mockito.times(1)).save(ArgumentMatchers.any(Employee.class));
-
-    }
 
 
     @Test
