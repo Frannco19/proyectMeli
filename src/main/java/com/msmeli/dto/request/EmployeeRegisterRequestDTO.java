@@ -27,9 +27,9 @@ public class EmployeeRegisterRequestDTO {
     @NotBlank(message = "Ingrese un email.")
     private String email;
     @NotBlank(message = "Ingrese un nombre.")
-    private String nombre;
+    private String name;
     @NotBlank(message = "Ingrese un apellido.")
-    private String apellido;
+    private String lastname;
     private String rol;
 
 }

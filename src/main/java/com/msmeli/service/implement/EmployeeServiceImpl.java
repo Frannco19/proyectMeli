@@ -57,10 +57,10 @@ public class EmployeeServiceImpl implements EmployeeService {
             existingEmployee.setEmail(employeeUpdateDTO.getEmail());
         }
         if (employeeUpdateDTO.getNombre() != null) {
-            existingEmployee.setNombre(employeeUpdateDTO.getNombre());
+            existingEmployee.setName(employeeUpdateDTO.getNombre());
         }
         if (employeeUpdateDTO.getApellido() != null) {
-            existingEmployee.setApellido(employeeUpdateDTO.getApellido());
+            existingEmployee.setLastname(employeeUpdateDTO.getApellido());
         }
 
         // Guardar la entidad actualizada
