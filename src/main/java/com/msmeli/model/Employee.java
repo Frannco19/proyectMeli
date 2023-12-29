@@ -13,10 +13,9 @@ import lombok.Setter;
 @NoArgsConstructor
 @Table(name = "employees")
 public class Employee extends UserEntity{
-    private String nombre;
-    private String apellido;
+    private String name;
+    private String lastname;
     @ManyToOne (fetch = FetchType.LAZY)
     @JoinColumn(name = "sellerRefactor_id")
     private SellerRefactor sellerRefactor;
 }
-

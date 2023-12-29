@@ -53,8 +53,8 @@ public class EmployeeServiceImplTest {
         existingEmployee.setUsername("oldUsername");
         existingEmployee.setPassword("oldPassword");
         existingEmployee.setEmail("oldEmail");
-        existingEmployee.setNombre("oldNombre");
-        existingEmployee.setApellido("oldApellido");
+        existingEmployee.setName("oldNombre");
+        existingEmployee.setLastname("oldApellido");
 
         when(employeeRepository.findById(employeeId)).thenReturn(java.util.Optional.of(existingEmployee));
         when(userEntityRepository.findByUsername(requestDTO.getUsername())).thenReturn(java.util.Optional.empty());

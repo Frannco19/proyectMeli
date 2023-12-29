@@ -14,7 +14,6 @@ import com.msmeli.feignClient.MeliFeignClient;
 import com.msmeli.model.Employee;
 import com.msmeli.model.Seller;
 import com.msmeli.model.SellerRefactor;
-import com.msmeli.model.Stock;
 import com.msmeli.repository.EmployeeRepository;
 import com.msmeli.repository.SellerRefactorRepository;
 import com.msmeli.repository.SellerRepository;
@@ -306,7 +305,15 @@ public class SellerServiceImpl implements SellerService {
         List<Employee> employeeList = seller.getEmployees();
 
         List<EmployeesResponseDto> employeesListDTO = employeeList.stream()
-                .map(employee -> mapper.map(employee, EmployeesResponseDto.class))
+                .map(employee -> {
+                    EmployeesResponseDto dto = mapper.map(employee, EmployeesResponseDto.class);
+                    dto.setId(employee.getId());
+                    dto.setName(employee.getName());
+                    dto.setLastname(employee.getLastname());
+                    dto.setUsername(employee.getUsername());
+                    dto.setEmail(employee.getEmail());
+                    return dto;
+                })
                 .collect(Collectors.toList());
 
         return employeesListDTO;
