@@ -30,4 +30,5 @@ public interface ItemService {
     Page<ItemResponseDTO> getItemsAndCostPaged(Integer id, int offset, int pageSize) throws ResourceNotFoundException;
 
     void saveAllItemForSeller() throws ResourceNotFoundException;
+    List<Item>findAllidSeller(Long idSeller) throws AppException;
 }

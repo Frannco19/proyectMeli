@@ -84,8 +84,10 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public Page<ItemResponseDTO> getItemsAndCostPaged(Integer id, int offset, int pageSize) throws ResourceNotFoundException {
+        Long idSeller = userEntityService.getAuthenticatedUserId();
+        SellerRefactor seller = sellerService.findById(idSeller);
         Pageable pageable = PageRequest.of(offset, pageSize);
-        Page<Item> itemCost = itemRepository.findAllBySellerId(id, pageable);
+        Page<Item> itemCost = itemRepository.findAllBySellerRefactorIdPage(seller,pageable);
         if (itemCost.getContent().isEmpty()) throw new ResourceNotFoundException("No hay items con esos parametros");
         return new PageImpl<>(itemCost.stream().map(this::getItemResponseDTO).toList(), pageable, itemCost.getTotalElements());
     }
@@ -164,15 +166,39 @@ public class ItemServiceImpl implements ItemService {
         return itemRepository.findAll();
     }
 
+    /**
+     * Metodo qye se encarga de buscar todos los Items de un Seller
+     * @param idSeller id del seller a buscar
+     * @return List<Item> lista de items relacionados al id
+     * @throws AppException en caso de no encontrar nada lanza la exception
+     */
+    @Override
+    public  List<Item> findAllidSeller(Long idSeller) throws AppException {
+        List<Item> listOfItems = itemRepository.findAllBySellerRefactorId(idSeller);
+        if(listOfItems.isEmpty()){
+            throw new AppException("No Content","metodo: findAllidSeller",  000, 204);
+        }
+        return listOfItems;
+    }
+
     @Override
     public Item save(Item item) {
         return itemRepository.save(item);
     }
 
-
+    /**
+     * Metodo se encarga de buscar todos los items  e invocar por cada uno la funcion
+     * createProductsCost
+     */
     public void createProductsCosts() {
         List<Item> items = findAll();
-        items.parallelStream().forEach((item -> save(costService.createProductsCosts(item, stockService.findLastBySku(item.getSku())))
+        items.parallelStream().forEach((item -> {
+            try {
+                save(costService.createProductsCostsV2(item, stockService.findLastBySku(item.getSku())));
+            } catch (AppException e) {
+                throw new RuntimeException(e);
+            }
+        }
         ));
     }
 
@@ -195,8 +221,7 @@ public class ItemServiceImpl implements ItemService {
         Long idSeller = userEntityService.getAuthenticatedUserId();
         SellerRefactor seller = sellerService.findById(idSeller);
         Pageable pageable = PageRequest.of(offset, pageSize);
-        int inCatalogue = isCatalogue ? -1 : -2;
-        Page<Item> results = itemRepository.findByFilters("%" + searchInput.toUpperCase() + "%", searchType, inCatalogue, isActive,seller, pageable);
+        Page<Item> results = itemRepository.findByFilters("%" + searchInput.toUpperCase() + "%", searchType, isCatalogue, isActive,seller, pageable);
         if (results.getContent().isEmpty()) throw new AppException("No Content","/search->searchProduct",  000, 204);
         return results.map(item -> {
             ItemResponseDTO itemDTO = getItemResponseDTO(item);
