@@ -1,10 +1,12 @@
 package com.msmeli.service.implement;
 
+import com.msmeli.configuration.security.entity.UserEntityUserDetails;
 import com.msmeli.dto.StockDTO;
 import com.msmeli.dto.request.StockRequestDTO;
 import com.msmeli.exception.ResourceNotFoundException;
 import com.msmeli.model.Stock;
 import com.msmeli.model.UserEntity;
+import com.msmeli.repository.SellerRefactorRepository;
 import com.msmeli.repository.StockRepository;
 import com.msmeli.repository.UserEntityRepository;
 import com.msmeli.service.services.StockService;
@@ -12,6 +14,8 @@ import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,12 +29,15 @@ public class StockServiceImpl implements StockService {
     private final UserEntityRepository userEntityRepository;
     private final ModelMapper modelMapper;
 
+    private final SellerRefactorRepository sellerRefactorRepository;
+
     /**
      * Servicio que gestiona las operaciones relacionadas con el stock.
      */
-    public StockServiceImpl(StockRepository stockRepository, UserEntityRepository userEntityRepository) {
+    public StockServiceImpl(StockRepository stockRepository, UserEntityRepository userEntityRepository, SellerRefactorRepository sellerRefactorRepository) {
         this.stockRepository = stockRepository;
         this.userEntityRepository = userEntityRepository;
+        this.sellerRefactorRepository = sellerRefactorRepository;
         this.modelMapper = new ModelMapper();
     }
 
@@ -47,20 +54,48 @@ public class StockServiceImpl implements StockService {
     }
 
     /**
-     * Guarda las existencias de un usuario según la solicitud proporcionada.
+     * Guarda una lista de stocks asociados al usuario autenticado.
      *
-     * @param requestDTO La solicitud que contiene las existencias del usuario a guardar.
+     * Este método toma una solicitud de transferencia de datos (DTO) que contiene información sobre los stocks a ser guardados.
+     * Para cada elemento en la lista de stocks de la solicitud, se crea una instancia de {@link Stock} utilizando la información proporcionada.
+     * El usuario autenticado se obtiene mediante la identificación del ID del usuario autenticado, y esta información se asigna a cada stock.
+     * Además, se redondea el precio de cada stock a dos decimales antes de guardarlo.
+     *
+     * @param requestDTO La solicitud de transferencia de datos que contiene la información de los stocks a ser guardados.
+     * @throws NoSuchElementException Si no se encuentra el usuario autenticado en la base de datos.
+     * @see Stock
+     * @see StockRequestDTO
+     * @see UserEntity
      */
     @Override
+    //@PreAuthorize("hasRole('ROLE_ADMIN')")  // Cambia ROLE_ADMIN según tus necesidades
     public void saveUserStock(StockRequestDTO requestDTO) {
-        stockRepository.saveAll(requestDTO.getContent()
+        Long authenticatedUserId = getAuthenticatedUserId();
+        UserEntity user = getUserById(authenticatedUserId);
+
+        List<Stock> stockList = requestDTO.getContent()
                 .parallelStream()
                 .map(e -> {
                     Stock userStock = modelMapper.map(e, Stock.class);
-                    userStock.setUser_id(getUserById(requestDTO.getUser_id()));
+                    userStock.setUser_id(user);
                     userStock.setPrice(Math.round(userStock.getPrice() * 100.0) / 100.0);
                     return userStock;
-                }).collect(Collectors.toList()));
+                })
+                .collect(Collectors.toList());
+
+        stockRepository.saveAll(stockList);
+    }
+
+
+    private Long getAuthenticatedUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication != null && authentication.getPrincipal() instanceof UserEntityUserDetails) {
+            UserEntityUserDetails userDetails = (UserEntityUserDetails) authentication.getPrincipal();
+            return userDetails.getId();
+        } else {
+            return null;
+        }
     }
 
     /**
