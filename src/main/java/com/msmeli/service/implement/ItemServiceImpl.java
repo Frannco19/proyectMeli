@@ -84,8 +84,10 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public Page<ItemResponseDTO> getItemsAndCostPaged(Integer id, int offset, int pageSize) throws ResourceNotFoundException {
+        Long idSeller = userEntityService.getAuthenticatedUserId();
+        SellerRefactor seller = sellerService.findById(idSeller);
         Pageable pageable = PageRequest.of(offset, pageSize);
-        Page<Item> itemCost = itemRepository.findAllBySellerId(id, pageable);
+        Page<Item> itemCost = itemRepository.findAllBySellerRefactorIdPage(seller,pageable);
         if (itemCost.getContent().isEmpty()) throw new ResourceNotFoundException("No hay items con esos parametros");
         return new PageImpl<>(itemCost.stream().map(this::getItemResponseDTO).toList(), pageable, itemCost.getTotalElements());
     }
@@ -185,12 +187,18 @@ public class ItemServiceImpl implements ItemService {
     }
 
     /**
-     * Metodo se encarga de buscar todos los items relacionados a un seller e invocar por cada uno la funcion
+     * Metodo se encarga de buscar todos los items  e invocar por cada uno la funcion
      * createProductsCost
      */
     public void createProductsCosts() {
         List<Item> items = findAll();
-        items.parallelStream().forEach((item -> save(costService.createProductsCosts(item, stockService.findLastBySku(item.getSku())))
+        items.parallelStream().forEach((item -> {
+            try {
+                save(costService.createProductsCostsV2(item, stockService.findLastBySku(item.getSku())));
+            } catch (AppException e) {
+                throw new RuntimeException(e);
+            }
+        }
         ));
     }
 

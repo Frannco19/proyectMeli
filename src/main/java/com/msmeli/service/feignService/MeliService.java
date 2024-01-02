@@ -242,19 +242,23 @@ public class MeliService {
      * @return DTO Con los datos del mejor pocisionado en el catalogo
      * @throws ResourceNotFoundException
      */
-    public BuyBoxWinnerResponseDTO getBuyBoxWinner(String productId) throws ResourceNotFoundException {
+    public BuyBoxWinnerResponseDTO getBuyBoxWinner(String productId) throws ResourceNotFoundException, AppException {
+        try {
+            Long id = userEntityService.getAuthenticatedUserId();
+            SellerRefactor user = sellerService.findById(id);
 
-        Long id = userEntityService.getAuthenticatedUserId();
-        SellerRefactor user = sellerService.findById(id);
+            BoxWinnerDTO result = meliFeignClient.getProductWinnerSearch(productId,"Bearer " + user.getTokenMl());
+            SellerDTO seller = meliFeignClient.getSellerBySellerId(result.getBuy_box_winner().getSeller_id());
 
-        BoxWinnerDTO result = meliFeignClient.getProductWinnerSearch(productId,"Bearer " + user.getTokenMl());
-        SellerDTO seller = meliFeignClient.getSellerBySellerId(result.getBuy_box_winner().getSeller_id());
+            BuyBoxWinnerResponseDTO responseDTO = modelMapper.map(result.getBuy_box_winner(), BuyBoxWinnerResponseDTO.class);
 
-        BuyBoxWinnerResponseDTO responseDTO = modelMapper.map(result.getBuy_box_winner(), BuyBoxWinnerResponseDTO.class);
+            responseDTO.setSeller_nickname(seller.getSeller().getNickname());
+            //responseDTO.setListing_type_id(getListingTypeNameFromBd(responseDTO.getListing_type_id()).getName());
+            return responseDTO;
+        }catch (Exception ex){
+            throw new AppException(ex.getMessage(),"meliService->getBuyWinner",000,404);
+        }
 
-        responseDTO.setSeller_nickname(seller.getSeller().getNickname());
-        //responseDTO.setListing_type_id(getListingTypeNameFromBd(responseDTO.getListing_type_id()).getName());
-        return responseDTO;
     }
 
     public BuyBoxWinnerResponseDTO getBuyBoxWinnerCatalog(String productId) throws ResourceNotFoundException {
