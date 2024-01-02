@@ -1,21 +1,20 @@
 package com.msmeli.service.implement;
 
-import com.msmeli.configuration.security.entity.UserEntityUserDetails;
 import com.msmeli.dto.StockDTO;
 import com.msmeli.dto.request.StockRequestDTO;
 import com.msmeli.exception.ResourceNotFoundException;
+import com.msmeli.model.SellerRefactor;
 import com.msmeli.model.Stock;
 import com.msmeli.model.UserEntity;
 import com.msmeli.repository.SellerRefactorRepository;
 import com.msmeli.repository.StockRepository;
 import com.msmeli.repository.UserEntityRepository;
 import com.msmeli.service.services.StockService;
+import com.msmeli.service.services.UserEntityService;
 import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,16 +27,18 @@ public class StockServiceImpl implements StockService {
     private final StockRepository stockRepository;
     private final UserEntityRepository userEntityRepository;
     private final ModelMapper modelMapper;
+    private final UserEntityService userEntityService;
 
     private final SellerRefactorRepository sellerRefactorRepository;
 
     /**
      * Servicio que gestiona las operaciones relacionadas con el stock.
      */
-    public StockServiceImpl(StockRepository stockRepository, UserEntityRepository userEntityRepository, SellerRefactorRepository sellerRefactorRepository) {
+    public StockServiceImpl(StockRepository stockRepository, UserEntityRepository userEntityRepository, SellerRefactorRepository sellerRefactorRepository, UserEntityService userEntityService) {
         this.stockRepository = stockRepository;
         this.userEntityRepository = userEntityRepository;
         this.sellerRefactorRepository = sellerRefactorRepository;
+        this.userEntityService =userEntityService;
         this.modelMapper = new ModelMapper();
     }
 
@@ -54,49 +55,33 @@ public class StockServiceImpl implements StockService {
     }
 
     /**
-     * Guarda una lista de stocks asociados al usuario autenticado.
+     * Guarda el stock del vendedor.
      *
-     * Este método toma una solicitud de transferencia de datos (DTO) que contiene información sobre los stocks a ser guardados.
-     * Para cada elemento en la lista de stocks de la solicitud, se crea una instancia de {@link Stock} utilizando la información proporcionada.
-     * El usuario autenticado se obtiene mediante la identificación del ID del usuario autenticado, y esta información se asigna a cada stock.
-     * Además, se redondea el precio de cada stock a dos decimales antes de guardarlo.
+     * Este método guarda la información del stock para un vendedor autenticado. Recupera el ID del usuario autenticado,
+     * mapea los datos del DTO de la solicitud a objetos de tipo Stock, ajusta el identificador del vendedor y redondea
+     * los precios antes de guardar la lista de stocks en el repositorio.
      *
-     * @param requestDTO La solicitud de transferencia de datos que contiene la información de los stocks a ser guardados.
-     * @throws NoSuchElementException Si no se encuentra el usuario autenticado en la base de datos.
-     * @see Stock
-     * @see StockRequestDTO
-     * @see UserEntity
+     * @param requestDTO El DTO de la solicitud que contiene la información del stock a guardar.
      */
     @Override
-    //@PreAuthorize("hasRole('ROLE_ADMIN')")  // Cambia ROLE_ADMIN según tus necesidades
-    public void saveUserStock(StockRequestDTO requestDTO) {
-        Long authenticatedUserId = getAuthenticatedUserId();
+    public void saveSellerStock(StockRequestDTO requestDTO) {
+
+        Long authenticatedUserId = userEntityService.getAuthenticatedUserId();
         UserEntity user = getUserById(authenticatedUserId);
 
         List<Stock> stockList = requestDTO.getContent()
                 .parallelStream()
                 .map(e -> {
-                    Stock userStock = modelMapper.map(e, Stock.class);
-                    userStock.setUser_id(user);
-                    userStock.setPrice(Math.round(userStock.getPrice() * 100.0) / 100.0);
-                    return userStock;
+                    Stock sellerStock = modelMapper.map(e, Stock.class);
+                    sellerStock.setSeller_id((SellerRefactor) user);
+                    sellerStock.setPrice(Math.round(sellerStock.getPrice() * 100.0) /100.0);
+                    return sellerStock;
                 })
                 .collect(Collectors.toList());
 
         stockRepository.saveAll(stockList);
     }
 
-
-    private Long getAuthenticatedUserId() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication != null && authentication.getPrincipal() instanceof UserEntityUserDetails) {
-            UserEntityUserDetails userDetails = (UserEntityUserDetails) authentication.getPrincipal();
-            return userDetails.getId();
-        } else {
-            return null;
-        }
-    }
 
     /**
      * Encuentra la última existencia por SKU.

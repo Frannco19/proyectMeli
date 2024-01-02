@@ -12,7 +12,7 @@ import java.util.List;
 
 public interface StockService {
     UserEntity getUserById(Long id);
-    void saveUserStock(StockRequestDTO requestDTO);
+    void saveSellerStock(StockRequestDTO requestDTO);
     Stock findLastBySku(String sku);
     Integer getTotalStockBySku(String sku);
     List<StockDTO> findAllMapped(Long sellerId);
