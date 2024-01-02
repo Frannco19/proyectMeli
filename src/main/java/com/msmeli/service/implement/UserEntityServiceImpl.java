@@ -1,74 +1,78 @@
 package com.msmeli.service.implement;
 
-    import com.msmeli.configuration.security.entity.UserEntityUserDetails;
-    import com.msmeli.configuration.security.service.JwtService;
-    import com.msmeli.configuration.security.service.UserEntityRefreshTokenService;
-    import com.msmeli.dto.request.*;
-    import com.msmeli.dto.response.UserAuthResponseDTO;
-    import com.msmeli.dto.response.UserResponseDTO;
-    import com.msmeli.exception.AlreadyExistsException;
-    import com.msmeli.exception.ResourceNotFoundException;
-    import com.msmeli.model.*;
-    import com.msmeli.repository.EmployeeRepository;
-    import com.msmeli.repository.SellerRefactorRepository;
-    import com.msmeli.repository.UserEntityRepository;
-    import com.msmeli.service.services.EmailService;
-    import com.msmeli.service.services.RoleEntityService;
-    import com.msmeli.util.Role;
-    import org.modelmapper.ModelMapper;
-    import org.springframework.security.core.Authentication;
-    import org.springframework.security.core.context.SecurityContextHolder;
-    import org.springframework.security.crypto.password.PasswordEncoder;
-    import org.springframework.stereotype.Service;
-    import org.springframework.transaction.annotation.Transactional;
+import com.msmeli.configuration.security.entity.UserEntityUserDetails;
+import com.msmeli.configuration.security.service.JwtService;
+import com.msmeli.configuration.security.service.UserEntityRefreshTokenService;
+import com.msmeli.dto.request.*;
+import com.msmeli.dto.response.UserAuthResponseDTO;
+import com.msmeli.dto.response.UserResponseDTO;
+import com.msmeli.exception.AlreadyExistsException;
+import com.msmeli.exception.AppException;
+import com.msmeli.exception.ResourceNotFoundException;
+import com.msmeli.model.*;
+import com.msmeli.repository.EmployeeRepository;
+import com.msmeli.repository.SellerRefactorRepository;
+import com.msmeli.repository.UserEntityRepository;
+import com.msmeli.service.services.EmailService;
+import com.msmeli.service.services.RoleEntityService;
+import com.msmeli.util.Role;
+import org.modelmapper.ModelMapper;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
-    import java.util.*;
+import java.util.*;
 
-    @Service
-    public class UserEntityServiceImpl implements com.msmeli.service.services.UserEntityService {
+@Service
+public class UserEntityServiceImpl implements com.msmeli.service.services.UserEntityService {
 
-        private final UserEntityRepository userEntityRepository;
-        private final PasswordEncoder passwordEncoder;
-        private final ModelMapper mapper;
-        private final RoleEntityService roleEntityService;
-        private final EmailService emailService;
-        private final UserEntityRefreshTokenService refreshTokenService;
-        private final JwtService jwtService;
-        private final SellerRefactorRepository sellerRefactorRepository;
+    private final UserEntityRepository userEntityRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final ModelMapper mapper;
+    private final RoleEntityService roleEntityService;
+    private final EmailService emailService;
+    private final UserEntityRefreshTokenService refreshTokenService;
+    private final JwtService jwtService;
+    private final SellerRefactorRepository sellerRefactorRepository;
 
-        private final EmployeeRepository employeeRepository;
+    private final EmployeeRepository employeeRepository;
+    private final AuthenticationManager authManager;
 
-        private static final String NOT_FOUND = "Usuario no encontrado.";
+    private static final String NOT_FOUND = "Usuario no encontrado.";
 
 
-        public UserEntityServiceImpl(UserEntityRepository userEntityRepository, PasswordEncoder passwordEncoder, ModelMapper mapper, RoleEntityService roleEntityService, EmailService emailService, UserEntityRefreshTokenService refreshTokenService, JwtService jwtService, SellerRefactorRepository sellerRefactorRepository, EmployeeRepository employeeRepository) {
-            this.userEntityRepository = userEntityRepository;
-            this.passwordEncoder = passwordEncoder;
-            this.mapper = mapper;
-            this.roleEntityService = roleEntityService;
-            this.emailService = emailService;
-            this.refreshTokenService = refreshTokenService;
-            this.jwtService = jwtService;
-            this.sellerRefactorRepository = sellerRefactorRepository;
-            this.employeeRepository = employeeRepository;
+    public UserEntityServiceImpl(UserEntityRepository userEntityRepository, PasswordEncoder passwordEncoder, ModelMapper mapper, RoleEntityService roleEntityService, EmailService emailService, UserEntityRefreshTokenService refreshTokenService, JwtService jwtService, SellerRefactorRepository sellerRefactorRepository, EmployeeRepository employeeRepository, AuthenticationManager authManager) {
+        this.userEntityRepository = userEntityRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.mapper = mapper;
+        this.roleEntityService = roleEntityService;
+        this.emailService = emailService;
+        this.refreshTokenService = refreshTokenService;
+        this.jwtService = jwtService;
+        this.sellerRefactorRepository = sellerRefactorRepository;
+        this.employeeRepository = employeeRepository;
 
-        }
+        this.authManager = authManager;
+    }
 
-        @Override
-        public UserResponseDTO createSeller(UserRegisterRequestDTO userRegisterRequestDTO) throws ResourceNotFoundException, AlreadyExistsException {
-            if (!userRegisterRequestDTO.getPassword().equals(userRegisterRequestDTO.getRePassword()))
-                throw new ResourceNotFoundException("Las contraseñas ingresadas no coinciden.");
-            if (userEntityRepository.findByUsername(userRegisterRequestDTO.getUsername()).isPresent())
-                throw new AlreadyExistsException("El nombre de usuario ya existe.");
-            SellerRefactor newSeller = mapper.map(userRegisterRequestDTO,SellerRefactor.class);
-            newSeller.setPassword(passwordEncoder.encode(userRegisterRequestDTO.getPassword()));
-            List<RoleEntity> roles = new ArrayList<>();
-            roles.add(roleEntityService.findByName(Role.SELLER));
-            newSeller.setRoles(roles);
-            sellerRefactorRepository.save(newSeller);
-            emailService.sendMail(newSeller.getEmail(),"Bienvenido a G&L App", emailWelcomeBody(newSeller.getUsername()));
-            return mapper.map(newSeller, UserResponseDTO.class);
-        }
+    @Override
+    public UserResponseDTO createSeller(UserRegisterRequestDTO userRegisterRequestDTO) throws ResourceNotFoundException, AlreadyExistsException {
+        if (!userRegisterRequestDTO.getPassword().equals(userRegisterRequestDTO.getRePassword()))
+            throw new ResourceNotFoundException("Las contraseñas ingresadas no coinciden.");
+        if (userEntityRepository.findByUsername(userRegisterRequestDTO.getUsername()).isPresent())
+            throw new AlreadyExistsException("El nombre de usuario ya existe.");
+        SellerRefactor newSeller = mapper.map(userRegisterRequestDTO,SellerRefactor.class);
+        newSeller.setPassword(passwordEncoder.encode(userRegisterRequestDTO.getPassword()));
+        List<RoleEntity> roles = new ArrayList<>();
+        roles.add(roleEntityService.findByName(Role.SELLER));
+        newSeller.setRoles(roles);
+        sellerRefactorRepository.save(newSeller);
+        emailService.sendMail(newSeller.getEmail(),"Bienvenido a G&L App", emailWelcomeBody(newSeller.getUsername()));
+        return mapper.map(newSeller, UserResponseDTO.class);
+    }
 
     @Override
     public UserResponseDTO createEmployee(EmployeeRegisterRequestDTO employeeRegisterDTO) throws AlreadyExistsException, ResourceNotFoundException {
@@ -178,11 +182,18 @@ package com.msmeli.service.implement;
     }
 
     @Override
-    public UserAuthResponseDTO userAuthenticateAndGetToken(String username) throws ResourceNotFoundException {
-        UserAuthResponseDTO userAuthResponseDTO = findByUsername(username);
-        userAuthResponseDTO.setToken(jwtService.generateToken(username,userAuthResponseDTO.getId()));
+    public UserAuthResponseDTO userAuthenticateAndGetToken(String username,String pass) throws ResourceNotFoundException, AppException {
+        try{
+            UserAuthResponseDTO userAuthResponseDTO = findByUsername(username);
+            authManager.authenticate(new UsernamePasswordAuthenticationToken(username,pass));
+            userAuthResponseDTO.setToken(jwtService.generateToken(username,userAuthResponseDTO.getId()));
+            return userAuthResponseDTO;
+        }catch (Exception e){
+            throw new AppException(e.getMessage(),"Error en la autenticacion",403,403);
+        }
 
-        return userAuthResponseDTO;
+
+
     }
 
     /**
