@@ -24,7 +24,7 @@ public class StockController {
 
     @PostMapping("/save")
     public void saveUserStock(@RequestBody StockRequestDTO requestDTO) {
-        stockService.saveUserStock(requestDTO);
+        stockService.saveSellerStock(requestDTO);
     }
 
     @GetMapping("/list/{sellerId}")

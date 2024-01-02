@@ -3,11 +3,14 @@ package com.msmeli.service.implement;
 import com.msmeli.dto.StockDTO;
 import com.msmeli.dto.request.StockRequestDTO;
 import com.msmeli.exception.ResourceNotFoundException;
+import com.msmeli.model.SellerRefactor;
 import com.msmeli.model.Stock;
 import com.msmeli.model.UserEntity;
+import com.msmeli.repository.SellerRefactorRepository;
 import com.msmeli.repository.StockRepository;
 import com.msmeli.repository.UserEntityRepository;
 import com.msmeli.service.services.StockService;
+import com.msmeli.service.services.UserEntityService;
 import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -24,13 +27,18 @@ public class StockServiceImpl implements StockService {
     private final StockRepository stockRepository;
     private final UserEntityRepository userEntityRepository;
     private final ModelMapper modelMapper;
+    private final UserEntityService userEntityService;
+
+    private final SellerRefactorRepository sellerRefactorRepository;
 
     /**
      * Servicio que gestiona las operaciones relacionadas con el stock.
      */
-    public StockServiceImpl(StockRepository stockRepository, UserEntityRepository userEntityRepository) {
+    public StockServiceImpl(StockRepository stockRepository, UserEntityRepository userEntityRepository, SellerRefactorRepository sellerRefactorRepository, UserEntityService userEntityService) {
         this.stockRepository = stockRepository;
         this.userEntityRepository = userEntityRepository;
+        this.sellerRefactorRepository = sellerRefactorRepository;
+        this.userEntityService =userEntityService;
         this.modelMapper = new ModelMapper();
     }
 
@@ -47,21 +55,33 @@ public class StockServiceImpl implements StockService {
     }
 
     /**
-     * Guarda las existencias de un usuario según la solicitud proporcionada.
+     * Guarda el stock del vendedor.
      *
-     * @param requestDTO La solicitud que contiene las existencias del usuario a guardar.
+     * Este método guarda la información del stock para un vendedor autenticado. Recupera el ID del usuario autenticado,
+     * mapea los datos del DTO de la solicitud a objetos de tipo Stock, ajusta el identificador del vendedor y redondea
+     * los precios antes de guardar la lista de stocks en el repositorio.
+     *
+     * @param requestDTO El DTO de la solicitud que contiene la información del stock a guardar.
      */
     @Override
-    public void saveUserStock(StockRequestDTO requestDTO) {
-        stockRepository.saveAll(requestDTO.getContent()
+    public void saveSellerStock(StockRequestDTO requestDTO) {
+
+        Long authenticatedUserId = userEntityService.getAuthenticatedUserId();
+        UserEntity user = getUserById(authenticatedUserId);
+
+        List<Stock> stockList = requestDTO.getContent()
                 .parallelStream()
                 .map(e -> {
-                    Stock userStock = modelMapper.map(e, Stock.class);
-                    userStock.setUser_id(getUserById(requestDTO.getUser_id()));
-                    userStock.setPrice(Math.round(userStock.getPrice() * 100.0) / 100.0);
-                    return userStock;
-                }).collect(Collectors.toList()));
+                    Stock sellerStock = modelMapper.map(e, Stock.class);
+                    sellerStock.setSeller_id((SellerRefactor) user);
+                    sellerStock.setPrice(Math.round(sellerStock.getPrice() * 100.0) /100.0);
+                    return sellerStock;
+                })
+                .collect(Collectors.toList());
+
+        stockRepository.saveAll(stockList);
     }
+
 
     /**
      * Encuentra la última existencia por SKU.
