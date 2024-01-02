@@ -7,6 +7,7 @@ import com.msmeli.dto.BoxWinnerDTO;
 import com.msmeli.dto.SellerDTO;
 import com.msmeli.dto.response.BuyBoxWinnerResponseDTO;
 import com.msmeli.dto.response.CatalogItemResponseDTO;
+import com.msmeli.exception.AppException;
 import com.msmeli.exception.ResourceNotFoundException;
 import com.msmeli.feignClient.MeliFeignClient;
 import com.msmeli.model.Category;
@@ -14,6 +15,8 @@ import com.msmeli.model.Item;
 import com.msmeli.model.ListingType;
 import com.msmeli.model.Seller;
 import com.msmeli.repository.*;
+import com.msmeli.service.services.SellerService;
+import com.msmeli.service.services.UserEntityService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -53,6 +56,10 @@ public class MeliServiceTest {
 
     @Mock
     private ModelMapper modelMapper;
+    @Mock
+    private UserEntityService userEntityService;
+    @Mock
+    private SellerService sellerService;
 
     @Mock
     private ObjectMapper objectMapper;
@@ -73,110 +80,157 @@ public class MeliServiceTest {
 
     @Test
     public void testGetItemById() {
-        // Configura el comportamiento simulado del repositorio de ítems
-        Mockito.when(itemRepository.findById("itemId")).thenReturn(Optional.of(new Item(/* Datos del ítem */)));
+        Item expectedItem = new Item();
+        Mockito.when(itemRepository.findById("itemId")).thenReturn(Optional.of(expectedItem));
 
-        // Llama al método que deseas probar
         try {
-            Item item = meliService.getItemById("itemId");
+            MeliService meliService = new MeliService(
+                    meliFeignClient,
+                    itemRepository,
+                    categoryRepository,
+                    sellerRepository,
+                    listingTypeRepository,
+                    userEntityService,
+                    sellerService,
+                    objectMapper
+            );
 
-            // Realiza afirmaciones sobre el resultado
-            Assertions.assertNotNull(item);
-            // Agrega más afirmaciones según sea necesario
+            Item actualItem = meliService.getItemById("itemId");
+
+            assertNotNull(actualItem);
+            assertEquals(expectedItem, actualItem);
         } catch (Exception e) {
-            Assertions.fail("Excepción no esperada: " + e.getMessage());
+            fail("Unexpected exception: " + e.getMessage());
         }
     }
 
     @Test
     public void testGetCategory() {
-        // Configura el comportamiento simulado del repositorio de categorías
-        Mockito.when(categoryRepository.findById("categoryId")).thenReturn(Optional.of(new Category(/* Datos de la categoría */)));
+        Category expectedCategory = new Category();
+        Mockito.when(categoryRepository.findById("categoryId")).thenReturn(Optional.of(expectedCategory));
 
-        // Llama al método que deseas probar
         try {
-            Category category = meliService.getCategory("categoryId");
+            MeliService meliService = new MeliService(
+                    meliFeignClient,
+                    itemRepository,
+                    categoryRepository,
+                    sellerRepository,
+                    listingTypeRepository,
+                    userEntityService,
+                    sellerService,
+                    objectMapper
+            );
 
-            // Realiza afirmaciones sobre el resultado
-            Assertions.assertNotNull(category);
-            // Agrega más afirmaciones según sea necesario
+            Category actualCategory = meliService.getCategory("categoryId");
+
+            assertNotNull(actualCategory);
+            assertEquals(expectedCategory, actualCategory);
         } catch (Exception e) {
-            Assertions.fail("Excepción no esperada: " + e.getMessage());
+            fail("Unexpected exception: " + e.getMessage());
         }
     }
 
+    /**
+     * Prueba unitaria para verificar el comportamiento del método getSeller en MeliService.
+     * Se establece un identificador de vendedor (sellerId) y se crea un objeto Seller esperado.
+     * Se configura el mock del sellerRepository para devolver el objeto esperado cuando se llama a findById.
+     * Se instancia un servicio de Meli con los mocks y objetos simulados necesarios para la prueba.
+     * Se llama al método que se está probando, en este caso, getSeller.
+     * Se verifica que el resultado no sea nulo y que sea igual al vendedor esperado.
+     * Se manejan las excepciones inesperadas para evitar que la prueba falle de manera incontrolada.
+     */
     @Test
     public void testGetSeller() {
-        // Configura el comportamiento simulado del repositorio de vendedores
-        int sellerId = 123; // El ID del vendedor que deseas buscar
-        Seller seller = new Seller(/* Datos del vendedor simulado */);
-        Mockito.when(sellerRepository.findById(sellerId)).thenReturn(Optional.of(seller));
+        int sellerId = 123;
+        Seller expectedSeller = new Seller();
+        Mockito.when(sellerRepository.findById(sellerId)).thenReturn(Optional.of(expectedSeller));
 
-        // Llama al método que deseas probar
         try {
-            Seller resultSeller = meliService.getSeller(sellerId);
+            MeliService meliService = new MeliService(
+                    meliFeignClient,
+                    itemRepository,
+                    categoryRepository,
+                    sellerRepository,
+                    listingTypeRepository,
+                    userEntityService,
+                    sellerService,
+                    objectMapper
+            );
 
-            // Realiza afirmaciones sobre el resultado
-            Assertions.assertNotNull(resultSeller);
-            // Agrega más afirmaciones según sea necesario
+            Seller actualSeller = meliService.getSeller(sellerId);
+
+            assertNotNull(actualSeller);
+            assertEquals(expectedSeller, actualSeller);
         } catch (Exception e) {
-            Assertions.fail("Excepción no esperada: " + e.getMessage());
+            fail("Unexpected exception: " + e.getMessage());
         }
     }
 
     @Test
     public void testGetSellerWhenSellerNotFound() {
-        // Configura el comportamiento simulado del repositorio de vendedores cuando no se encuentra el vendedor
-        int sellerId = 456; // Un ID de vendedor que no existe en el repositorio
+        int sellerId = 456;
         Mockito.when(sellerRepository.findById(sellerId)).thenReturn(Optional.empty());
 
-        // Llama al método que deseas probar y espera una excepción
+
         Assertions.assertThrows(Exception.class, () -> {
             meliService.getSeller(sellerId);
         }, "Seller not found");
     }
 
+    /**
+     * Prueba unitaria para verificar el comportamiento del método getPositionMethod en MeliService.
+     * Se crea un contexto de documento JSON utilizando JsonPath con un objeto que contiene la propiedad "position" con el valor 42.
+     * Se llama al método que se está probando, en este caso, getPositionMethod.
+     * Se verifica que el resultado del método sea igual a 42.
+     */
     @Test
     public void testGetPositionMethod() {
-        // Arrange
         DocumentContext documentContext = JsonPath.parse("{\"position\": 42}");
 
-        // Act
         Integer result = meliService.getPositionMethod(documentContext);
 
-        // Assert
         Assertions.assertEquals(42, result);
     }
 
-
+    /**
+     * Prueba unitaria para verificar el comportamiento del método getListingTypeNameFromBd en MeliService.
+     * Se establece un comportamiento simulado utilizando mocks para el listingTypeRepository,
+     * donde se devuelve un objeto ListingType cuando se llama al método findById con el identificador "listingTypeId".
+     * Se llama al método que se está probando, en este caso, getListingTypeNameFromBd.
+     * Se verifica que el resultado del método sea igual al objeto ListingType esperado.
+     *
+     * @throws ResourceNotFoundException Excepción esperada si el recurso no es encontrado.
+     */
     @Test
     void testGetListingTypeNameFromBd() throws ResourceNotFoundException {
         // Mocking behavior
         ListingType listingType = new ListingType();
         when(listingTypeRepository.findById("listingTypeId")).thenReturn(Optional.of(listingType));
 
-        // Call the method to be tested
         ListingType result = new MeliService(null, null, null, null, listingTypeRepository, null, null, null)
                 .getListingTypeNameFromBd("listingTypeId");
 
-        // Assert the result
         assertEquals(listingType, result);
     }
 
+    /**
+     * Prueba unitaria para verificar el comportamiento del método getListingTypeNameFromBd en MeliService
+     * cuando el tipo de listado no se encuentra en el repositorio.
+     * Se configura un mock para el listingTypeRepository para devolver un Optional vacío
+     * cuando se llama al método findById con cualquier identificador de listado.
+     * Se espera que la prueba arroje una excepción de tipo ResourceNotFoundException.
+     */
     @Test
     void testGetListingTypeNameFromBd_ListingTypeNotFound() {
-        // Mocking behavior
         when(listingTypeRepository.findById(anyString())).thenReturn(Optional.empty());
 
-        // Call the method and assert the exception
         assertThrows(ResourceNotFoundException.class,
                 () -> new MeliService(null, null, null, null, listingTypeRepository, null, null, null)
                         .getListingTypeNameFromBd("nonExistentListingTypeId"));
     }
 
     @Test
-    void testGetBuyBoxWinner() throws ResourceNotFoundException {
-        // Mocking behavior
+    void testGetBuyBoxWinner() throws ResourceNotFoundException, AppException {
         BoxWinnerDTO mockResultDTO = createMockBoxWinnerDTO();
         when(meliFeignClient.getProductWinnerSearch(anyString(), anyString())).thenReturn(mockResultDTO);
 
@@ -185,47 +239,36 @@ public class MeliServiceTest {
 
         MeliService meliService = new MeliService(meliFeignClient, null, null, null, null, null, null, null);
 
-        // Call the method to be tested
         BuyBoxWinnerResponseDTO resultDTO = meliService.getBuyBoxWinner("productId");
 
-        // Assert the result
         assertEquals(mockResultDTO.getBuy_box_winner().getListing_type_id(),
                 resultDTO.getListing_type_id());
         assertEquals(mockSellerDTO.getSeller().getNickname(),
                 resultDTO.getSeller_nickname());
-        // Add more assertions based on your actual mapping logic
     }
 
-    // Utility methods to create mock data
+
     private BoxWinnerDTO createMockBoxWinnerDTO() {
         BoxWinnerDTO boxWinnerDTO = new BoxWinnerDTO();
-        // Set mock data
         return boxWinnerDTO;
     }
 
     private SellerDTO createMockSellerDTO() {
         SellerDTO sellerDTO = new SellerDTO();
-        // Set mock data
         return sellerDTO;
     }
 
     @Test
     void testGetBuyBoxWinnerCatalog() throws ResourceNotFoundException {
-        // Mocking behavior
         BoxWinnerDTO mockResultDTO = createMockBoxWinnerDTO();
         when(meliFeignClient.getProductWinnerSearch(anyString(), anyString())).thenReturn(mockResultDTO);
 
         MeliService meliService = new MeliService(meliFeignClient, null, null, null, null, null, null, null);
 
-        // Call the method to be tested
-        BuyBoxWinnerResponseDTO resultDTO = meliService.getBuyBoxWinnerCatalog("productId"); //simular token
+        BuyBoxWinnerResponseDTO resultDTO = meliService.getBuyBoxWinnerCatalog("productId");
 
-        // Assert the result
         assertEquals(mockResultDTO.getBuy_box_winner().getListing_type_id(),
                 resultDTO.getListing_type_id());
-        // Add more assertions based on your actual mapping logic
     }
-
-
 
 }

@@ -65,10 +65,10 @@ public class CostServiceImpl implements CostService {
     }
 
     /**
-     * metod que se encarga en solicitar los datos de Fee desde la api de mercado LIbre en relacion al item que entra
+     * metodo que se encarga en solicitar los datos de Fee desde la api de mercado Libre en relacion al item que entra
      * como parametro
      * @param item
-     * @return FeeDetailsDTO devuelde los datos solcitados al api de mercadolibre
+     * @return FeeDetailsDTO devuelve los datos solcitados a la api de mercadolibre
      * @throws AppException puede lanzar excepciones de tipo feign
      */
    private FeeDetailsDTO getFeeForItem(Item item) throws AppException {
@@ -77,7 +77,7 @@ public class CostServiceImpl implements CostService {
    }
 
     /**
-     * Metodo que que se encarga de comprbar si existe un stock en relacion al item
+     * Metodo que que se encarga de comprobar si existe un stock en relacion al item
      * @param item
      * @param stock
      * @return
@@ -90,7 +90,7 @@ public class CostServiceImpl implements CostService {
    }
 
     /**
-     * Metodo para controlar si existe las comiciones de mercadolibre
+     * Metodo para controlar si existen las comisiones de mercadolibre
      * @param feeDetails
      * @return
      */
@@ -114,7 +114,7 @@ public class CostServiceImpl implements CostService {
     /**
      * El metodo se encarga en setear los datos al objeto costo en relacion al item que entra por parametro
      * @param item
-     * @param feeDetails Comiciones mercadoLibre
+     * @param feeDetails Comisiones mercadoLibre
      * @param cost
      * @return
      * @throws AppException

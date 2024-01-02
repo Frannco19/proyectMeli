@@ -1,6 +1,7 @@
 package com.msmeli.service.implement;
 import com.msmeli.dto.response.FeeResponseDTO;
 import com.msmeli.dto.response.ShippingCostDTO;
+import com.msmeli.exception.AppException;
 import com.msmeli.model.Cost;
 import com.msmeli.model.Item;
 import com.msmeli.model.Stock;
@@ -31,6 +32,13 @@ public class CostServiceImplTest {
     @Mock
     private ModelMapper mapper;
 
+    /**
+     * Prueba unitaria para verificar el comportamiento del método createProductsCosts en CostService.
+     * Se crean instancias simuladas de Item y Stock con datos específicos para la prueba.
+     * Se configuran los mocks necesarios para el test, como el mapper y meliService.
+     * Se llama al método que se está probando, createProductsCosts.
+     * Se verifica que el método haya llamado correctamente al costRepository y que el resultado no sea nulo.
+     */
     @Test
     public void testCreateProductsCosts() {
         Item item = new Item();
@@ -47,7 +55,11 @@ public class CostServiceImplTest {
 
         // Configurar los mocks
         Mockito.when(mapper.map(Mockito.any(), Mockito.any())).thenReturn(new Cost());
-        Mockito.when(meliService.getItemFee(Mockito.anyDouble(), Mockito.anyString(), Mockito.anyString())).thenReturn(new FeeResponseDTO());
+        try {
+            Mockito.when(meliService.getItemFee(Mockito.anyDouble(), Mockito.anyString(), Mockito.anyString())).thenReturn(new FeeResponseDTO());
+        } catch (AppException e) {
+            throw new RuntimeException(e);
+        }
         // Llamar al método que se está probando
         Item result = costService.createProductsCosts(item, stock);
 

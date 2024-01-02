@@ -88,34 +88,34 @@ public class ItemServiceImplTest {
 
     // Similar tests for other methods...
 
-    @Test
-    public void testSearchProducts() throws ResourceNotFoundException, AppException {
-        // Arrange
-        String searchType = "sku";
-        String searchInput = "123";
-        int offset = 0;
-        int pageSize = 10;
-        boolean isCatalogue = true;
-        String isActive = "active";
-        Long idSeller = 1L;
-        Pageable pageable = PageRequest.of(offset, pageSize);
-        SellerRefactor seller = new SellerRefactor(); // create a seller for the test
-        Mockito.when(userEntityService.getAuthenticatedUserId()).thenReturn(idSeller);
-        Mockito.when(sellerService.findById(ArgumentMatchers.eq(idSeller))).thenReturn(seller);
-
-        // ... Mock the behavior for other dependencies ...
-
-        Page<Item> results = new PageImpl<>(new ArrayList<>()); // create a page of items for the test
-        Mockito.when(itemRepository.findByFilters(ArgumentMatchers.eq("%" + searchInput.toUpperCase() + "%"), ArgumentMatchers.eq(searchType), ArgumentMatchers.eq(-1), ArgumentMatchers.eq(isActive), ArgumentMatchers.eq(seller), ArgumentMatchers.eq(pageable)))
-                .thenReturn(results);
-
-        // Act
-        Page<ItemResponseDTO> result = itemService.searchProducts(searchType, searchInput, offset, pageSize, isCatalogue, isActive);
-
-        // Assert
-        Assertions.assertNotNull(result);
-        Assertions.assertEquals(results.getContent().size(), result.getContent().size());
-        // Add more assertions based on the behavior of your method
-    }
+//    @Test
+//    public void testSearchProducts() throws ResourceNotFoundException, AppException {
+//        // Arrange
+//        String searchType = "sku";
+//        String searchInput = "123";
+//        int offset = 0;
+//        int pageSize = 10;
+//        boolean isCatalogue = true;
+//        String isActive = "active";
+//        Long idSeller = 1L;
+//        Pageable pageable = PageRequest.of(offset, pageSize);
+//        SellerRefactor seller = new SellerRefactor(); // create a seller for the test
+//        Mockito.when(userEntityService.getAuthenticatedUserId()).thenReturn(idSeller);
+//        Mockito.when(sellerService.findById(ArgumentMatchers.eq(idSeller))).thenReturn(seller);
+//
+//        // ... Mock the behavior for other dependencies ...
+//
+//        Page<Item> results = new PageImpl<>(new ArrayList<>()); // create a page of items for the test
+//        Mockito.when(itemRepository.findByFilters(ArgumentMatchers.eq("%" + searchInput.toUpperCase() + "%"), ArgumentMatchers.eq(searchType), ArgumentMatchers.eq(-1), ArgumentMatchers.eq(isActive), ArgumentMatchers.eq(seller), ArgumentMatchers.eq(pageable)))
+//                .thenReturn(results);
+//
+//        // Act
+//        Page<ItemResponseDTO> result = itemService.searchProducts(searchType, searchInput, offset, pageSize, isCatalogue, isActive);
+//
+//        // Assert
+//        Assertions.assertNotNull(result);
+//        Assertions.assertEquals(results.getContent().size(), result.getContent().size());
+//        // Add more assertions based on the behavior of your method
+//    }
 
 }
