@@ -10,6 +10,7 @@ import com.msmeli.dto.response.BuyBoxWinnerResponseDTO;
 import com.msmeli.dto.response.CatalogItemResponseDTO;
 import com.msmeli.dto.response.FeeResponseDTO;
 import com.msmeli.dto.response.OptionsDTO;
+import com.msmeli.exception.AppException;
 import com.msmeli.exception.ResourceNotFoundException;
 import com.msmeli.feignClient.MeliFeignClient;
 import com.msmeli.model.*;
@@ -241,19 +242,23 @@ public class MeliService {
      * @return DTO Con los datos del mejor pocisionado en el catalogo
      * @throws ResourceNotFoundException
      */
-    public BuyBoxWinnerResponseDTO getBuyBoxWinner(String productId) throws ResourceNotFoundException {
+    public BuyBoxWinnerResponseDTO getBuyBoxWinner(String productId) throws ResourceNotFoundException, AppException {
+        try {
+            Long id = userEntityService.getAuthenticatedUserId();
+            SellerRefactor user = sellerService.findById(id);
 
-        Long id = userEntityService.getAuthenticatedUserId();
-        SellerRefactor user = sellerService.findById(id);
+            BoxWinnerDTO result = meliFeignClient.getProductWinnerSearch(productId,"Bearer " + user.getTokenMl());
+            SellerDTO seller = meliFeignClient.getSellerBySellerId(result.getBuy_box_winner().getSeller_id());
 
-        BoxWinnerDTO result = meliFeignClient.getProductWinnerSearch(productId,"Bearer " + user.getTokenMl());
-        SellerDTO seller = meliFeignClient.getSellerBySellerId(result.getBuy_box_winner().getSeller_id());
+            BuyBoxWinnerResponseDTO responseDTO = modelMapper.map(result.getBuy_box_winner(), BuyBoxWinnerResponseDTO.class);
 
-        BuyBoxWinnerResponseDTO responseDTO = modelMapper.map(result.getBuy_box_winner(), BuyBoxWinnerResponseDTO.class);
+            responseDTO.setSeller_nickname(seller.getSeller().getNickname());
+            //responseDTO.setListing_type_id(getListingTypeNameFromBd(responseDTO.getListing_type_id()).getName());
+            return responseDTO;
+        }catch (Exception ex){
+            throw new AppException(ex.getMessage(),"meliService->getBuyWinner",000,404);
+        }
 
-        responseDTO.setSeller_nickname(seller.getSeller().getNickname());
-        //responseDTO.setListing_type_id(getListingTypeNameFromBd(responseDTO.getListing_type_id()).getName());
-        return responseDTO;
     }
 
     public BuyBoxWinnerResponseDTO getBuyBoxWinnerCatalog(String productId) throws ResourceNotFoundException {
@@ -288,8 +293,13 @@ public class MeliService {
         return meliFeignClient.getShippingCostDTO(itemId);
     }
 
-    public FeeResponseDTO getItemFee(double price, String category_id, String listing_type_id) {
-        return meliFeignClient.getItemFee(price, category_id, listing_type_id);
+    public FeeResponseDTO getItemFee(double price, String category_id, String listing_type_id) throws AppException {
+        try {
+            return meliFeignClient.getItemFee(price, category_id, listing_type_id);
+        }catch (Exception ex){
+            throw new AppException(ex.getMessage(),"MeliService-> getItemfee",000,204);
+        }
+
     }
 
 
