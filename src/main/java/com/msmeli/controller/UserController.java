@@ -7,6 +7,7 @@ import com.msmeli.dto.request.UserRegisterRequestDTO;
 import com.msmeli.dto.response.UserAuthResponseDTO;
 import com.msmeli.dto.response.UserResponseDTO;
 import com.msmeli.exception.AlreadyExistsException;
+import com.msmeli.exception.AppException;
 import com.msmeli.exception.ResourceNotFoundException;
 import com.msmeli.service.services.SellerService;
 import com.msmeli.service.services.UserEntityService;
@@ -63,10 +64,10 @@ public class UserController {
     @PostMapping("/authenticate")
     @Operation(summary = "Endpoint para autenticar usuario.")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Devuelve el token y refreshToken del usuario.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = UserAuthResponseDTO.class))}), @ApiResponse(responseCode = "400", description = "Solicitud erronea.", content = @Content), @ApiResponse(responseCode = "404", description = "Usuario no registrado.", content = @Content), @ApiResponse(responseCode = "500", description = "Error del servidor", content = @Content)})
-    public ResponseEntity<UserAuthResponseDTO> authenticateAndGetToken(@Valid @RequestBody AuthRequestDTO authRequestDTO) throws ResourceNotFoundException {
+    public ResponseEntity<UserAuthResponseDTO> authenticateAndGetToken(@Valid @RequestBody AuthRequestDTO authRequestDTO) throws ResourceNotFoundException, AppException {
         Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequestDTO.getUsername(), authRequestDTO.getPassword()));
         if (authenticate.isAuthenticated()) {
-            return ResponseEntity.status(HttpStatus.OK).body(userEntityService.userAuthenticateAndGetToken(authRequestDTO.getUsername()));
+            return ResponseEntity.status(HttpStatus.OK).body(userEntityService.userAuthenticateAndGetToken(authRequestDTO.getUsername(), authRequestDTO.getPassword()));
         }
         throw new UsernameNotFoundException("Solicitud de usuario invalida");
     }
