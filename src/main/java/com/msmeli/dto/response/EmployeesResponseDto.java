@@ -1,7 +1,6 @@
 package com.msmeli.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.msmeli.model.Employee;
 import com.msmeli.model.RoleEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,10 +14,11 @@ import java.util.List;
 @Getter
 @Setter
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class EmployeesResponseDto {
+    public class EmployeesResponseDto {
     private Long id;
-    private String nombre;
-    private String apellido;
+    private String name;
+    private String lastname;
+    private String username;
+    private String email;
     private List<RoleEntity> roles;
-
 }

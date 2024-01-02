@@ -39,12 +39,10 @@ class SupplierServiceImplTest {
 
     @Test
     void testFindById() {
-        // Arrange
         Long supplierId = 1L;
         Supplier mockSupplier = new Supplier();
         when(supplierRepository.findById(supplierId)).thenReturn(Optional.of(mockSupplier));
 
-        // Act
         Supplier result = null;
         try {
             result = supplierService.findById(supplierId);
@@ -52,24 +50,20 @@ class SupplierServiceImplTest {
             throw new RuntimeException(e);
         }
 
-        // Assert
         assertNotNull(result);
         assertEquals(mockSupplier, result);
     }
 
     @Test
     void testFindByIdWhenNotFound() {
-        // Arrange
         Long supplierId = 1L;
         when(supplierRepository.findById(supplierId)).thenReturn(Optional.empty());
 
-        // Act and Assert
         assertThrows(ResourceNotFoundException.class, () -> supplierService.findById(supplierId));
     }
 
     @Test
     void testUploadSupplierStock() {
-        // Arrange
         Long supplierId = 1L;
         StockBySupplierRequestDTO requestDTO = new StockBySupplierRequestDTO();
         requestDTO.setSupplierId(supplierId);
@@ -80,7 +74,6 @@ class SupplierServiceImplTest {
         List<SupplierStock> mockStockList = Collections.singletonList(new SupplierStock());
         when(supplierStockService.create(mockSupplier, requestDTO.getContent())).thenReturn(mockStockList);
 
-        // Act
         List<SupplierStock> result = null;
         try {
             result = supplierService.uploadSupplierStock(requestDTO);
@@ -88,24 +81,20 @@ class SupplierServiceImplTest {
             throw new RuntimeException(e);
         }
 
-        // Assert
         assertNotNull(result);
         assertEquals(mockStockList, result);
     }
 
     @Test
     void testUploadSupplierStockWhenSupplierNotFound() {
-        // Arrange
         Long supplierId = 1L;
         StockBySupplierRequestDTO requestDTO = new StockBySupplierRequestDTO();
         requestDTO.setSupplierId(supplierId);
 
         when(supplierRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        // Act and Assert
         assertThrows(ResourceNotFoundException.class, () -> supplierService.uploadSupplierStock(requestDTO));
 
-        // Verify that supplierStockService.create is not called
         verify(supplierStockService, never()).create(any(), any());
     }
 }
