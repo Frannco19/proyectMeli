@@ -6,6 +6,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class SecurityExceptionTest {
 
+    /**
+     * Prueba la creación de una instancia de SecurityException y verifica que los valores se han establecido correctamente
+     * utilizando los métodos getter.
+     */
     @Test
     public void testSecurityException() {
         // Crear una instancia de SecurityException
@@ -17,6 +21,10 @@ public class SecurityExceptionTest {
         assertEquals(123, securityException.getCode());
     }
 
+    /**
+     * Prueba la creación de una instancia de SecurityException con causa y verifica que los valores se han establecido
+     * correctamente utilizando los métodos getter. Además, se verifica que la causa también se ha establecido correctamente.
+     */
     @Test
     public void testSecurityExceptionWithCause() {
         // Crear una instancia de SecurityException con causa

@@ -37,6 +37,15 @@ public class EmployeeServiceImplTest {
         MockitoAnnotations.initMocks(this);
     }
 
+    /**
+     * Prueba la funcionalidad de "updateEmployee" en el servicio de empleados (EmployeeService).
+     * Se configura un escenario donde se proporciona un ID de empleado y una solicitud de actualización (EmployeeUpdateRequestDTO).
+     * Se simula el comportamiento del repositorio de empleados al devolver un empleado existente con el ID proporcionado.
+     * Se simula también el comportamiento del repositorio de entidades de usuario al no encontrar un usuario con el nuevo nombre de usuario.
+     * Se simula la codificación de la nueva contraseña y la devolución de una respuesta de usuario mapeada.
+     * Luego, se llama al método "updateEmployee" del servicio de empleados y se verifica que las interacciones esperadas
+     * con los repositorios, el codificador de contraseña y el mapeador hayan ocurrido sin errores.
+     */
     @Test
     void testUpdateEmployee() {
         // Arrange
@@ -72,6 +81,12 @@ public class EmployeeServiceImplTest {
         verify(mapper, times(1)).map(existingEmployee, UserResponseDTO.class);
     }
 
+    /**
+     * Prueba la funcionalidad de "deleteEmployee" en el servicio de empleados (EmployeeService).
+     * Se configura un escenario donde se proporciona un ID de empleado y se simula el comportamiento del repositorio de empleados
+     * al devolver un empleado existente con el ID proporcionado. Luego, se llama al método "deleteEmployee" del servicio de empleados
+     * y se verifica que las interacciones esperadas con el repositorio hayan ocurrido sin errores, incluida la llamada al método "delete".
+     */
     @Test
     void testDeleteEmployee() {
         // Arrange

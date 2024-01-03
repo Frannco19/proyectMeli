@@ -82,7 +82,7 @@ public class CostServiceImpl implements CostService {
      * @param stock
      * @return
      */
-   private boolean hasStock(Item item, Stock stock){
+    boolean hasStock(Item item, Stock stock){
        if(item.getSku() != null && stock != null){
            return true;
        }
@@ -94,7 +94,7 @@ public class CostServiceImpl implements CostService {
      * @param feeDetails
      * @return
      */
-   private boolean hasFee(FeeDetailsDTO feeDetails){
+    boolean hasFee(FeeDetailsDTO feeDetails){
        if (feeDetails != null){
            return true;
        }
@@ -119,7 +119,7 @@ public class CostServiceImpl implements CostService {
      * @return
      * @throws AppException
      */
-    private Item setCostItem(Item item,FeeDetailsDTO feeDetails,Cost cost) throws AppException {
+     Item setCostItem(Item item, FeeDetailsDTO feeDetails, Cost cost) throws AppException {
         try {
             Double shippingCost = 0.0;
             if(hasFee(feeDetails)){
