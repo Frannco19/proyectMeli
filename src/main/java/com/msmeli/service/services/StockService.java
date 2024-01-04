@@ -19,5 +19,6 @@ public interface StockService {
     List<Stock> findAll(Long sellerId) throws ResourceNotFoundException;
     Page<Stock> findAllPaged(Long sellerId, Pageable pageable) throws ResourceNotFoundException;
     List<StockDTO> findAllByUserId(Long userId) throws ResourceNotFoundException;
+    List<StockDTO>findAllByAuthenticatedUser();
 }
 

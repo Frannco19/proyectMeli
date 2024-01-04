@@ -32,11 +32,12 @@ public class StockController {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(stockService.findAllMapped(sellerId));
     }
 
-
     @GetMapping("/listrefactor/{userId}")
     public List<StockDTO> findAllByUserId(@PathVariable Long userId) {
         return stockService.findAllByUserId(userId);
     }
 
+    @GetMapping("/list")
+    public List<StockDTO>findAllByAuthenticatedUser(){return stockService.findAllByAuthenticatedUser();}
 
 }

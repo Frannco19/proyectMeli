@@ -164,6 +164,30 @@ public class StockServiceImpl implements StockService {
         return stockDTOList;
     }
 
+    public List<StockDTO> findAllByAuthenticatedUser() {
+        // Recupera el ID del usuario autenticado
+        Long authenticatedUserId = userEntityService.getAuthenticatedUserId();
+
+        // Busca el stock por el ID del usuario autenticado
+        List<Stock> stockList = stockRepository.findAllByUserId(authenticatedUserId);
+
+        // Crea instancias de StockDTO a partir de Stock
+        List<StockDTO> stockDTOList = stockList.stream()
+                .map(stock -> new StockDTO(
+                        stock.getId(),
+                        stock.getSku(),
+                        stock.getAvailable_quantity(),
+                        stock.getPrice(),
+                        stock.getRegister_date(),
+                        // Aquí deberías crear una instancia de SupplierStockResponseDTO si es necesario
+                        null  // Por ahora, establezco null, ya que no proporcionaste cómo obtener SupplierStockResponseDTO
+                ))
+                .collect(Collectors.toList());
+
+        return stockDTOList;
+    }
+
+
 
 
 
