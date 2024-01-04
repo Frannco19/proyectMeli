@@ -27,16 +27,6 @@ public class StockController {
         stockService.saveSellerStock(requestDTO);
     }
 
-    @GetMapping("/list/{sellerId}")
-    public ResponseEntity<List<StockDTO>> findAllPaged(@PathVariable Long sellerId) {
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(stockService.findAllMapped(sellerId));
-    }
-
-    @GetMapping("/listrefactor/{userId}")
-    public List<StockDTO> findAllByUserId(@PathVariable Long userId) {
-        return stockService.findAllByUserId(userId);
-    }
-
     @GetMapping("/list")
     public List<StockDTO>findAllByAuthenticatedUser(){return stockService.findAllByAuthenticatedUser();}
 
