@@ -53,7 +53,7 @@ public class StockServiceImplTest {
         Mockito.when(userEntityRepository.findById(1L)).thenReturn(java.util.Optional.of(userEntity));
 
         // Act
-        stockService.saveUserStock(requestDTO);
+        stockService.saveSellerStock(requestDTO);
 
         // Assert
         Mockito.verify(stockRepository, Mockito.times(1)).saveAll(Mockito.anyList());

@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.ArrayList;
@@ -39,6 +40,31 @@ public class GeneralCategoryServiceImplTest {
         generalCategoryRepository = mock(GeneralCategoryRepository.class);
         meliService = mock(MeliService.class);
         generalCategoryService = new GeneralCategoryServiceImpl(generalCategoryRepository, meliService);
+        MockitoAnnotations.openMocks(this);
+
+    }
+
+    @Test
+    void createAll_shouldSaveGeneralCategories() {
+        // Arrange
+        List<GeneralCategory> mockCategories = createMockCategories();
+        when(meliService.findGeneralCategories()).thenReturn(mockCategories);
+
+        // Act
+        generalCategoryService.createAll();
+
+        // Assert
+        verify(generalCategoryRepository, times(1)).saveAll(mockCategories);
+    }
+
+    private List<GeneralCategory> createMockCategories() {
+        // Create and return a list of mock GeneralCategory objects
+        // You can customize this method based on your specific needs
+        // For example:
+        List<GeneralCategory> categories = new ArrayList<>();
+        categories.add(new GeneralCategory(/* specify constructor arguments */));
+        // Add more categories as needed
+        return categories;
     }
 
     @Test
@@ -57,18 +83,7 @@ public class GeneralCategoryServiceImplTest {
         // Verificar el resultado
         Assertions.assertEquals(mockCategories, result);
     }
-    @Test
-    void testCreateAll() {
-        // Arrange
-        List<GeneralCategory> mockCategories = new ArrayList<>(); // Populate with mock data
-        when(meliService.findGeneralCategories()).thenReturn(mockCategories);
 
-        // Act
-        assertDoesNotThrow(() -> generalCategoryService.createAll());
-
-        // Assert
-        verify(generalCategoryRepository, times(1)).saveAll(anyList());
-    }
     @Test
     void testFindAllThrowsResourceNotFoundException() {
         // Arrange
