@@ -1,4 +1,4 @@
-package com.msmeli.dto;
+package com.msmeli.dto.feign;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;

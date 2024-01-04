@@ -1,7 +1,7 @@
 package com.msmeli.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.msmeli.dto.ShippingDTO;
+import com.msmeli.dto.feign.ShippingDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
