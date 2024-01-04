@@ -4,6 +4,7 @@ import com.msmeli.configuration.security.entity.UserEntityUserDetails;
 import com.msmeli.configuration.security.service.JwtService;
 import com.msmeli.configuration.security.service.UserEntityRefreshTokenService;
 import com.msmeli.dto.request.EmployeeRegisterRequestDTO;
+import com.msmeli.dto.request.UserRegisterRequestDTO;
 import com.msmeli.dto.response.UserAuthResponseDTO;
 import com.msmeli.dto.response.UserResponseDTO;
 import com.msmeli.exception.AlreadyExistsException;
@@ -26,6 +27,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -36,26 +38,46 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static com.msmeli.util.Role.SELLER;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class UserEntityServiceImplTest {
-
-    @InjectMocks
-    private UserEntityServiceImpl userEntityServiceImpl;
+class UserEntityServiceImplTest {
 
     @Mock
     private UserEntityRepository userEntityRepository;
+
     @Mock
-    private EmailService emailService;
+    private PasswordEncoder passwordEncoder;
+
     @Mock
-    private Authentication authentication;
+    private ModelMapper mapper;
 
     @Mock
     private RoleEntityService roleEntityService;
 
+    @Mock
+    private EmailService emailService;
+
+    @Mock
+    private Authentication authentication;
+
+    @Mock
+    private JwtService jwtService;
+
+    @Mock
+    private SellerRefactorRepository sellerRefactorRepository;
+
+    @Mock
+    private EmployeeRepository employeeRepository;
+
+    @Mock
+    private AuthenticationManager authManager;
+
+    @InjectMocks
+    private UserEntityServiceImpl userEntityServiceImpl;
 
 
     @BeforeEach
@@ -64,6 +86,28 @@ public class UserEntityServiceImplTest {
     }
 
 
+    @Test
+    void testCreateSeller() throws ResourceNotFoundException, AlreadyExistsException {
+        // Arrange
+        UserRegisterRequestDTO requestDTO = new UserRegisterRequestDTO();
+        requestDTO.setUsername("testUser");
+        requestDTO.setPassword("testPassword");
+        requestDTO.setRePassword("testPassword");
+
+        SellerRefactor newSeller = new SellerRefactor();
+        newSeller.setUsername(requestDTO.getUsername());
+
+        when(userEntityRepository.findByUsername(requestDTO.getUsername())).thenReturn(Optional.empty());
+        when(mapper.map(requestDTO, SellerRefactor.class)).thenReturn(newSeller);
+        when(roleEntityService.findByName(SELLER)).thenReturn(new RoleEntity());
+        when(passwordEncoder.encode(requestDTO.getPassword())).thenReturn("encodedPassword");
+        when(sellerRefactorRepository.save(any(SellerRefactor.class))).thenReturn(newSeller);
+
+        UserResponseDTO responseDTO = userEntityServiceImpl.createSeller(requestDTO);
+
+        assertNotNull(responseDTO);
+        assertEquals(requestDTO.getUsername(), responseDTO.getUsername());
+    }
 
     @Test
     void testReadUser() {

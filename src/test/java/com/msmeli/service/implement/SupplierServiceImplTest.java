@@ -37,6 +37,11 @@ class SupplierServiceImplTest {
         MockitoAnnotations.openMocks(this);
     }
 
+    /**
+     * Prueba el método findById de SupplierServiceImpl.
+     * Verifica que el método findById devuelva el proveedor correcto cuando se encuentra.
+     * @throws ResourceNotFoundException Si no se encuentra el proveedor.
+     */
     @Test
     void testFindById() {
         Long supplierId = 1L;
@@ -54,6 +59,11 @@ class SupplierServiceImplTest {
         assertEquals(mockSupplier, result);
     }
 
+    /**
+     * Prueba el método findById de SupplierServiceImpl cuando el proveedor no se encuentra.
+     * Verifica que el método findById lance una excepción ResourceNotFoundException cuando
+     * el proveedor no se encuentra en la base de datos.
+     */
     @Test
     void testFindByIdWhenNotFound() {
         Long supplierId = 1L;
@@ -62,6 +72,11 @@ class SupplierServiceImplTest {
         assertThrows(ResourceNotFoundException.class, () -> supplierService.findById(supplierId));
     }
 
+    /**
+     * Prueba el método uploadSupplierStock de SupplierServiceImpl.
+     * Verifica que el método uploadSupplierStock devuelva la lista de SupplierStock esperada
+     * cuando el proveedor se encuentra y la solicitud de stock es válida.
+     */
     @Test
     void testUploadSupplierStock() {
         Long supplierId = 1L;
@@ -85,6 +100,11 @@ class SupplierServiceImplTest {
         assertEquals(mockStockList, result);
     }
 
+    /**
+     * Prueba el método uploadSupplierStock de SupplierServiceImpl cuando el proveedor no se encuentra.
+     * Verifica que el método uploadSupplierStock lance una excepción ResourceNotFoundException
+     * y que no se realice la creación de SupplierStock si el proveedor no se encuentra.
+     */
     @Test
     void testUploadSupplierStockWhenSupplierNotFound() {
         Long supplierId = 1L;
