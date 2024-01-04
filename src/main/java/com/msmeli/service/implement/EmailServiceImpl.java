@@ -8,14 +8,14 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 @Service
-public class EmailService implements com.msmeli.service.services.EmailService {
+public class EmailServiceImpl implements com.msmeli.service.services.EmailService {
 
     @Value("${spring.mail.username}")
     private String fromEmail;
 
     private final JavaMailSender javaMailSender;
 
-    public EmailService(JavaMailSender javaMailSender) {
+    public EmailServiceImpl(JavaMailSender javaMailSender) {
         this.javaMailSender = javaMailSender;
     }
 
