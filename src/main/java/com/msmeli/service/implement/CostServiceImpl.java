@@ -121,7 +121,7 @@ public class CostServiceImpl implements CostService {
      */
      Item setCostItem(Item item, FeeDetailsDTO feeDetails, Cost cost) throws AppException {
         try {
-            Double shippingCost = 0.0;
+            Double shippingCost = getShippingCost(item);
             if(hasFee(feeDetails)){
                 cost.setComision_fee(feeDetails.getPercentage_fee());
                 cost.setComision_discount(feeDetails.getGross_amount());
@@ -138,6 +138,16 @@ public class CostServiceImpl implements CostService {
             throw new AppException(ex.getMessage(),"CostServiceImple->setCostItem",000,404);
         }
         return item;
+    }
+    private double getShippingCost(Item item){
+        double shippingCost = 0.0;
+        try{
+            shippingCost = meliService.getShippingCostDTO(item.getId()).getOptions().stream().filter(option -> option.getName().equals("Estándar a domicilio")).findFirst().get().getList_cost();
+            return shippingCost;
+        }catch (Exception e){
+            return shippingCost;
+        }
+
     }
 
 }

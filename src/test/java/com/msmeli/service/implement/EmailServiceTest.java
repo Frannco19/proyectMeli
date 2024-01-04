@@ -7,11 +7,9 @@ import jakarta.mail.internet.MimeMessage;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
-import org.springframework.mail.javamail.MimeMessageHelper;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -24,7 +22,7 @@ class EmailServiceTest {
     private JavaMailSender javaMailSender;
 
     @InjectMocks
-    private EmailService emailService;
+    private EmailServiceImpl emailService;
 
     @Test
     void testSendMail() throws ResourceNotFoundException, MessagingException {
