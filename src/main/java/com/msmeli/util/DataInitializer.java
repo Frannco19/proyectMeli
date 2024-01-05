@@ -86,7 +86,7 @@ public class DataInitializer {
             ClassPathResource resource = new ClassPathResource("stock_example.json");
             ObjectMapper map = new ObjectMapper();
             StockRequestDTO requestDTO = map.readValue(resource.getInputStream(), StockRequestDTO.class);
-            stockService.saveUserStock(requestDTO);
+            stockService.saveSellerStock(requestDTO);
         }
     }
 

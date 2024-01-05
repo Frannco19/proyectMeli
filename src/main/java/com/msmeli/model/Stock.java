@@ -19,10 +19,10 @@ public class Stock {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-
+    
     @ManyToOne
-    @JoinColumn(name = "user_id")
-    private UserEntity user_id;
+    @JoinColumn(name = "seller_id")
+    private SellerRefactor seller_id;
 
     private String sku;
 

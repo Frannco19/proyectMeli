@@ -7,11 +7,9 @@ import jakarta.mail.internet.MimeMessage;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
-import org.springframework.mail.javamail.MimeMessageHelper;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -24,7 +22,7 @@ class EmailServiceTest {
     private JavaMailSender javaMailSender;
 
     @InjectMocks
-    private EmailService emailService;
+    private EmailServiceImpl emailService;
 
     @Test
     void testSendMail() throws ResourceNotFoundException, MessagingException {
@@ -55,7 +53,15 @@ class EmailServiceTest {
         verify(mockJavaMailSender).send(any(MimeMessage.class));
     }
 
-
+    /**
+     * Prueba unitaria para verificar el comportamiento del método sendMail en EmailService al lanzar una excepción de tipo ResourceNotFoundException.
+     * Se inicializan los mocks necesarios para la prueba.
+     * Se simula la información de correo electrónico para la prueba, incluyendo el destinatario, el asunto y el cuerpo del mensaje.
+     * Se simula el lanzamiento de una excepción al llamar al método send de JavaMailSender.
+     * Se llama al método que se está probando y se verifica que se lance la excepción esperada de tipo ResourceNotFoundException.
+     *
+     * @throws MessagingException Excepción lanzada por el método send de JavaMailSender (simulada para la prueba).
+     */
     @Test
     void testSendMailException() throws MessagingException {
         // Initialize mocks

@@ -13,5 +13,5 @@ import lombok.Setter;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ShippingCostDTO {
     private String name;
-    private double base_cost;
+    private double list_cost;
 }

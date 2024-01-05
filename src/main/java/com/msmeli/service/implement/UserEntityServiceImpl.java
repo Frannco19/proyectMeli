@@ -7,6 +7,7 @@ import com.msmeli.dto.request.*;
 import com.msmeli.dto.response.UserAuthResponseDTO;
 import com.msmeli.dto.response.UserResponseDTO;
 import com.msmeli.exception.AlreadyExistsException;
+import com.msmeli.exception.AppException;
 import com.msmeli.exception.ResourceNotFoundException;
 import com.msmeli.model.*;
 import com.msmeli.repository.EmployeeRepository;
@@ -16,11 +17,12 @@ import com.msmeli.service.services.EmailService;
 import com.msmeli.service.services.RoleEntityService;
 import com.msmeli.util.Role;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -37,11 +39,12 @@ public class UserEntityServiceImpl implements com.msmeli.service.services.UserEn
     private final SellerRefactorRepository sellerRefactorRepository;
 
     private final EmployeeRepository employeeRepository;
+    private final AuthenticationManager authManager;
 
     private static final String NOT_FOUND = "Usuario no encontrado.";
 
 
-    public UserEntityServiceImpl(UserEntityRepository userEntityRepository, PasswordEncoder passwordEncoder, ModelMapper mapper, RoleEntityService roleEntityService, EmailService emailService, UserEntityRefreshTokenService refreshTokenService, JwtService jwtService, SellerRefactorRepository sellerRefactorRepository, EmployeeRepository employeeRepository) {
+    public UserEntityServiceImpl(UserEntityRepository userEntityRepository, PasswordEncoder passwordEncoder, ModelMapper mapper, RoleEntityService roleEntityService, EmailService emailService, UserEntityRefreshTokenService refreshTokenService, JwtService jwtService, SellerRefactorRepository sellerRefactorRepository, EmployeeRepository employeeRepository, AuthenticationManager authManager) {
         this.userEntityRepository = userEntityRepository;
         this.passwordEncoder = passwordEncoder;
         this.mapper = mapper;
@@ -52,6 +55,7 @@ public class UserEntityServiceImpl implements com.msmeli.service.services.UserEn
         this.sellerRefactorRepository = sellerRefactorRepository;
         this.employeeRepository = employeeRepository;
 
+        this.authManager = authManager;
     }
 
     @Override
@@ -178,11 +182,18 @@ public class UserEntityServiceImpl implements com.msmeli.service.services.UserEn
     }
 
     @Override
-    public UserAuthResponseDTO userAuthenticateAndGetToken(String username) throws ResourceNotFoundException {
-        UserAuthResponseDTO userAuthResponseDTO = findByUsername(username);
-        userAuthResponseDTO.setToken(jwtService.generateToken(username,userAuthResponseDTO.getId()));
+    public UserAuthResponseDTO userAuthenticateAndGetToken(String username,String pass) throws ResourceNotFoundException, AppException {
+        try{
+            UserAuthResponseDTO userAuthResponseDTO = findByUsername(username);
+            authManager.authenticate(new UsernamePasswordAuthenticationToken(username,pass));
+            userAuthResponseDTO.setToken(jwtService.generateToken(username,userAuthResponseDTO.getId()));
+            return userAuthResponseDTO;
+        }catch (Exception e){
+            throw new AppException(e.getMessage(),"Error en la autenticacion",403,403);
+        }
 
-        return userAuthResponseDTO;
+
+
     }
 
     /**

@@ -4,6 +4,7 @@ import com.msmeli.dto.request.*;
 import com.msmeli.dto.response.UserAuthResponseDTO;
 import com.msmeli.dto.response.UserResponseDTO;
 import com.msmeli.exception.AlreadyExistsException;
+import com.msmeli.exception.AppException;
 import com.msmeli.exception.ResourceNotFoundException;
 import com.msmeli.model.UserEntity;
 
@@ -34,6 +35,6 @@ public interface UserEntityService {
 
     UserAuthResponseDTO userRefreshToken(UserRefreshTokenRequestDTO refreshTokenRequestDTO) throws ResourceNotFoundException;
 
-    UserAuthResponseDTO userAuthenticateAndGetToken(String username) throws ResourceNotFoundException;
+    UserAuthResponseDTO userAuthenticateAndGetToken(String username, String pass) throws ResourceNotFoundException, AppException;
     Long getAuthenticatedUserId();
 }

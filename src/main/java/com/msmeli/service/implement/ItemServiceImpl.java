@@ -111,7 +111,7 @@ public class ItemServiceImpl implements ItemService {
     /**
      * Este metodo se encarga de cargar todos los atributos de un item consultando a la api de mercadolibre recorriendo un
      * ArrayList de ids de item
-     * @param idsItems ids de Item de un selle
+     * @param idsItems ids de Item de un seller
      * @param seller Entidad "Seller" con la que se establece la relacion en la BD
      */
     private void setItemAtributtes(List<String>idsItems,SellerRefactor seller) {
@@ -129,7 +129,7 @@ public class ItemServiceImpl implements ItemService {
 
     /**
      * Este metodo se encarga de consultar a la api de mercadolibre  traer todos los Ids de los items de un seller
-     * @param seller entidad con las credenciasles necesarias para la consulta a la api de mercadolibre
+     * @param seller entidad con las credenciales necesarias para la consulta a la api de mercadolibre
      * @return idsItems ArrayList con los Ids de todos los items del seller
      */
     private List<String> getItemId(SellerRefactor seller) {
@@ -210,9 +210,9 @@ public class ItemServiceImpl implements ItemService {
      *               Para listas o secuencias, este valor representa el índice del elemento.
      *               Para consultas SQL, indica el número de filas que se deben omitir desde el principio.
      *               El valor debe ser mayor o igual a cero.
-     * @param pageSize Tamñano de pagina solitizado desde el controlador
+     * @param pageSize Tamñano de pagina solicitado desde el controlador
      * @param isCatalogue Boolean
-     * @param isActive String Solicitadon si un item es activo o no
+     * @param isActive String Solicitado si un item es activo o no
      * @return Page < ItemResponseDTO > Page de ItemResposeDTO cargado con los items
      * @throws ResourceNotFoundException
      */
@@ -253,8 +253,8 @@ public class ItemServiceImpl implements ItemService {
     }
 
     /**
-     * Este metodo se encarga de calcular el color del semaforo par el front
-     * @param itemResponseDTO DTO de itemResponseDTO donse se cargar el dato
+     * Este metodo se encarga de calcular el color del semaforo para el front
+     * @param itemResponseDTO DTO de itemResponseDTO donde se cargara el dato
      * @return devuelve el Dto cargado
      */
     private ItemResponseDTO calculateColor(ItemResponseDTO itemResponseDTO) throws ResourceNotFoundException {
