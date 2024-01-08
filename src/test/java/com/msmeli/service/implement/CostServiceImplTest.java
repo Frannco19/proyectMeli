@@ -55,19 +55,16 @@ public class CostServiceImplTest {
         stock.setPrice(50.0);
 
         ShippingCostDTO mockShippingCostDTO = new ShippingCostDTO();
-        mockShippingCostDTO.getBase_cost();
+        mockShippingCostDTO.getList_cost();
 
-        // Configurar los mocks
         when(mapper.map(Mockito.any(), Mockito.any())).thenReturn(new Cost());
         try {
             when(meliService.getItemFee(Mockito.anyDouble(), Mockito.anyString(), Mockito.anyString())).thenReturn(new FeeResponseDTO());
         } catch (AppException e) {
             throw new RuntimeException(e);
         }
-        // Llamar al método que se está probando
         Item result = costService.createProductsCosts(item, stock);
 
-        // Verificar el resultado
         Mockito.verify(costRepository, Mockito.times(1)).save(Mockito.any());
         Assertions.assertNotNull(result);
     }
@@ -79,33 +76,31 @@ public class CostServiceImplTest {
      */
         @Test
         void testHasStockWhenSkuAndStockAreNotNull() {
-            // Arrange
             Item item = new Item();
             item.setSku("ABC");
 
             Stock stock = new Stock();
 
 
-            // Act
             CostServiceImpl costService = new CostServiceImpl(null, null, null);
             boolean result = costService.hasStock(item, stock);
 
-            // Assert
             assertTrue(result);
         }
 
+    /**
+     * Prueba la funcionalidad de "hasStock" en el caso en que tanto el SKU como el Stock no son nulos.
+     * Se verifica si el servicio de costo (CostServiceImpl) devuelve true al llamar al método "hasStock" con un objeto
+     * de tipo Item y un objeto de tipo Stock que tienen valores nulos.
+     */
         @Test
         void testHasStockWhenSkuIsNull() {
-            // Arrange
-            Item item = new Item();  // Sku is null
+            Item item = new Item();
             Stock stock = new Stock();
-            // Set necessary properties for stock
 
-            // Act
             CostServiceImpl costService = new CostServiceImpl(null, null, null);
             boolean result = costService.hasStock(item, stock);
 
-            // Assert
             assertFalse(result);
         }
 
@@ -116,50 +111,43 @@ public class CostServiceImplTest {
      */
         @Test
         void testHasStockWhenStockIsNull() {
-            // Arrange
             Item item = new Item();
-            item.setSku("ABC");  // Set other necessary properties
+            item.setSku("ABC");
 
-            // Stock is null
             Stock stock = null;
 
-            // Act
             CostServiceImpl costService = new CostServiceImpl(null, null, null);
             boolean result = costService.hasStock(item, stock);
 
-            // Assert
             assertFalse(result);
         }
-
-    @Test
-    void testHasFeeWhenFeeDetailsIsNotNull() {
-        // Arrange
-        FeeDetailsDTO feeDetails = new FeeDetailsDTO();
-        // Set necessary properties for feeDetails
-
-        // Act
-        CostServiceImpl costService = new CostServiceImpl(null, null, null);
-        boolean result = costService.hasFee(feeDetails);
-
-        // Assert
-        assertTrue(result);
-    }
-
     /**
      * Prueba la funcionalidad de "hasFee" en el caso en que los detalles de la tarifa (FeeDetailsDTO) no son nulos.
      * Se verifica si el servicio de costo (CostServiceImpl) devuelve true al llamar al método "hasFee" con un objeto
      * de tipo FeeDetailsDTO que tiene valores no nulos.
      */
     @Test
-    void testHasFeeWhenFeeDetailsIsNull() {
-        // Arrange
-        FeeDetailsDTO feeDetails = null;
+    void testHasFeeWhenFeeDetailsIsNotNull() {
+        FeeDetailsDTO feeDetails = new FeeDetailsDTO();
 
-        // Act
         CostServiceImpl costService = new CostServiceImpl(null, null, null);
         boolean result = costService.hasFee(feeDetails);
 
-        // Assert
+        assertTrue(result);
+    }
+
+    /**
+     * Prueba la funcionalidad de "hasFee" en el caso en que los detalles de la tarifa (FeeDetailsDTO) no son nulos.
+     * Se verifica si el servicio de costo (CostServiceImpl) devuelve true al llamar al método "hasFee" con un objeto
+     * de tipo FeeDetailsDTO que tiene valores nulos.
+     */
+    @Test
+    void testHasFeeWhenFeeDetailsIsNull() {
+        FeeDetailsDTO feeDetails = null;
+
+        CostServiceImpl costService = new CostServiceImpl(null, null, null);
+        boolean result = costService.hasFee(feeDetails);
+
         assertFalse(result);
     }
 
@@ -173,7 +161,6 @@ public class CostServiceImplTest {
      */
     @Test
     void testSetCostItemWithFeeDetails() {
-        // Arrange
         Item item = new Item();
         item.setPrice(100.0);
 
@@ -206,9 +193,8 @@ public class CostServiceImplTest {
      */
     @Test
     void testSetCostItemWithoutFeeDetails() {
-        // Arrange
         Item item = new Item();
-        item.setPrice(100.0);  // Set other necessary properties
+        item.setPrice(100.0);
 
         FeeDetailsDTO feeDetails = null;
 
@@ -216,15 +202,11 @@ public class CostServiceImplTest {
 
         when(costRepository.save(Mockito.any(Cost.class))).thenReturn(cost);
 
-        // Act
         try {
             Item resultItem = costService.setCostItem(item, feeDetails, cost);
 
-            // Assert
             assertNotNull(resultItem.getCost());
-            // Add more assertions based on your requirements
         } catch (AppException ex) {
-            // Handle exception or fail the test based on your needs
             fail("Unexpected exception: " + ex.getMessage());
         }
     }

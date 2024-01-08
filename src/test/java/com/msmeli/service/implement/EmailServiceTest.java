@@ -4,10 +4,14 @@ import com.msmeli.exception.ResourceNotFoundException;
 import jakarta.mail.MessagingException;
 import jakarta.mail.Session;
 import jakarta.mail.internet.MimeMessage;
+import jakarta.validation.constraints.NotNull;
 import org.junit.jupiter.api.Test;
+import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
@@ -16,6 +20,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
+@SpringBootTest
+@RunWith(MockitoJUnitRunner.class)
 class EmailServiceTest {
 
     @Mock
@@ -25,32 +31,31 @@ class EmailServiceTest {
     private EmailServiceImpl emailService;
 
     @Test
-    void testSendMail() throws ResourceNotFoundException, MessagingException {
-        // Initialize mocks
-        MockitoAnnotations.initMocks(this);
+    public void testSendMailSuccess() throws Exception {
+        when(javaMailSender.createMimeMessage()).thenReturn(mock(MimeMessage.class));
 
-        // Mocking data for the test
-        String to = "recipient@example.com";
-        String subject = "Test Subject";
-        String body = "Test Body";
+        String result = emailService.sendMail("to@example.com", "subject", "body");
 
-        // Create a spy of JavaMailSenderImpl
-        JavaMailSenderImpl mockJavaMailSender = spy(new JavaMailSenderImpl());
+        assertEquals("Mail sent succesfully", result);
+        verify(javaMailSender, times(1)).send(any(MimeMessage.class));
+    }
 
-        // Mocking a non-null MimeMessage when JavaMailSender's createMimeMessage method is called
-        doReturn(new MimeMessage((Session) null)).when(mockJavaMailSender).createMimeMessage();
+    /**
+     * Prueba unitaria para el método sendMail en la clase EmailService cuando ocurre un fallo.
+     *
+     * Esta prueba verifica el comportamiento del método sendMail en EmailService cuando
+     * javaMailSender.createMimeMessage() lanza una excepción. Se espera que el método maneje
+     * la excepción correctamente y no intente enviar el mensaje de correo.
+     */
+    @Test
+    public void testSendMailFailure() {
+        when(javaMailSender.createMimeMessage()).thenThrow(new RuntimeException("error"));
 
-        // Use the spy in the emailService
-        doReturn(mockJavaMailSender).when(emailService).sendMail("fff","fff","fff");
+        assertThrows(Exception.class, () -> {
+            emailService.sendMail("to@example.com", "subject", "body");
+        });
 
-        // Call the method to test
-        String result = emailService.sendMail(to, subject, body);
-
-        // Verify the results
-        assertEquals("Mail sent successfully", result);
-
-        // Verify that JavaMailSender's send method was called with the expected parameters
-        verify(mockJavaMailSender).send(any(MimeMessage.class));
+        verify(javaMailSender, times(0)).send(any(MimeMessage.class));
     }
 
     /**
@@ -64,18 +69,14 @@ class EmailServiceTest {
      */
     @Test
     void testSendMailException() throws MessagingException {
-        // Initialize mocks
         MockitoAnnotations.initMocks(this);
 
-        // Mocking data for the test
         String to = "recipient@example.com";
         String subject = "Test Subject";
         String body = "Test Body";
 
-        // Mocking an exception when JavaMailSender's send method is called
-        doReturn(null).when(javaMailSender).createMimeMessage();  // Mock a null MimeMessage
+        doReturn(null).when(javaMailSender).createMimeMessage();
 
-        // Call the method to test and verify that ResourceNotFoundException is thrown
         assertThrows(ResourceNotFoundException.class, () -> emailService.sendMail(to, subject, body));
     }
 }

@@ -27,6 +27,12 @@ public class SupplierStockServiceImplTest {
         supplierStockService = new SupplierStockServiceImpl(supplierStockRepository, modelMapper);
     }
 
+    /**
+     * Prueba la funcionalidad de actualización o creación de SupplierStock en SupplierStockService.
+     *
+     * Esta prueba verifica que el método createOrUpdateSupplierStock actualice correctamente el precio
+     * de SupplierStock y guarde la entidad en el repositorio.
+     */
     @Test
     void testCreateOrUpdateSupplierStock() {
         SupplierStock supplierStock = new SupplierStock();
@@ -40,6 +46,13 @@ public class SupplierStockServiceImplTest {
         verify(supplierStockRepository, times(1)).save(supplierStock);
     }
 
+    /**
+     * Prueba la funcionalidad de creación de SupplierStock en SupplierStockService.
+     *
+     * Esta prueba verifica que el método create en SupplierStockService mapee correctamente SupplierStockRequestDTO
+     * a SupplierStock, asocie los datos con un proveedor (Supplier), guarde la lista de SupplierStock en el repositorio
+     * y devuelva una lista vacía.
+     */
     @Test
     void testCreate() {
         Supplier supplier = new Supplier();
