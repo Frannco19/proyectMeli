@@ -17,7 +17,6 @@ import lombok.Setter;
 public class Supplier {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
     private String supplierName;
 }

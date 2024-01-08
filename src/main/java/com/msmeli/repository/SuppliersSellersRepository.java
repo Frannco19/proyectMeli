@@ -14,7 +14,7 @@ import java.util.Optional;
 public interface SuppliersSellersRepository extends JpaRepository<SuppliersSellers, Long> {
 
     @Query("SELECT ss FROM SuppliersSellers ss WHERE ss.supplier.id =?1 AND ss.seller.id =?2 AND ss.supplierStock.sku = ?3")
-    Optional<SuppliersSellers> filterSupplierSeller(Long supplierId, Long sellerId, String sku);
+    Optional<SuppliersSellers> filterSupplierSeller(Integer supplierId, Long sellerId, String sku);
 
     List<SuppliersSellers> findAllBySellerId(Long id);
 
