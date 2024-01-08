@@ -70,12 +70,6 @@ class UserEntityServiceImplTest {
     @Mock
     private SellerRefactorRepository sellerRefactorRepository;
 
-    @Mock
-    private EmployeeRepository employeeRepository;
-
-    @Mock
-    private AuthenticationManager authManager;
-
     @InjectMocks
     private UserEntityServiceImpl userEntityServiceImpl;
 
@@ -111,16 +105,13 @@ class UserEntityServiceImplTest {
 
     @Test
     void testReadUser() {
-        // Arrange
         UserEntity userEntity = new UserEntity();
         userEntity.setId(1L);
         Mockito.when(userEntityRepository.findById(1L)).thenReturn(Optional.of(userEntity));
 
-        // Act
         try {
             UserResponseDTO responseDTO = userEntityServiceImpl.read(1L);
 
-            // Assert
             Assertions.assertNotNull(responseDTO, "ResponseDTO should not be null");
             Assertions.assertEquals(1L, responseDTO.getId(), "Incorrect user ID");
         } catch (ResourceNotFoundException e) {
@@ -131,12 +122,10 @@ class UserEntityServiceImplTest {
     @SneakyThrows
     @Test
     public void testReadAllUsers() {
-        // Definir el comportamiento esperado del repositorio
         List<UserEntity> users = new ArrayList<>();
         users.add(new UserEntity());
         Mockito.when(userEntityRepository.findAll()).thenReturn(users);
 
-        // Llamar al método y verificar el resultado
         try {
             List<UserResponseDTO> responseDTOs = userEntityServiceImpl.readAll();
 
@@ -150,13 +139,11 @@ class UserEntityServiceImplTest {
     @SneakyThrows
     @Test
     public void testUpdateUser() {
-        // Definir el comportamiento esperado del repositorio
         UserEntity userEntity = new UserEntity();
         userEntity.setId(1L);
         Mockito.when(userEntityRepository.findById(1L)).thenReturn(Optional.of(userEntity));
         Mockito.when(userEntityRepository.save(userEntity)).thenReturn(userEntity);
 
-        // Llamar al método y verificar el resultado
         try {
             UserEntity updatedUserEntity = userEntityServiceImpl.update(userEntity);
 
@@ -169,19 +156,16 @@ class UserEntityServiceImplTest {
 
     @Test
     public void testDeleteUser() {
-        // Definir el comportamiento esperado del repositorio
         UserEntity userEntity = new UserEntity();
         userEntity.setId(1L);
         Mockito.when(userEntityRepository.findById(1L)).thenReturn(Optional.of(userEntity));
 
-        // Llamar al método y verificar que no se lance ninguna excepción
         Assertions.assertDoesNotThrow(() -> userEntityServiceImpl.delete(1L));
     }
 
     @SneakyThrows
     @Test
     public void testModifyUserRoles() {
-        // Definir el comportamiento esperado del repositorio y otros mocks
         UserEntity userEntity = new UserEntity();
         userEntity.setId(1L);
         Mockito.when(userEntityRepository.findById(1L)).thenReturn(Optional.of(userEntity));
@@ -189,11 +173,9 @@ class UserEntityServiceImplTest {
         RoleEntity adminRole = new RoleEntity();
         Mockito.when(roleEntityService.findByName(Role.ADMIN)).thenReturn(adminRole);
 
-        // Llamar al método y verificar el resultado
         try {
             UserResponseDTO responseDTO = userEntityServiceImpl.modifyUserRoles(1L);
 
-            //assertNotNull(responseDTO);
             Assertions.assertEquals(1L, responseDTO.getId());
         } catch (ResourceNotFoundException e) {
             Assertions.fail("Se lanzó una ResourceNotFoundException de manera inesperada.");
@@ -203,12 +185,10 @@ class UserEntityServiceImplTest {
     @SneakyThrows
     @Test
     public void testFindByUsername() {
-        // Definir el comportamiento esperado del repositorio
         UserEntity userEntity = new UserEntity();
         userEntity.setUsername("testuser");
         Mockito.when(userEntityRepository.findByUsername("testuser")).thenReturn(Optional.of(userEntity));
 
-        // Llamar al método y verificar el resultado
         try {
             UserAuthResponseDTO responseDTO = userEntityServiceImpl.findByUsername("testuser");
 
@@ -222,32 +202,26 @@ class UserEntityServiceImplTest {
 
     @Test
     void testRecoverPassword() throws ResourceNotFoundException {
-        // Configuración del mock
         String username = "testUser";
         UserEntity userEntity = new UserEntity();
         userEntity.setEmail("test@example.com");
 
         Mockito.when(userEntityRepository.findByUsername(username)).thenReturn(Optional.of(userEntity));
 
-        // Llamada al método que deseas probar
         Map<String, String> result = userEntityServiceImpl.recoverPassword(username);
 
-        // Verificaciones
         Mockito.verify(emailService,  Mockito.times(1)).sendMail(ArgumentMatchers.eq("test@example.com"), ArgumentMatchers.eq("Recuperar contraseña"), ArgumentMatchers.anyString());
         Assertions.assertEquals("Correo electrónico de recuperación de contraseña enviado correctamente a testUser", result.get("message"));
     }
 
     @Test
     void testRecoverPasswordUserNotFound() {
-        // Configuración del mock cuando el usuario no se encuentra
         String username = "nonExistingUser";
 
         Mockito.when(userEntityRepository.findByUsername(username)).thenReturn(Optional.empty());
 
-        // Verificación de la excepción lanzada
         Assertions.assertThrows(ResourceNotFoundException.class, () -> userEntityServiceImpl.recoverPassword(username));
 
-        // Verificación de que el servicio de envío de correo no se invoca
         try {
             Mockito.verify(emailService, Mockito.never()).sendMail(ArgumentMatchers.anyString(), ArgumentMatchers.anyString(), ArgumentMatchers.anyString());
         } catch (ResourceNotFoundException e) {
@@ -257,14 +231,12 @@ class UserEntityServiceImplTest {
 
     @Test
     void testGetAuthenticatedUserId() {
-        // Configuración del mock
         UserEntityUserDetails userDetails = Mockito.mock(UserEntityUserDetails.class);
         SellerRefactor sellerRefactor = new SellerRefactor();
         sellerRefactor.setId(1L);
         Employee employee = new Employee();
         employee.setSellerRefactor(sellerRefactor);
 
-        // Configuración de SecurityContextHolder
         SecurityContextHolder.getContext().setAuthentication(
                 new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities())
         );
@@ -272,22 +244,26 @@ class UserEntityServiceImplTest {
         Mockito.when(authentication.getPrincipal()).thenReturn(userDetails);
         Mockito.when(userDetails.getUserEntity()).thenReturn(employee);
 
-        // Llamada al método que deseas probar
         Long result = userEntityServiceImpl.getAuthenticatedUserId();
 
-        // Verificaciones
         Assertions.assertEquals(1L, result);
     }
 
+    /**
+     * Prueba unitaria para el método getAuthenticatedUserId en la clase UserEntityServiceImpl
+     * cuando no hay autenticación.
+     *
+     * Esta prueba verifica el correcto funcionamiento del método getAuthenticatedUserId en
+     * UserEntityServiceImpl cuando no hay información de autenticación en el contexto de seguridad.
+     * Se asegura de que, al llamar al método en esta situación, se devuelva null, indicando la
+     * ausencia de autenticación.
+     */
     @Test
     void testGetAuthenticatedUserIdNoAuthentication() {
-        // Configuración de SecurityContextHolder sin autenticación
         SecurityContextHolder.clearContext();
 
-        // Llamada al método que deseas probar
         Long result = userEntityServiceImpl.getAuthenticatedUserId();
 
-        // Verificaciones
         Assertions.assertNull(result);
     }
 

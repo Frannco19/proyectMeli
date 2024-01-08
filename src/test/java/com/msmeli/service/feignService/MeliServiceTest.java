@@ -52,11 +52,6 @@ public class MeliServiceTest {
     private SellerRepository sellerRepository;
 
     @Mock
-    private CatalogItemResponseDTO catalogItemResponseDTO;
-
-    @Mock
-    private ModelMapper modelMapper;
-    @Mock
     private UserEntityService userEntityService;
     @Mock
     private SellerService sellerService;

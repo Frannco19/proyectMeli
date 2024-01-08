@@ -55,27 +55,21 @@ public class RoleEntityServiceTest {
 
     @Test
     public void testFindByNameNotFound() {
-        // Configurar comportamiento simulado para el mock cuando no se encuentra el rol
         Role role = Role.SELLER;
 
         Mockito.when(roleRepository.findByName(role)).thenReturn(Optional.empty());
 
-        // Llamar al método que estás probando y esperar la excepción
         Assertions.assertThrows(ResourceNotFoundException.class, () -> roleEntityService.findByName(role));
 
-        // Verificar que los métodos necesarios se hayan llamado
         Mockito.verify(roleRepository, Mockito.atLeastOnce()).findByName(role);
     }
     @Test
     public void testFindByNameWhenRoleNotFound() {
-        // Configurar comportamiento simulado para el mock cuando no se encuentra el rol
-        Role role = null /* Crear un objeto Role según tus necesidades */;
+        Role role = null ;
         Mockito.when(roleRepository.findByName(role)).thenReturn(Optional.empty());
 
-        // Llamar al método que estás probando y verificar que se lance la excepción esperada
         Assertions.assertThrows(ResourceNotFoundException.class, () -> roleEntityService.findByName(role));
 
-        // Verificar que los métodos necesarios se hayan llamado
         Mockito.verify(roleRepository, Mockito.atLeastOnce()).findByName(role);
     }
 
