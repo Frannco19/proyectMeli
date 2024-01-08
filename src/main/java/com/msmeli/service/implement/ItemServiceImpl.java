@@ -101,7 +101,7 @@ public class ItemServiceImpl implements ItemService {
      * @throws ResourceNotFoundException (Tratar mejor los errores)
      */
     @Override
-    public void saveAllItemForSeller() throws ResourceNotFoundException {
+    public void saveAllItemForSeller() throws ResourceNotFoundException, AppException {
         Long idSeller = userEntityService.getAuthenticatedUserId();
         SellerRefactor seller = sellerService.findById(idSeller);
         List<String>DBitemsIDs = itemRepository.findAllIdsBySellerRefactorId(idSeller);
@@ -114,6 +114,7 @@ public class ItemServiceImpl implements ItemService {
             }
         }
         setItemAtributtes(idsItems,seller);
+        createProductsCosts();
     }
 
     /**
@@ -195,11 +196,12 @@ public class ItemServiceImpl implements ItemService {
     }
 
     /**
-     * Metodo se encarga de buscar todos los items  e invocar por cada uno la funcion
+     * Metodo se encarga de buscar todos los items  e invocar por cada uno la funcion en relacion al seller
      * createProductsCost
      */
-    public void createProductsCosts() {
-        List<Item> items = findAll();
+    public void createProductsCosts() throws AppException {
+        Long id = userEntityService.getAuthenticatedUserId();
+        List<Item> items = findAllidSeller(id);
         items.parallelStream().forEach((item -> {
             try {
                 save(costService.createProductsCostsV2(item, stockService.findLastBySku(item.getSku())));
