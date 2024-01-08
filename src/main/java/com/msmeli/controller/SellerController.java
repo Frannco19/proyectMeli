@@ -3,6 +3,7 @@ package com.msmeli.controller;
 
 import com.msmeli.dto.request.EmployeeUpdateRequestDTO;
 
+import com.msmeli.dto.request.SupplierResquestDTO;
 import com.msmeli.dto.response.EmployeesResponseDto;
 
 import com.msmeli.dto.response.TokenResposeDTO;
@@ -10,6 +11,7 @@ import com.msmeli.dto.response.UserResponseDTO;
 import com.msmeli.exception.AlreadyExistsException;
 import com.msmeli.exception.ResourceNotFoundException;
 import com.msmeli.model.Employee;
+import com.msmeli.model.Supplier;
 import com.msmeli.service.services.ItemService;
 import com.msmeli.service.services.SellerService;
 
@@ -80,5 +82,8 @@ public class SellerController {
         return ResponseEntity.ok(employeesList);
     }
 
-
+    @PostMapping("addSuppplier")
+        public ResponseEntity<String> addSupplier(SupplierResquestDTO supplierResquestDTO){
+            return null;
+        }
 }

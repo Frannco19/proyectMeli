@@ -20,4 +20,12 @@ public class SellerRefactor extends UserEntity {
     private List<Employee> employees;
     @OneToMany(mappedBy = "sellerRefactor", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Item> Items;
+    @ManyToMany
+    @JoinTable(
+            name = "Sellers_Suppliers",
+            joinColumns = @JoinColumn(name = "seller_id"),
+            inverseJoinColumns = @JoinColumn(name = "supplier_id"))
+    private List<Supplier> suppliers;
+
+
 }
