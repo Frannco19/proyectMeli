@@ -41,7 +41,7 @@ public class AuthController {
 
     @PostMapping("/register-seller")
     @Operation(summary = "Endpoint para crear Seller, se espera UserRegisterRequestDTO.")
-    public ResponseEntity<UserResponseDTO> registerSeller(@Valid @RequestBody UserRegisterRequestDTO userEntity) throws ResourceNotFoundException, AlreadyExistsException{
+    public ResponseEntity<UserResponseDTO> registerSeller(@Valid @RequestBody UserRegisterRequestDTO userEntity) throws ResourceNotFoundException, AlreadyExistsException, AppException {
         return ResponseEntity.status(HttpStatus.CREATED).body(sellerService.createSeller(userEntity));
     }
 

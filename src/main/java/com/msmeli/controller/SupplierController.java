@@ -2,9 +2,13 @@ package com.msmeli.controller;
 
 import com.msmeli.dto.StockDTO;
 import com.msmeli.dto.request.StockBySupplierRequestDTO;
+import com.msmeli.dto.request.SupplierResquestDTO;
 import com.msmeli.dto.response.SupplierStockResponseDTO;
+import com.msmeli.exception.AppException;
 import com.msmeli.exception.ResourceNotFoundException;
+import com.msmeli.model.Supplier;
 import com.msmeli.model.SuppliersSellers;
+import com.msmeli.service.services.SupplierService;
 import com.msmeli.service.services.SuppliersSellersService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -19,9 +23,11 @@ import java.util.List;
 public class SupplierController {
 
     private final SuppliersSellersService suppliersSellersService;
+    private final SupplierService supplierService;
 
-    public SupplierController(SuppliersSellersService suppliersSellersService) {
+    public SupplierController(SuppliersSellersService suppliersSellersService, SupplierService supplierService) {
         this.suppliersSellersService = suppliersSellersService;
+        this.supplierService = supplierService;
     }
 
     @PostMapping("/createStock")
@@ -48,4 +54,13 @@ public class SupplierController {
     public ResponseEntity<Page<StockDTO>> getStockAndSupplierStock(@RequestParam("sellerId") Long sellerId, @RequestParam(value = "offset", defaultValue = "0") int offset, @RequestParam(value = "pageSize", defaultValue = "5") int pageSize) throws ResourceNotFoundException {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(suppliersSellersService.getStockAndSupplierStock(sellerId, offset, pageSize));
     }
+    @PostMapping("createSupplier")
+    public ResponseEntity<String> createSupplier(@RequestBody SupplierResquestDTO supplierResquestDTO) throws AppException {
+        supplierService.createSupplier(supplierResquestDTO);
+        return ResponseEntity.status(HttpStatus.OK).body("Proveedor Creado");
+    }
+    @GetMapping("listSupplier")
+        public ResponseEntity<List<Supplier>> listSupplier() throws AppException {
+            return ResponseEntity.status(HttpStatus.OK).body(supplierService.listSupplier());
+        }
 }

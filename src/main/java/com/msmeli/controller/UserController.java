@@ -49,7 +49,7 @@ public class UserController {
     @PostMapping("/create")
     @Operation(summary = "Endpoint para crear usuario, se espera UserRegisterRequestDTO.")
     @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "Usuario creado correctamente.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDTO.class))}), @ApiResponse(responseCode = "400", description = "Solicitud erronea.", content = @Content), @ApiResponse(responseCode = "500", description = "Error del servidor.", content = @Content)})
-    public ResponseEntity<UserResponseDTO> createUser(@Valid @RequestBody UserRegisterRequestDTO userEntity) throws ResourceNotFoundException, AlreadyExistsException {
+    public ResponseEntity<UserResponseDTO> createUser(@Valid @RequestBody UserRegisterRequestDTO userEntity) throws ResourceNotFoundException, AlreadyExistsException, AppException {
         return ResponseEntity.status(HttpStatus.CREATED).body(sellerService.createSeller(userEntity));
     }
 
@@ -82,14 +82,14 @@ public class UserController {
     @GetMapping("/recover_password/{username}")
     @Operation(summary = "Endpoint para recuperar contraseña al recibir un mail.")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Envia un mail con link al usuario para recuperar la contraseña.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = Map.class))}), @ApiResponse(responseCode = "400", description = "Solicitud erronea.", content = @Content), @ApiResponse(responseCode = "404", description = "Usuario no registrado.", content = @Content), @ApiResponse(responseCode = "500", description = "Error del servidor", content = @Content)})
-    public ResponseEntity<Map<String, String>> recoverPassword(@PathVariable String username) throws ResourceNotFoundException {
+    public ResponseEntity<Map<String, String>> recoverPassword(@PathVariable String username) throws ResourceNotFoundException, AppException {
         return ResponseEntity.status(HttpStatus.OK).body(userEntityService.recoverPassword(username));
     }
 
     @GetMapping("/reset_password/{username}")
     @Operation(summary = "Endpoint para resetar la contraseña del usuario.")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Se reseteo la contraseña correctamente.", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = Map.class))}), @ApiResponse(responseCode = "400", description = "Solicitud erronea.", content = @Content), @ApiResponse(responseCode = "404", description = "Usuario no registrado.", content = @Content), @ApiResponse(responseCode = "500", description = "Error del servidor", content = @Content)})
-    public ResponseEntity<Map<String, String>> resetPassword(@PathVariable String username) throws ResourceNotFoundException {
+    public ResponseEntity<Map<String, String>> resetPassword(@PathVariable String username) throws ResourceNotFoundException, AppException {
         return ResponseEntity.status(HttpStatus.OK).body(userEntityService.resetPassword(username));
     }
 

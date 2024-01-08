@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface UserEntityService {
-    UserResponseDTO createSeller(UserRegisterRequestDTO userRegisterRequestDTO) throws ResourceNotFoundException, AlreadyExistsException;
+    UserResponseDTO createSeller(UserRegisterRequestDTO userRegisterRequestDTO) throws ResourceNotFoundException, AlreadyExistsException, AppException;
     UserResponseDTO createEmployee(EmployeeRegisterRequestDTO employeeRegisterRequestDTO) throws ResourceNotFoundException, AlreadyExistsException;
 
     UserResponseDTO read(Long id) throws ResourceNotFoundException;
@@ -27,9 +27,9 @@ public interface UserEntityService {
 
     UserAuthResponseDTO findByUsername(String username) throws ResourceNotFoundException;
 
-    Map<String, String> recoverPassword(String username) throws ResourceNotFoundException;
+    Map<String, String> recoverPassword(String username) throws ResourceNotFoundException, AppException;
 
-    Map<String, String> resetPassword(String username) throws ResourceNotFoundException;
+    Map<String, String> resetPassword(String username) throws ResourceNotFoundException, AppException;
 
     Map<String, String> updatePassword(UpdatePassRequestDTO updatePassRequestDTO, String username) throws ResourceNotFoundException;
 

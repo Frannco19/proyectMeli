@@ -67,7 +67,7 @@ public class UserEntityServiceImpl implements com.msmeli.service.services.UserEn
      * @throws AlreadyExistsException    Si el nombre de usuario ya existe.
      */
     @Override
-    public UserResponseDTO createSeller(UserRegisterRequestDTO userRegisterRequestDTO) throws ResourceNotFoundException, AlreadyExistsException {
+    public UserResponseDTO createSeller(UserRegisterRequestDTO userRegisterRequestDTO) throws ResourceNotFoundException, AlreadyExistsException ,AppException{
         if (!userRegisterRequestDTO.getPassword().equals(userRegisterRequestDTO.getRePassword()))
             throw new ResourceNotFoundException("Las contraseñas ingresadas no coinciden.");
         if (userEntityRepository.findByUsername(userRegisterRequestDTO.getUsername()).isPresent())
@@ -196,6 +196,7 @@ public class UserEntityServiceImpl implements com.msmeli.service.services.UserEn
         return mapper.map(userSearch, UserAuthResponseDTO.class);
     }
 
+
     /**
      * Inicia el proceso de recuperación de contraseña para un usuario.
      *
@@ -203,7 +204,8 @@ public class UserEntityServiceImpl implements com.msmeli.service.services.UserEn
      * @return Un mapa con un mensaje indicando que el correo electrónico de recuperación de contraseña se ha enviado correctamente.
      * @throws ResourceNotFoundException Si no se encuentra un usuario con el nombre de usuario proporcionado.
      */
-    public Map<String, String> recoverPassword(String username) throws ResourceNotFoundException {
+    public Map<String, String> recoverPassword(String username) throws ResourceNotFoundException,AppException {
+
         Optional<UserEntity> userSearch = userEntityRepository.findByUsername(username);
         if (userSearch.isEmpty()) throw new ResourceNotFoundException(NOT_FOUND);
         emailService.sendMail(userSearch.get().getEmail(), "Recuperar contraseña", emailRecoverPassword(username));
@@ -217,7 +219,7 @@ public class UserEntityServiceImpl implements com.msmeli.service.services.UserEn
      * @return Un Map<String, String> que contiene un mensaje indicando el éxito de la operación de reinicio de contraseña.
      * @throws ResourceNotFoundException Si no se encuentra al usuario con el nombre de usuario especificado.
      */
-    public Map<String, String> resetPassword(String username) throws ResourceNotFoundException {
+        public Map<String, String> resetPassword(String username) throws ResourceNotFoundException, AppException{
         Optional<UserEntity> userSearch = userEntityRepository.findByUsername(username);
         if (userSearch.isEmpty()) throw new ResourceNotFoundException("User not found");
         String newPassword = String.valueOf(UUID.randomUUID()).substring(0, 7);
