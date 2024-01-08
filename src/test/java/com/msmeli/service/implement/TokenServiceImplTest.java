@@ -54,6 +54,13 @@ public class TokenServiceImplTest {
         Mockito.verify(tokenRepository, Mockito.times(1)).save(ArgumentMatchers.any(Token.class));
     }
 
+    /**
+     * Prueba unitaria para el método updateToken en la clase TokenService.
+     *
+     * Esta prueba verifica el correcto funcionamiento del método updateToken en TokenService.
+     * Se asegura de que, al proporcionar un nuevo token de acceso, el token existente sea actualizado
+     * correctamente en el repositorio.
+     */
     @Test
     public void testUpdateToken() {
         // Arrange
@@ -69,34 +76,39 @@ public class TokenServiceImplTest {
         Mockito.verify(tokenRepository, Mockito.times(1)).save(token);
     }
 
+    /**
+     * Prueba unitaria para el método getRefreshToken en la clase TokenService.
+     *
+     * Esta prueba verifica el correcto funcionamiento del método getRefreshToken en TokenService.
+     * Se asegura de que, al proporcionar un nombre de usuario, se recupere el token de actualización
+     * correspondiente desde el repositorio y se devuelva correctamente.
+     */
     @Test
     public void testGetRefreshToken() {
-        // Arrange
         Token token = new Token();
         token.setRefresh_token("someRefreshToken");
         Mockito.when(tokenRepository.findByUsername("someUser")).thenReturn(token);
 
-        // Act
         String refreshToken = tokenService.getRefreshToken("someUser");
 
-        // Assert
         Assertions.assertEquals("someRefreshToken", refreshToken);
     }
 
+    /**
+     * Prueba unitaria para el método getRefreshToken en la clase TokenService.
+     *
+     * Esta prueba verifica el correcto funcionamiento del método getRefreshToken en TokenService.
+     * Se asegura de que, al proporcionar un nombre de usuario, se recupere el token de actualización
+     * correspondiente desde el repositorio y se devuelva correctamente.
+     */
     @Test
     public void testGetAccessToken() {
-        // Arrange
         Token token = new Token();
         token.setAccess_token("someAccessToken");
         Mockito.when(tokenRepository.findByUsername("someUser")).thenReturn(token);
 
-        // Act
         String accessToken = tokenService.getAccessToken("someUser");
 
-        // Assert
         Assertions.assertEquals("someAccessToken", accessToken);
     }
-
-    // Add more test cases as needed
-
 }

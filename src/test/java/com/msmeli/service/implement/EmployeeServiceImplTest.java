@@ -48,7 +48,6 @@ public class EmployeeServiceImplTest {
      */
     @Test
     void testUpdateEmployee() {
-        // Arrange
         Long employeeId = 1L;
         EmployeeUpdateRequestDTO requestDTO = new EmployeeUpdateRequestDTO();
         requestDTO.setUsername("newUsername");
@@ -70,10 +69,8 @@ public class EmployeeServiceImplTest {
         when(passwordEncoder.encode(requestDTO.getPassword())).thenReturn("encodedPassword");
         when(mapper.map(existingEmployee, UserResponseDTO.class)).thenReturn(new UserResponseDTO());
 
-        // Act
         assertDoesNotThrow(() -> employeeService.updateEmployee(employeeId, requestDTO));
 
-        // Assert
         verify(employeeRepository, times(1)).findById(employeeId);
         verify(userEntityRepository, times(1)).findByUsername(requestDTO.getUsername());
         verify(passwordEncoder, times(1)).encode(requestDTO.getPassword());
@@ -89,16 +86,13 @@ public class EmployeeServiceImplTest {
      */
     @Test
     void testDeleteEmployee() {
-        // Arrange
         Long employeeId = 1L;
         Employee employeeToDelete = new Employee();
 
         when(employeeRepository.findById(employeeId)).thenReturn(java.util.Optional.of(employeeToDelete));
 
-        // Act
         assertDoesNotThrow(() -> employeeService.deleteEmployee(employeeId));
 
-        // Assert
         verify(employeeRepository, times(1)).findById(employeeId);
         verify(employeeRepository, times(1)).delete(employeeToDelete);
     }

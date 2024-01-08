@@ -60,33 +60,43 @@ public class SellerServiceImplTest {
         MockitoAnnotations.openMocks(this);
     }
 
+    /**
+     * Prueba unitaria para el método getSeller en la clase SellerService.
+     *
+     * Esta prueba verifica el correcto funcionamiento del método getSeller en SellerService.
+     * Se asegura de que, al proporcionar un ID de vendedor, se recupere el vendedor correspondiente
+     * del repositorio y se devuelva correctamente.
+     */
     @Test
     public void testGetSeller() {
-        // Arrange
         int sellerId = 1;
         Seller expectedSeller = new Seller();
         Mockito.when(sellerRepository.findById(sellerId)).thenReturn(Optional.of(expectedSeller));
 
-        // Act
         Optional<Seller> result = sellerService.getSeller(sellerId);
 
-        // Assert
         Assertions.assertTrue(result.isPresent());
         Assertions.assertEquals(expectedSeller, result.get());
     }
 
+    /**
+     * Prueba unitaria para el método create en la clase SellerService.
+     *
+     * Esta prueba verifica el correcto funcionamiento del método create en SellerService.
+     * Se asegura de que se cree un nuevo vendedor a partir de un DTO, que el mapeo se realice
+     * correctamente usando Mockito, y que el vendedor creado sea guardado adecuadamente en el
+     * repositorio.
+     */
     @Test
     public void testCreate() {
-        // Arrange
         SellerRequestDTO sellerRequestDTO = new SellerRequestDTO();
         Seller expectedSeller = new Seller();
         Mockito.when(mapper.map(ArgumentMatchers.eq(sellerRequestDTO), ArgumentMatchers.eq(Seller.class))).thenReturn(expectedSeller);
         Mockito.when(sellerRepository.save(expectedSeller)).thenReturn(expectedSeller);
 
-        // Act
         Seller result = sellerService.create(sellerRequestDTO);
 
-        // Assert
+
         Assertions.assertNotNull(result);
         Assertions.assertEquals(expectedSeller, result);
         Mockito.verify(sellerRepository, Mockito.times(1)).save(expectedSeller);
@@ -94,46 +104,54 @@ public class SellerServiceImplTest {
 
     @Test
     public void testCreateSeller() throws ResourceNotFoundException, AlreadyExistsException {
-        // Arrange
         UserRegisterRequestDTO userRegisterRequestDTO = new UserRegisterRequestDTO();
         UserResponseDTO expectedResponse = new UserResponseDTO();
         Mockito.when(userEntityService.createSeller(userRegisterRequestDTO)).thenReturn(expectedResponse);
 
-        // Act
         UserResponseDTO result = sellerService.createSeller(userRegisterRequestDTO);
 
-        // Assert
         Assertions.assertNotNull(result);
         Assertions.assertEquals(expectedResponse, result);
         Mockito.verify(userEntityService, Mockito.times(1)).createSeller(userRegisterRequestDTO);
     }
 
+    /**
+     * Prueba unitaria para el método createEmployee en la clase SellerService.
+     *
+     * Esta prueba verifica el correcto funcionamiento del método createEmployee en SellerService.
+     * Se asegura de que, al proporcionar un DTO de registro de empleado, se invoque correctamente el
+     * servicio userEntityService para crear un nuevo empleado y se devuelva la respuesta esperada.
+     *
+     * @throws ResourceNotFoundException Si no se encuentra un recurso necesario.
+     * @throws AlreadyExistsException    Si el recurso ya existe y no se puede crear de nuevo.
+     */
     @Test
     public void testCreateEmployee() throws ResourceNotFoundException, AlreadyExistsException {
-        // Arrange
         EmployeeRegisterRequestDTO employeeRegisterDTO = new EmployeeRegisterRequestDTO();
         UserResponseDTO expectedResponse = new UserResponseDTO();
         Mockito.when(userEntityService.createEmployee(employeeRegisterDTO)).thenReturn(expectedResponse);
 
-        // Act
         UserResponseDTO result = sellerService.createEmployee(employeeRegisterDTO);
 
-        // Assert
         Assertions.assertNotNull(result);
         Assertions.assertEquals(expectedResponse, result);
         Mockito.verify(userEntityService, Mockito.times(1)).createEmployee(employeeRegisterDTO);
     }
 
+    /**
+     * Prueba unitaria para el método findAll en la clase SellerService.
+     *
+     * Esta prueba verifica el correcto funcionamiento del método findAll en SellerService.
+     * Se asegura de que, al llamar al repositorio para obtener todos los vendedores, se devuelva
+     * una lista que contiene el vendedor esperado.
+     */
     @Test
     public void testFindAll() {
-        // Arrange
         Seller expectedSeller = new Seller();
         Mockito.when(sellerRepository.findAll()).thenReturn(Collections.singletonList(expectedSeller));
 
-        // Act
         List<Seller> result = sellerService.findAll();
 
-        // Assert
         Assertions.assertNotNull(result);
         Assertions.assertEquals(1, result.size());
         Assertions.assertEquals(expectedSeller, result.get(0));
@@ -141,7 +159,6 @@ public class SellerServiceImplTest {
 
     @Test
     public void testSaveToken() {
-        // Arrange
         Long sellerId = 1L;
         String TG = "testToken";
         SellerRefactor seller = new SellerRefactor();
@@ -149,29 +166,21 @@ public class SellerServiceImplTest {
         TokenRequestDTO tokenRequestDTO = new TokenRequestDTO();
         Mockito.when(meliFeignClient.tokenForTG(tokenRequestDTO)).thenReturn(new TokenResposeDTO());
 
-        // Act
         TokenResposeDTO result = sellerService.saveToken(TG);
 
-        // Assert
         Assertions.assertNotNull(result);
-        // Añade más aserciones según tu lógica
     }
 
     @Test
     public void testRefreshToken() {
-        // Arrange
         Long sellerId = 1L;
         SellerRefactor seller = new SellerRefactor();
 
-        // Configura el comportamiento de sellerRefactorRepository
         Mockito.when(sellerRefactorRepository.findById(sellerId)).thenReturn(Optional.of(seller));
 
-        // Act
         TokenResposeDTO result = sellerService.refreshToken();
 
-        // Assert
         Assertions.assertNotNull(result);
-        // Añade más aserciones según tu lógica
     }
 
 
@@ -198,34 +207,32 @@ public class SellerServiceImplTest {
 
     @Test
     public void testGetEmployeesBySellerId() throws ResourceNotFoundException {
-        // Arrange
         Long sellerId = 1L;
         SellerRefactor seller = new SellerRefactor();
         Mockito.when(sellerRefactorRepository.findById(sellerId)).thenReturn(Optional.of(seller));
         List<Employee> employeeList = Collections.singletonList(new Employee());
         Mockito.when(employeeRepository.findAll()).thenReturn(employeeList);
 
-        // Act
         List<EmployeesResponseDto> result = sellerService.getEmployeesBySellerId();
 
-        // Assert
         Assertions.assertNotNull(result);
     }
 
+    /**
+     * Prueba unitaria para el método getAllEmployees en la clase SellerService.
+     *
+     * Esta prueba verifica el correcto funcionamiento del método getAllEmployees en SellerService.
+     * Se asegura de que, al llamar al repositorio para obtener todos los empleados, se devuelva
+     * una lista que contiene al menos un empleado.
+     */
     @Test
     public void testGetAllEmployees() {
-        // Arrange
         List<Employee> allEmployees = Collections.singletonList(new Employee());
         Mockito.when(employeeRepository.findAll()).thenReturn(allEmployees);
 
-        // Act
         List<EmployeesResponseDto> result = sellerService.getAllEmployees();
 
-        // Assert
         Assertions.assertNotNull(result);
-        // Añade más aserciones según tu lógica
     }
-
-
 }
 

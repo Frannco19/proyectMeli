@@ -58,6 +58,14 @@ public class UserEntityServiceImpl implements com.msmeli.service.services.UserEn
         this.authManager = authManager;
     }
 
+    /**
+     * Metodo que crea un nuevo vendedor en el sistema.
+     *
+     * @param userRegisterRequestDTO Datos del usuario para registrar como vendedor.
+     * @return UserResponseDTO que representa la información del nuevo vendedor creado.
+     * @throws ResourceNotFoundException Si las contraseñas no coinciden.
+     * @throws AlreadyExistsException    Si el nombre de usuario ya existe.
+     */
     @Override
     public UserResponseDTO createSeller(UserRegisterRequestDTO userRegisterRequestDTO) throws ResourceNotFoundException, AlreadyExistsException ,AppException{
         if (!userRegisterRequestDTO.getPassword().equals(userRegisterRequestDTO.getRePassword()))
@@ -74,6 +82,14 @@ public class UserEntityServiceImpl implements com.msmeli.service.services.UserEn
         return mapper.map(newSeller, UserResponseDTO.class);
     }
 
+    /**
+     * este metodo crea un nuevo empleado en el sistema asociado a un vendedor existente.
+     *
+     * @param employeeRegisterDTO Datos del empleado para registrar.
+     * @return UserResponseDTO que representa la información del nuevo empleado creado.
+     * @throws AlreadyExistsException    Si el nombre de usuario ya existe.
+     * @throws ResourceNotFoundException Si las contraseñas ingresadas no coinciden o si no se encuentra el vendedor asociado.
+     */
     @Override
     public UserResponseDTO createEmployee(EmployeeRegisterRequestDTO employeeRegisterDTO) throws AlreadyExistsException, ResourceNotFoundException {
 
@@ -98,13 +114,24 @@ public class UserEntityServiceImpl implements com.msmeli.service.services.UserEn
         return mapper.map(newEmployee,UserResponseDTO.class);
     }
 
-
-
+    /**
+     * Obtiene la información de un usuario por su ID.
+     *
+     * @param id El ID del usuario a recuperar.
+     * @return UserResponseDTO que representa la información del usuario.
+     * @throws ResourceNotFoundException Si no se encuentra un usuario con el ID proporcionado.
+     */
     @Override
     public UserResponseDTO read(Long id) throws ResourceNotFoundException {
         return userEntityRepository.findById(id).map(user -> mapper.map(user, UserResponseDTO.class)).orElseThrow(() -> new ResourceNotFoundException(NOT_FOUND));
     }
 
+    /**
+     * Obtiene la lista de todos los usuarios registrados en el sistema.
+     *
+     * @return Lista de UserResponseDTO que representa la información de todos los usuarios.
+     * @throws ResourceNotFoundException Si no hay usuarios en la base de datos.
+     */
     @Override
     public List<UserResponseDTO> readAll() throws ResourceNotFoundException {
         List<UserEntity> usersSearch = userEntityRepository.findAll();
@@ -112,7 +139,13 @@ public class UserEntityServiceImpl implements com.msmeli.service.services.UserEn
         return usersSearch.stream().map(userEntity -> mapper.map(userEntity, UserResponseDTO.class)).toList();
     }
 
-
+    /**
+     * Actualiza la información de un usuario en el sistema.
+     *
+     * @param userEntity La entidad de usuario con la información actualizada.
+     * @return La entidad de usuario actualizada.
+     * @throws ResourceNotFoundException Si no se encuentra un usuario con el ID proporcionado.
+     */
     @Override
     public UserEntity update(UserEntity userEntity) throws ResourceNotFoundException {
         Optional<UserEntity> userSearch = userEntityRepository.findById(userEntity.getId());
@@ -120,6 +153,12 @@ public class UserEntityServiceImpl implements com.msmeli.service.services.UserEn
         return userEntityRepository.save(userEntity);
     }
 
+    /**
+     * Elimina un usuario del sistema por su ID.
+     *
+     * @param id El ID del usuario a eliminar.
+     * @throws ResourceNotFoundException Si no se encuentra un usuario con el ID proporcionado.
+     */
     @Override
     public void delete(Long id) throws ResourceNotFoundException {
         Optional<UserEntity> userSearch = userEntityRepository.findById(id);
@@ -127,8 +166,13 @@ public class UserEntityServiceImpl implements com.msmeli.service.services.UserEn
         userEntityRepository.deleteById(id);
     }
 
-
-
+    /**
+     * Modifica los roles de un usuario en el sistema.
+     *
+     * @param userId El ID del usuario cuyos roles se van a modificar.
+     * @return UserResponseDTO que representa la información del usuario después de la modificación.
+     * @throws ResourceNotFoundException Si no se encuentra un usuario con el ID proporcionado.
+     */
     @Override
     public UserResponseDTO modifyUserRoles(Long userId) throws ResourceNotFoundException {
         UserEntity userEntity = userEntityRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException(NOT_FOUND));
@@ -138,6 +182,13 @@ public class UserEntityServiceImpl implements com.msmeli.service.services.UserEn
         return mapper.map(userEntityRepository.save(userEntity), UserResponseDTO.class);
     }
 
+    /**
+     * Busca un usuario por su nombre de usuario.
+     *
+     * @param username El nombre de usuario del usuario a buscar.
+     * @return UserAuthResponseDTO que representa la información del usuario encontrado.
+     * @throws ResourceNotFoundException Si no se encuentra un usuario con el nombre de usuario proporcionado.
+     */
     @Override
     public UserAuthResponseDTO findByUsername(String username) throws ResourceNotFoundException {
         Optional<UserEntity> userSearch = userEntityRepository.findByUsername(username);
@@ -145,14 +196,30 @@ public class UserEntityServiceImpl implements com.msmeli.service.services.UserEn
         return mapper.map(userSearch, UserAuthResponseDTO.class);
     }
 
+
+    /**
+     * Inicia el proceso de recuperación de contraseña para un usuario.
+     *
+     * @param username El nombre de usuario del usuario para el cual se recuperará la contraseña.
+     * @return Un mapa con un mensaje indicando que el correo electrónico de recuperación de contraseña se ha enviado correctamente.
+     * @throws ResourceNotFoundException Si no se encuentra un usuario con el nombre de usuario proporcionado.
+     */
     public Map<String, String> recoverPassword(String username) throws ResourceNotFoundException,AppException {
+
         Optional<UserEntity> userSearch = userEntityRepository.findByUsername(username);
         if (userSearch.isEmpty()) throw new ResourceNotFoundException(NOT_FOUND);
         emailService.sendMail(userSearch.get().getEmail(), "Recuperar contraseña", emailRecoverPassword(username));
         return Map.of("message", "Correo electrónico de recuperación de contraseña enviado correctamente a " + username);
     }
 
-    public Map<String, String> resetPassword(String username) throws ResourceNotFoundException, AppException{
+    /**
+     * Reinicia la contraseña para un usuario identificado por el nombre de usuario proporcionado.
+     *
+     * @param username El nombre de usuario del usuario cuya contraseña debe reiniciarse.
+     * @return Un Map<String, String> que contiene un mensaje indicando el éxito de la operación de reinicio de contraseña.
+     * @throws ResourceNotFoundException Si no se encuentra al usuario con el nombre de usuario especificado.
+     */
+        public Map<String, String> resetPassword(String username) throws ResourceNotFoundException, AppException{
         Optional<UserEntity> userSearch = userEntityRepository.findByUsername(username);
         if (userSearch.isEmpty()) throw new ResourceNotFoundException("User not found");
         String newPassword = String.valueOf(UUID.randomUUID()).substring(0, 7);
@@ -162,6 +229,15 @@ public class UserEntityServiceImpl implements com.msmeli.service.services.UserEn
         return Map.of("message", "Correo electrónico para restablecer la contraseña enviado correctamente a" + username);
     }
 
+    /**
+     * Actualiza la contraseña de un usuario.
+     *
+     * @param updatePassRequestDTO Objeto que contiene la información necesaria para la actualización de la contraseña.
+     * @param username             El nombre de usuario del usuario cuya contraseña se va a actualizar.
+     * @return Un Map<String, String> que contiene un mensaje indicando el éxito de la actualización de la contraseña.
+     * @throws ResourceNotFoundException Si el usuario con el nombre de usuario especificado no se encuentra, las nuevas contraseñas no coinciden
+     *                                   o la contraseña actual proporcionada no es correcta.
+     */
     @Override
     public Map<String, String> updatePassword(UpdatePassRequestDTO updatePassRequestDTO, String username) throws ResourceNotFoundException {
         Optional<UserEntity> userSearch = userEntityRepository.findByUsername(username);
@@ -176,11 +252,28 @@ public class UserEntityServiceImpl implements com.msmeli.service.services.UserEn
         return Map.of("message", "Contraseña actualizada correctamente.");
     }
 
+    /**
+     * ESTE METODO SE VA A ELIMINAR
+     * Renueva el token de autenticación del usuario utilizando un token de refresco.
+     *
+     * @param refreshTokenRequestDTO Objeto que contiene el token de refresco necesario para renovar el token de autenticación.
+     * @return Un objeto UserAuthResponseDTO que contiene la información actualizada de autenticación del usuario.
+     * @throws ResourceNotFoundException Si el token de refresco no se encuentra en la base de datos.
+     */
     @Override
     public UserAuthResponseDTO userRefreshToken(UserRefreshTokenRequestDTO refreshTokenRequestDTO) throws ResourceNotFoundException {
         return refreshTokenService.findByToken(refreshTokenRequestDTO.getRefreshToken()).map(UserEntityRefreshToken::getUserEntity).map(userEntity -> new UserAuthResponseDTO(userEntity.getId(), userEntity.getUsername(), userEntity.getEmail(), jwtService.generateToken(userEntity.getUsername(),userEntity.getId()), refreshTokenRequestDTO.getRefreshToken(),userEntity.getRoles())).orElseThrow(() -> new ResourceNotFoundException("El token de refresco no se encuentra en la base de datos."));
     }
 
+    /**
+     * Autentica al usuario utilizando el nombre de usuario y la contraseña proporcionados, y genera un nuevo token de autenticación.
+     *
+     * @param username El nombre de usuario del usuario que se está autenticando.
+     * @param pass     La contraseña del usuario que se está autenticando.
+     * @return Un objeto UserAuthResponseDTO que contiene la información de autenticación actualizada del usuario, incluido el nuevo token de autenticación.
+     * @throws ResourceNotFoundException Si no se encuentra al usuario con el nombre de usuario proporcionado.
+     * @throws AppException              Si hay un error en la autenticación, se lanza una excepción de aplicación con detalles específicos del error.
+     */
     @Override
     public UserAuthResponseDTO userAuthenticateAndGetToken(String username,String pass) throws ResourceNotFoundException, AppException {
         try{
@@ -191,9 +284,6 @@ public class UserEntityServiceImpl implements com.msmeli.service.services.UserEn
         }catch (Exception e){
             throw new AppException(e.getMessage(),"Error en la autenticacion",403,403);
         }
-
-
-
     }
 
     /**
@@ -217,17 +307,34 @@ public class UserEntityServiceImpl implements com.msmeli.service.services.UserEn
         return null;
     }
 
+    /**
+     * Genera el cuerpo del correo electrónico de bienvenida.
+     *
+     * @param username El nombre de usuario al que se le da la bienvenida.
+     * @return El cuerpo del correo electrónico de bienvenida como una cadena de texto.
+     */
     private String emailWelcomeBody(String username) {
         return "Hola " + username + ",\n \n" + "Para iniciar sesión click aqui : https://ml.gylgroup.com/auth/login/" + "\n \n" + "Saludos, equipo de la 3ra Aceleracion.";
     }
 
+    /**
+     * Genera el cuerpo del correo electrónico para recuperar la contraseña.
+     *
+     * @param username El nombre de usuario para el cual se está recuperando la contraseña.
+     * @return El cuerpo del correo electrónico de recuperación de contraseña como una cadena de texto.
+     */
     private String emailRecoverPassword(String username) {
         return "Hola " + username + ",\n \n" + "Para continuar con el restablecimiento de su contraseña haga click aquí: https://ml.gylgroup.com/recover-password/" + username + "\n \n" + "Si no has solicitado el restablecimiento descarta este correo. " + "\n \n" + "Saludos, equipo de la 3ra Aceleracion.";
     }
 
+    /**
+     * Genera el cuerpo del correo electrónico para notificar un restablecimiento exitoso de la contraseña.
+     *
+     * @param username    El nombre de usuario para el cual se restableció la contraseña.
+     * @param newPassword La nueva contraseña generada y asignada al usuario.
+     * @return El cuerpo del correo electrónico de restablecimiento de contraseña exitoso como una cadena de texto.
+     */
     private String emailResetPassword(String username, String newPassword) {
         return "Hola " + username + ",\n \n" + "Restablecimiento de contraseña exitoso." + "\n \n" + "Tu nueva contraseña es :  " + newPassword + "\n \n" + "Saludos, equipo de la 3ra Aceleracion.";
     }
-
-
 }

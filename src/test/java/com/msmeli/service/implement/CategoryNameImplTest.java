@@ -31,22 +31,17 @@ class CategoryNameImplTest {
      */
     @Test
     void testFindAll() {
-        // Crear nombres de categoría simulados para la prueba
         List<CategoryName> mockCategoryNames = Arrays.asList(
                 new CategoryName("1L", "Categoría1"),
                 new CategoryName("2L", "Categoría2")
         );
 
-        // Inicializar objetos simulados (mock)
         MockitoAnnotations.initMocks(this);
 
-        // Simular el comportamiento del método categoryNameRepository.findAll()
         when(categoryNameRepository.findAll()).thenReturn(mockCategoryNames);
 
-        // Llamar al método findAll en CategoryNameService
         List<CategoryName> result = categoryNameService.findAll();
 
-        // Verificar que el resultado coincida con los nombres de categoría simulados esperados
         assertEquals(mockCategoryNames, result);
     }
 
