@@ -59,7 +59,7 @@ public class UserEntityServiceImpl implements com.msmeli.service.services.UserEn
     }
 
     @Override
-    public UserResponseDTO createSeller(UserRegisterRequestDTO userRegisterRequestDTO) throws ResourceNotFoundException, AlreadyExistsException {
+    public UserResponseDTO createSeller(UserRegisterRequestDTO userRegisterRequestDTO) throws ResourceNotFoundException, AlreadyExistsException ,AppException{
         if (!userRegisterRequestDTO.getPassword().equals(userRegisterRequestDTO.getRePassword()))
             throw new ResourceNotFoundException("Las contraseñas ingresadas no coinciden.");
         if (userEntityRepository.findByUsername(userRegisterRequestDTO.getUsername()).isPresent())
@@ -145,14 +145,14 @@ public class UserEntityServiceImpl implements com.msmeli.service.services.UserEn
         return mapper.map(userSearch, UserAuthResponseDTO.class);
     }
 
-    public Map<String, String> recoverPassword(String username) throws ResourceNotFoundException {
+    public Map<String, String> recoverPassword(String username) throws ResourceNotFoundException,AppException {
         Optional<UserEntity> userSearch = userEntityRepository.findByUsername(username);
         if (userSearch.isEmpty()) throw new ResourceNotFoundException(NOT_FOUND);
         emailService.sendMail(userSearch.get().getEmail(), "Recuperar contraseña", emailRecoverPassword(username));
         return Map.of("message", "Correo electrónico de recuperación de contraseña enviado correctamente a " + username);
     }
 
-    public Map<String, String> resetPassword(String username) throws ResourceNotFoundException {
+    public Map<String, String> resetPassword(String username) throws ResourceNotFoundException, AppException{
         Optional<UserEntity> userSearch = userEntityRepository.findByUsername(username);
         if (userSearch.isEmpty()) throw new ResourceNotFoundException("User not found");
         String newPassword = String.valueOf(UUID.randomUUID()).substring(0, 7);

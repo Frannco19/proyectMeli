@@ -7,6 +7,7 @@ import com.msmeli.dto.response.EmployeesResponseDto;
 import com.msmeli.dto.response.TokenResposeDTO;
 import com.msmeli.dto.response.UserResponseDTO;
 import com.msmeli.exception.AlreadyExistsException;
+import com.msmeli.exception.AppException;
 import com.msmeli.exception.ResourceNotFoundException;
 import com.msmeli.model.Seller;
 import com.msmeli.model.SellerRefactor;
@@ -20,7 +21,7 @@ public interface SellerService {
 
     Seller create(SellerRequestDTO sellerRequestDTO);
 
-    UserResponseDTO createSeller(UserRegisterRequestDTO userRegisterRequestDTO) throws ResourceNotFoundException, AlreadyExistsException;
+    UserResponseDTO createSeller(UserRegisterRequestDTO userRegisterRequestDTO) throws ResourceNotFoundException, AlreadyExistsException, AppException;
 
     UserResponseDTO createEmployee(EmployeeRegisterRequestDTO EmployeeRegister) throws ResourceNotFoundException, AlreadyExistsException;
     Seller findById(Integer id) throws ResourceNotFoundException;

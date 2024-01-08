@@ -9,6 +9,7 @@ import com.msmeli.dto.response.EmployeesResponseDto;
 import com.msmeli.dto.response.TokenResposeDTO;
 import com.msmeli.dto.response.UserResponseDTO;
 import com.msmeli.exception.AlreadyExistsException;
+import com.msmeli.exception.AppException;
 import com.msmeli.exception.ResourceNotFoundException;
 import com.msmeli.feignClient.MeliFeignClient;
 import com.msmeli.model.Employee;
@@ -105,7 +106,7 @@ public class SellerServiceImpl implements SellerService {
      *                                se lanza una excepción AlreadyExistsException con un mensaje explicativo.
      */
     @Override
-    public UserResponseDTO createSeller(UserRegisterRequestDTO userRegisterRequestDTO) throws ResourceNotFoundException, AlreadyExistsException {
+    public UserResponseDTO createSeller(UserRegisterRequestDTO userRegisterRequestDTO) throws ResourceNotFoundException, AlreadyExistsException, AppException {
         //Seller seller = sellerRepository.findById(userRegisterRequestDTO.getSeller_id()).orElseThrow(() -> new ResourceNotFoundException(NOT_FOUND));
         SellerRefactor seller = new SellerRefactor();
         return userEntityService.createSeller(userRegisterRequestDTO);
