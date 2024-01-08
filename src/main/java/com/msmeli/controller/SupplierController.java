@@ -6,6 +6,7 @@ import com.msmeli.dto.request.SupplierResquestDTO;
 import com.msmeli.dto.response.SupplierStockResponseDTO;
 import com.msmeli.exception.AppException;
 import com.msmeli.exception.ResourceNotFoundException;
+import com.msmeli.model.Supplier;
 import com.msmeli.model.SuppliersSellers;
 import com.msmeli.service.services.SupplierService;
 import com.msmeli.service.services.SuppliersSellersService;
@@ -58,4 +59,8 @@ public class SupplierController {
         supplierService.createSupplier(supplierResquestDTO);
         return ResponseEntity.status(HttpStatus.OK).body("Proveedor Creado");
     }
+    @GetMapping("listSupplier")
+        public ResponseEntity<List<Supplier>> listSupplier() throws AppException {
+            return ResponseEntity.status(HttpStatus.OK).body(supplierService.listSupplier());
+        }
 }

@@ -14,4 +14,5 @@ public interface SupplierService {
 
     Supplier findById(Integer id) throws ResourceNotFoundException;
     void createSupplier(SupplierResquestDTO supplierResquestDTO) throws AppException;
+    List<Supplier>listSupplier() throws AppException;
 }

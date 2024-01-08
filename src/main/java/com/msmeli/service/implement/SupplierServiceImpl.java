@@ -49,6 +49,18 @@ public class SupplierServiceImpl implements SupplierService {
     }
 
     /**
+     * Este metodo devuelve todas la entidades Supplier
+     * @return lista de Entidad Supplier
+     * @throws AppException
+     */
+    @Override
+    public List<Supplier> listSupplier() throws AppException {
+            List<Supplier>listSupplier = supplierRepository.findAll();
+            if (listSupplier.isEmpty()) throw new AppException("No hay supplier en el sistema","listSupplier",000,500);
+            return listSupplier;
+    }
+
+    /**
      * Este metodo se encarga de devolver un True si no existe un Proveedor con el id enviado por parametro
      * @param id para Identificar la entidad en la base de datos
      * @return devuelve true si no se encontro ninguna entidad
