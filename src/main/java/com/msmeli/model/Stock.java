@@ -19,7 +19,7 @@ public class Stock {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    
+
     @ManyToOne
     @JoinColumn(name = "seller_id")
     private SellerRefactor seller_id;

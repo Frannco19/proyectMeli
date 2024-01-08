@@ -82,7 +82,6 @@ public interface MeliFeignClient {
     DescriptionProductDTO getProductDescription(@PathVariable String itemId);
 
     @GetMapping("/sites/MLA/categories")
-
     List<GeneralCategory> getGeneralCategory();
 
     @GetMapping("/highlights/MLA/category/{id}")
