@@ -9,6 +9,7 @@ import com.msmeli.dto.response.EmployeesResponseDto;
 import com.msmeli.dto.response.TokenResposeDTO;
 import com.msmeli.dto.response.UserResponseDTO;
 import com.msmeli.exception.AlreadyExistsException;
+import com.msmeli.exception.AppException;
 import com.msmeli.exception.ResourceNotFoundException;
 import com.msmeli.model.Employee;
 import com.msmeli.model.Supplier;
@@ -83,7 +84,8 @@ public class SellerController {
     }
 
     @PostMapping("addSuppplier")
-        public ResponseEntity<String> addSupplier(SupplierResquestDTO supplierResquestDTO){
-            return null;
+        public ResponseEntity<String> addSupplier(@RequestBody SupplierResquestDTO supplierResquestDTO) throws AppException, ResourceNotFoundException {
+        sellerService.addSupplier(supplierResquestDTO);
+        return ResponseEntity.status(HttpStatus.OK).body("Supplier Agregado a Seller");
         }
 }

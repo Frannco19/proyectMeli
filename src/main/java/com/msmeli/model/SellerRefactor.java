@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -25,7 +26,12 @@ public class SellerRefactor extends UserEntity {
             name = "Sellers_Suppliers",
             joinColumns = @JoinColumn(name = "seller_id"),
             inverseJoinColumns = @JoinColumn(name = "supplier_id"))
-    private List<Supplier> suppliers;
+    private Set<Supplier> suppliers;
+
+    public void addSupplier(Supplier supplier) {
+        suppliers.add(supplier);
+        supplier.getSellers().add(this);
+    }
 
 
 }

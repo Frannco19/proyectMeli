@@ -2,6 +2,7 @@ package com.msmeli.service.services;
 
 import com.msmeli.dto.request.EmployeeRegisterRequestDTO;
 import com.msmeli.dto.request.SellerRequestDTO;
+import com.msmeli.dto.request.SupplierResquestDTO;
 import com.msmeli.dto.request.UserRegisterRequestDTO;
 import com.msmeli.dto.response.EmployeesResponseDto;
 import com.msmeli.dto.response.TokenResposeDTO;
@@ -39,4 +40,5 @@ public interface SellerService {
     List<EmployeesResponseDto> getEmployeesBySellerId() throws ResourceNotFoundException;
 
     List<EmployeesResponseDto> getAllEmployees();
+    void addSupplier(SupplierResquestDTO supplierResquestDTO) throws ResourceNotFoundException, AppException;
 }

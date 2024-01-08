@@ -1,10 +1,7 @@
 package com.msmeli.service.implement;
 
 import com.msmeli.configuration.security.entity.UserEntityUserDetails;
-import com.msmeli.dto.request.EmployeeRegisterRequestDTO;
-import com.msmeli.dto.request.SellerRequestDTO;
-import com.msmeli.dto.request.TokenRequestDTO;
-import com.msmeli.dto.request.UserRegisterRequestDTO;
+import com.msmeli.dto.request.*;
 import com.msmeli.dto.response.EmployeesResponseDto;
 import com.msmeli.dto.response.TokenResposeDTO;
 import com.msmeli.dto.response.UserResponseDTO;
@@ -15,16 +12,19 @@ import com.msmeli.feignClient.MeliFeignClient;
 import com.msmeli.model.Employee;
 import com.msmeli.model.Seller;
 import com.msmeli.model.SellerRefactor;
+import com.msmeli.model.Supplier;
 import com.msmeli.repository.EmployeeRepository;
 import com.msmeli.repository.SellerRefactorRepository;
 import com.msmeli.repository.SellerRepository;
 import com.msmeli.service.services.SellerService;
+import com.msmeli.service.services.SupplierService;
 import com.msmeli.service.services.UserEntityService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -37,6 +37,7 @@ public class SellerServiceImpl implements SellerService {
     private final MeliFeignClient meliFeignClient;
     private final UserEntityService userEntityService;
     private final EmployeeRepository employeeRepository;
+    private final SupplierService supplierService;
 
     private ModelMapper mapper;
     private static final String NOT_FOUND = "Seller no encontrado.";
@@ -52,12 +53,13 @@ public class SellerServiceImpl implements SellerService {
     private String meliRedirectUri;
 
 
-    public SellerServiceImpl(SellerRepository sellerRepository, SellerRefactorRepository sellerRefactorRepository, MeliFeignClient meliFeignClient, UserEntityService userEntityService, EmployeeRepository employeeRepository, ModelMapper mapper) {
+    public SellerServiceImpl(SellerRepository sellerRepository, SellerRefactorRepository sellerRefactorRepository, MeliFeignClient meliFeignClient, UserEntityService userEntityService, EmployeeRepository employeeRepository, SupplierService supplierService, ModelMapper mapper) {
         this.sellerRepository = sellerRepository;
         this.sellerRefactorRepository = sellerRefactorRepository;
         this.meliFeignClient = meliFeignClient;
         this.userEntityService = userEntityService;
         this.employeeRepository = employeeRepository;
+        this.supplierService = supplierService;
         this.mapper = mapper;
     }
 
@@ -334,5 +336,25 @@ public class SellerServiceImpl implements SellerService {
                 .collect(Collectors.toList());
 
         return employeesListDTO;
+    }
+
+    /**
+     * Este metodo se encarga en establecer la relacion en tre el proveedor y el seller
+     * @param supplierResquestDTO datos del proveedor a relacionar con el seller
+     * @throws ResourceNotFoundException
+     * @throws AppException
+     */
+    @Override
+    @Transactional
+    public void addSupplier(SupplierResquestDTO supplierResquestDTO) throws ResourceNotFoundException, AppException {
+         try{
+             Long id = userEntityService.getAuthenticatedUserId();
+             SellerRefactor seller = findById(id);
+             Supplier supplier = supplierService.findById(supplierResquestDTO.getId());
+             seller.addSupplier(supplier);
+             sellerRefactorRepository.save(seller);
+         }catch (Exception ex){
+             throw new AppException("Error al agregar Suppliar a Seller","addSuplier",000,500);
+         }
     }
 }
