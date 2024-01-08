@@ -82,7 +82,6 @@ public class StockServiceImpl implements StockService {
         stockRepository.saveAll(stockList);
     }
 
-
     /**
      * Encuentra la última existencia por SKU.
      *
@@ -144,11 +143,22 @@ public class StockServiceImpl implements StockService {
         return stockList;
     }
 
+    /**
+     * Recupera y devuelve una lista de objetos StockDTO que representan el stock asociado al usuario autenticado.
+     *
+     * El método utiliza el servicio {@code userEntityService} para obtener el ID del usuario autenticado y
+     * luego busca los stocks asociados a ese ID utilizando el repositorio {@code stockRepository}.
+     *
+     * @return Una lista de objetos StockDTO que representan el stock del usuario autenticado.
+     */
+    public List<StockDTO> findAllByAuthenticatedUser() {
+        // Recupera el ID del usuario autenticado
+        Long authenticatedUserId = userEntityService.getAuthenticatedUserId();
 
-    public List<StockDTO> findAllByUserId(Long userId) {
-        List<Stock> stockList = stockRepository.findAllByUserId(userId);
+        // Busca el stock por el ID del usuario autenticado
+        List<Stock> stockList = stockRepository.findAllByUserId(authenticatedUserId);
 
-        // Ahora, crea instancias de StockDTO a partir de Stock
+        // Crea instancias de StockDTO a partir de Stock
         List<StockDTO> stockDTOList = stockList.stream()
                 .map(stock -> new StockDTO(
                         stock.getId(),
@@ -156,16 +166,12 @@ public class StockServiceImpl implements StockService {
                         stock.getAvailable_quantity(),
                         stock.getPrice(),
                         stock.getRegister_date(),
-                        // Aquí deberías crear una instancia de SupplierStockResponseDTO si es necesario
-                        null  // Por ahora, establezco null, ya que no proporcionaste cómo obtener SupplierStockResponseDTO
+
+                        null
                 ))
                 .collect(Collectors.toList());
 
         return stockDTOList;
     }
-
-
-
-
 
 }
