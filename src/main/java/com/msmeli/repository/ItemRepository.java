@@ -36,6 +36,9 @@ public interface ItemRepository extends JpaRepository<Item, String> {
     @Query("SELECT i FROM Item i WHERE i.sellerRefactor = :sellerId")
     List<Item> findAllBySellerRefactorId(Long sellerId);
 
+    @Query("SELECT i.id FROM Item i WHERE i.sellerRefactor.id = :sellerId")
+    List<String> findAllIdsBySellerRefactorId(Long sellerId);
+
     @Query("SELECT i FROM Item i WHERE i.sellerRefactor = :seller")
     Page<Item> findAllBySellerRefactorIdPage(SellerRefactor seller,Pageable pageable);
 }

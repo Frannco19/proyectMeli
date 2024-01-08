@@ -104,7 +104,15 @@ public class ItemServiceImpl implements ItemService {
     public void saveAllItemForSeller() throws ResourceNotFoundException {
         Long idSeller = userEntityService.getAuthenticatedUserId();
         SellerRefactor seller = sellerService.findById(idSeller);
+        List<String>DBitemsIDs = itemRepository.findAllIdsBySellerRefactorId(idSeller);
         List<String> idsItems = getItemId(seller);
+        if (!DBitemsIDs.isEmpty()){
+            List<String> ItemsToErase = new ArrayList<>(DBitemsIDs);
+            ItemsToErase.removeAll(idsItems);
+            for (String items : ItemsToErase) {
+                itemRepository.deleteById(items);
+            }
+        }
         setItemAtributtes(idsItems,seller);
     }
 
