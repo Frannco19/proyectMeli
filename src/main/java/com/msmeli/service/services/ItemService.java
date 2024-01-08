@@ -25,10 +25,10 @@ public interface ItemService {
 
     Page<ItemResponseDTO> searchProducts(String searchType, String searchInput, int offset, int pageSize, boolean isCatalogue, String isActive) throws ResourceNotFoundException, AppException;
 
-    void createProductsCosts();
+    void createProductsCosts() throws AppException;
 
     Page<ItemResponseDTO> getItemsAndCostPaged(Integer id, int offset, int pageSize) throws ResourceNotFoundException;
 
-    void saveAllItemForSeller() throws ResourceNotFoundException;
+    void saveAllItemForSeller() throws ResourceNotFoundException, AppException;
     List<Item>findAllidSeller(Long idSeller) throws AppException;
 }

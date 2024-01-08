@@ -82,9 +82,6 @@ public class ItemController {
     public BuyBoxWinnerResponseDTO getBuyBoxWinner(@PathVariable String product_catalog_id) throws JsonProcessingException, ResourceNotFoundException, AppException {
         return meliService.getBuyBoxWinner(product_catalog_id);
     }
-    @PostMapping("/cargarCosto")
-    public void cargarCosto(){
-        itemService.createProductsCosts();
-    }
+
 
 }
