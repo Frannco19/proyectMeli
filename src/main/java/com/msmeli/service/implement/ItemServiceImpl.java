@@ -132,7 +132,7 @@ public class ItemServiceImpl implements ItemService {
      * @param seller entidad con las credenciales necesarias para la consulta a la api de mercadolibre
      * @return idsItems ArrayList con los Ids de todos los items del seller
      */
-    List<String> getItemId(SellerRefactor seller) {
+   private List<String> getItemId(SellerRefactor seller) {
        int offset = 0;
        int limit = 100;
        ItemIdsResponseDTO resultado = null;
