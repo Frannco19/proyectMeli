@@ -1,15 +1,15 @@
 package com.msmeli.controller;
 
 import com.msmeli.dto.TopSoldDetailedProductDTO;
+import com.msmeli.exception.AppException;
 import com.msmeli.exception.ResourceNotFoundException;
+import com.msmeli.model.AllGeneralCategory;
 import com.msmeli.model.GeneralCategory;
+import com.msmeli.service.services.AllGeneralCategoryService;
 import com.msmeli.service.services.GeneralCategoryService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -21,9 +21,11 @@ import java.util.List;
 public class MetricsController {
 
     private final GeneralCategoryService categoryService;
+    private final AllGeneralCategoryService generalCategoryService;
 
-    public MetricsController(GeneralCategoryService categoryService) {
+    public MetricsController(GeneralCategoryService categoryService, AllGeneralCategoryService generalCategoryService) {
         this.categoryService = categoryService;
+        this.generalCategoryService = generalCategoryService;
     }
 
     @GetMapping("/listCategories")
@@ -34,5 +36,15 @@ public class MetricsController {
     @GetMapping("/topSold/{id}")
     public ResponseEntity<List<TopSoldDetailedProductDTO>> getTopProductsByCategory(@PathVariable String id) {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(categoryService.getTopProductsByCategory(id));
+    }
+
+    @PostMapping("save")
+    public void saveAllGeneralCategory()throws ResourceNotFoundException, AppException {
+        generalCategoryService.saveAllGeneralCategory();
+    }
+
+    @GetMapping("listAllCategory")
+    public List<AllGeneralCategory> getAllGeneralCategories()throws ResourceNotFoundException, AppException {
+        return generalCategoryService.findAll();
     }
 }

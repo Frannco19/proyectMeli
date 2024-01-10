@@ -14,6 +14,8 @@ import com.msmeli.service.services.UserEntityService;
 import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -151,15 +153,15 @@ public class StockServiceImpl implements StockService {
      *
      * @return Una lista de objetos StockDTO que representan el stock del usuario autenticado.
      */
-    public List<StockDTO> findAllByAuthenticatedUser() {
+    public Page<StockDTO> findAllByAuthenticatedUser(Pageable pageable) {
         // Recupera el ID del usuario autenticado
         Long authenticatedUserId = userEntityService.getAuthenticatedUserId();
 
         // Busca el stock por el ID del usuario autenticado
-        List<Stock> stockList = stockRepository.findAllByUserId(authenticatedUserId);
+        Page<Stock> stockPage = stockRepository.findAllByUserId(authenticatedUserId, pageable);
 
         // Crea instancias de StockDTO a partir de Stock
-        List<StockDTO> stockDTOList = stockList.stream()
+        List<StockDTO> stockDTOList = stockPage.getContent().stream()
                 .map(stock -> new StockDTO(
                         stock.getId(),
                         stock.getSku(),
@@ -171,7 +173,7 @@ public class StockServiceImpl implements StockService {
                 ))
                 .collect(Collectors.toList());
 
-        return stockDTOList;
+        return new PageImpl<>(stockDTOList, pageable, stockPage.getTotalElements());
     }
 
 }

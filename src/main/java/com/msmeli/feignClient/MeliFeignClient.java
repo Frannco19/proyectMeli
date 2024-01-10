@@ -4,13 +4,13 @@ import com.msmeli.configuration.feign.FeignClientConfiguration;
 import com.msmeli.dto.*;
 import com.msmeli.dto.feign.ItemFeignDTO;
 import com.msmeli.dto.feign.ItemIdsResponseDTO;
-import com.msmeli.dto.request.RefreshTokenRequestDTO;
 import com.msmeli.dto.request.TokenRequestDTO;
 import com.msmeli.dto.request.description.DescriptionCatalogDTO;
 import com.msmeli.dto.request.description.DescriptionProductDTO;
 import com.msmeli.dto.response.FeeResponseDTO;
 import com.msmeli.dto.response.OptionsDTO;
 import com.msmeli.dto.response.TokenResposeDTO;
+import com.msmeli.model.AllGeneralCategory;
 import com.msmeli.model.GeneralCategory;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
@@ -83,6 +83,9 @@ public interface MeliFeignClient {
 
     @GetMapping("/sites/MLA/categories")
     List<GeneralCategory> getGeneralCategory();
+
+    @GetMapping("sites/MLA/categories")
+    List<AllGeneralCategory> getAllGeneralCategory();
 
     @GetMapping("/highlights/MLA/category/{id}")
     TopSoldProductCategoryDTO getTopProductsByCategory(@PathVariable String id);

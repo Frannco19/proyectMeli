@@ -308,6 +308,10 @@ public class MeliService {
         return meliFeignClient.getGeneralCategory().stream().filter(category -> !categoriesNotIncluded.contains(category.getId())).toList();
     }
 
+    public List<AllGeneralCategory> findAllGeneralCategories(){
+        return meliFeignClient.getAllGeneralCategory();
+    }
+
     public TopSoldProductCategoryDTO getTopProductsByCategory(String id) {
         return meliFeignClient.getTopProductsByCategory(id);
     }
