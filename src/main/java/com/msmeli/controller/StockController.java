@@ -6,6 +6,9 @@ import com.msmeli.exception.ResourceNotFoundException;
 import com.msmeli.model.SellerRefactor;
 import com.msmeli.model.Stock;
 import com.msmeli.service.implement.StockServiceImpl;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +31,13 @@ public class StockController {
     }
 
     @GetMapping("/list")
-    public List<StockDTO>findAllByAuthenticatedUser(){return stockService.findAllByAuthenticatedUser();}
+    public ResponseEntity<Page<StockDTO>>findAllByAuthenticatedUser(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size){
 
+        Pageable pageable = PageRequest.of(page, size);
+        Page<StockDTO> stockPage = stockService.findAllByAuthenticatedUser(pageable);
+
+        return new ResponseEntity<>(stockPage, HttpStatus.OK);
+    }
 }

@@ -52,7 +52,7 @@ public class SellerController {
     }
 
     @PostMapping("/saveAllItemForSeller")
-    public void prueba() throws ResourceNotFoundException {
+    public void prueba() throws ResourceNotFoundException, AppException {
         itemService.saveAllItemForSeller();
 
     }
